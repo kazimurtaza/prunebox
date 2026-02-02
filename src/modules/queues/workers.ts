@@ -273,6 +273,14 @@ export function createBulkDeleteWorker() {
         const { batchDeleteMessages: deleteMessages } = await import('../gmail/client');
         await deleteMessages(accessToken, refreshToken, messageIds);
 
+        // Remove the subscription(s) from our database since all emails are gone
+        await db.subscription.deleteMany({
+          where: {
+            userId,
+            senderEmail,
+          },
+        });
+
         await db.bulkDeletionJob.update({
           where: { id: deleteJob.id },
           data: {

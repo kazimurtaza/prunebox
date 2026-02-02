@@ -6,7 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Trash2, Archive, Mail } from "lucide-react";
+import { Trash2, Archive, Mail, Trash, AlertTriangle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Subscription {
   id: string;
@@ -27,6 +37,12 @@ export function SubscriptionList({ userId }: SubscriptionListProps) {
   const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState<"all" | "unsubscribe" | "rollup" | "keep">("all");
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    open: boolean;
+    senderEmails: string[];
+    subscriptionIds?: string[];
+    count: number;
+  }>({ open: false, senderEmails: [], count: 0 });
 
   useEffect(() => {
     fetchSubscriptions();
@@ -85,6 +101,17 @@ export function SubscriptionList({ userId }: SubscriptionListProps) {
   const bulkAction = async (action: "unsubscribe" | "rollup" | "delete") => {
     if (selectedIds.size === 0) return;
 
+    if (action === "delete") {
+      const selectedSubs = subscriptions.filter((s) => selectedIds.has(s.id));
+      setDeleteConfirm({
+        open: true,
+        senderEmails: selectedSubs.map((s) => s.senderEmail),
+        subscriptionIds: Array.from(selectedIds),
+        count: selectedSubs.length,
+      });
+      return;
+    }
+
     try {
       const response = await fetch("/api/subscriptions/bulk", {
         method: "POST",
@@ -98,6 +125,37 @@ export function SubscriptionList({ userId }: SubscriptionListProps) {
       }
     } catch (error) {
       console.error("Failed to perform bulk action:", error);
+    }
+  };
+
+  const deleteFromSender = async (senderEmail: string, senderName: string) => {
+    setDeleteConfirm({
+      open: true,
+      senderEmails: [senderEmail],
+      count: 1,
+    });
+  };
+
+  const confirmDelete = async () => {
+    try {
+      const response = await fetch("/api/subscriptions/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "delete",
+          senderEmails: deleteConfirm.senderEmails,
+          subscriptionIds: deleteConfirm.subscriptionIds,
+        }),
+      });
+
+      if (response.ok) {
+        setDeleteConfirm({ open: false, senderEmails: [], count: 0 });
+        setSelectedIds(new Set());
+        // Refresh subscriptions after a delay to allow deletion to process
+        setTimeout(() => fetchSubscriptions(), 2000);
+      }
+    } catch (error) {
+      console.error("Failed to delete emails:", error);
     }
   };
 
@@ -155,7 +213,11 @@ export function SubscriptionList({ userId }: SubscriptionListProps) {
         {selectedIds.size > 0 && (
           <div className="flex gap-2 items-center">
             <span className="text-sm text-muted-foreground">{selectedIds.size} selected</span>
-            <Button size="sm" variant="destructive" onClick={() => bulkAction("unsubscribe")}>
+            <Button size="sm" variant="destructive" onClick={() => bulkAction("delete")}>
+              <Trash className="h-4 w-4 mr-1" />
+              Delete Emails
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => bulkAction("unsubscribe")}>
               <Trash2 className="h-4 w-4 mr-1" />
               Unsubscribe
             </Button>
@@ -226,7 +288,7 @@ export function SubscriptionList({ userId }: SubscriptionListProps) {
                       )}
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <Button
                         size="sm"
                         variant={subscription.action === "keep" ? "default" : "outline"}
@@ -248,6 +310,15 @@ export function SubscriptionList({ userId }: SubscriptionListProps) {
                       >
                         Unsubscribe
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => deleteFromSender(subscription.senderEmail, subscription.senderName)}
+                        title="Delete all emails from this sender"
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
@@ -256,6 +327,35 @@ export function SubscriptionList({ userId }: SubscriptionListProps) {
           )}
         </div>
       </ScrollArea>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteConfirm.open} onOpenChange={(open) => setDeleteConfirm({ ...deleteConfirm, open })}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-600" />
+              Delete All Emails?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete all emails from {deleteConfirm.count === 1
+                ? `"${deleteConfirm.senderEmails[0]}"`
+                : `${deleteConfirm.count} senders`
+              }.
+              <br /><br />
+              <strong className="text-red-600">This action cannot be undone.</strong>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete All Emails
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -46,16 +46,18 @@ export async function POST(request: Request) {
       },
     });
 
+    if (!session.accessToken) {
+      return NextResponse.json({ error: 'No Gmail access token' }, { status: 400 });
+    }
+
     // If unsubscribe action, queue the unsubscription job
     if (action === 'unsubscribe') {
-      // Note: In a real app, you'd need to get fresh access/refresh tokens
-      // from the database. For now, this is a placeholder.
-      // await queueUnsubscribe({
-      //   userId: session.user.id,
-      //   subscriptionId,
-      //   accessToken: session.accessToken,
-      //   refreshToken: session.refreshToken,
-      // });
+      await queueUnsubscribe({
+        userId: session.user.id,
+        subscriptionId,
+        accessToken: session.accessToken,
+        refreshToken: session.refreshToken || undefined,
+      });
     }
 
     return NextResponse.json({ success: true });

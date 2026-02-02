@@ -1,9 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ['googleapis']
-  }
+  serverExternalPackages: ['googleapis']
 };
 
 export default nextConfig;
