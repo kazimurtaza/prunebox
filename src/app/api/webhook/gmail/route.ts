@@ -1,15 +1,16 @@
 import { NextResponse } from 'next/server';
 import { queueEmailScan } from '@/modules/queues';
+import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
 
 // Gmail Push Notification webhook endpoint
 // This receives notifications when new emails arrive
 export async function POST(request: Request) {
-  try {
+  return withErrorHandling(async () => {
     const body = await request.json();
     const { message } = body;
 
     if (!message?.data) {
-      return NextResponse.json({ error: 'Invalid message' }, { status: 400 });
+      return ApiErrorResponse.badRequest('Invalid message format');
     }
 
     // Decode the base64 data
@@ -19,7 +20,7 @@ export async function POST(request: Request) {
     const { emailAddress, historyId } = data;
 
     if (!emailAddress || !historyId) {
-      return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
+      return ApiErrorResponse.badRequest('Invalid data: missing emailAddress or historyId');
     }
 
     // Find user by Gmail address
@@ -37,8 +38,5 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('Error processing Gmail webhook:', error);
-    return NextResponse.json({ error: 'Failed to process webhook' }, { status: 500 });
-  }
+  }, 'Failed to process Gmail webhook');
 }

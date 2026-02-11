@@ -1,15 +1,16 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/modules/auth/auth';
 import { db } from '@/lib/db';
+import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
 
 export async function GET() {
-  const session = await auth();
+  return withErrorHandling(async () => {
+    const session = await auth();
 
-  if (!session?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+    if (!session?.user) {
+      return ApiErrorResponse.unauthorized();
+    }
 
-  try {
     const subscriptions = await db.subscription.findMany({
       where: { userId: session.user.id },
       orderBy: { lastSeenAt: 'desc' },
@@ -33,8 +34,5 @@ export async function GET() {
     }));
 
     return NextResponse.json(result);
-  } catch (error) {
-    console.error('Error fetching subscriptions:', error);
-    return NextResponse.json({ error: 'Failed to fetch subscriptions' }, { status: 500 });
-  }
+  }, 'Failed to fetch subscriptions');
 }

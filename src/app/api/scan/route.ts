@@ -2,26 +2,27 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/modules/auth/auth';
 import { queueEmailScan } from '@/modules/queues';
 import { db } from '@/lib/db';
+import { ApiErrorResponse, withErrorHandling, ErrorType } from '@/lib/errors';
 
 export async function POST(request: Request) {
-  const session = await auth();
+  return withErrorHandling(async () => {
+    const session = await auth();
 
-  if (!session?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+    if (!session?.user) {
+      return ApiErrorResponse.unauthorized();
+    }
 
-  if (!session.accessToken) {
-    return NextResponse.json({ error: 'No Gmail access token' }, { status: 400 });
-  }
+    if (!session.accessToken) {
+      return ApiErrorResponse.badRequest('No Gmail access token');
+    }
 
-  try {
     // Check if already scanning
     const syncState = await db.gmailSyncState.findUnique({
       where: { userId: session.user.id },
     });
 
     if (syncState?.scanStatus === 'scanning') {
-      return NextResponse.json({ error: 'Scan already in progress' }, { status: 409 });
+      return ApiErrorResponse.conflict('Scan already in progress');
     }
 
     let forceFullScan = false;
@@ -41,8 +42,5 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ success: true, message: 'Scan started' });
-  } catch (error) {
-    console.error('Error starting scan:', error);
-    return NextResponse.json({ error: 'Failed to start scan' }, { status: 500 });
-  }
+  }, 'Failed to start scan');
 }

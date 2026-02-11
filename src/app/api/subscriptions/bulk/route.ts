@@ -2,22 +2,23 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/modules/auth/auth';
 import { db } from '@/lib/db';
 import { queueUnsubscribe, queueBulkDelete } from '@/modules/queues';
+import { ApiErrorResponse, withErrorHandling, requireFields } from '@/lib/errors';
 
 export async function POST(request: Request) {
-  const session = await auth();
+  return withErrorHandling(async () => {
+    const session = await auth();
 
-  if (!session?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+    if (!session?.user) {
+      return ApiErrorResponse.unauthorized();
+    }
 
-  if (!session.accessToken) {
-    return NextResponse.json({ error: 'No Gmail access token' }, { status: 400 });
-  }
+    if (!session.accessToken) {
+      return ApiErrorResponse.badRequest('No Gmail access token');
+    }
 
-  const accessToken = session.accessToken;
-  const refreshToken = session.refreshToken;
+    const accessToken = session.accessToken;
+    const refreshToken = session.refreshToken;
 
-  try {
     const body = await request.json();
     const { subscriptionIds, action, senderEmails } = body;
 
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
     }
 
     if (!Array.isArray(subscriptionIds) || !action) {
-      return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+      return ApiErrorResponse.badRequest('subscriptionIds (array) and action are required');
     }
 
     // Verify user owns all subscriptions
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
     });
 
     if (subscriptions.length !== subscriptionIds.length) {
-      return NextResponse.json({ error: 'Some subscriptions not found' }, { status: 404 });
+      return ApiErrorResponse.notFound('Some subscriptions');
     }
 
     // Handle delete action - queue bulk delete jobs
@@ -100,8 +101,5 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true, count: subscriptionIds.length });
-  } catch (error) {
-    console.error('Error performing bulk action:', error);
-    return NextResponse.json({ error: 'Failed to perform action' }, { status: 500 });
-  }
+  }, 'Failed to perform bulk action');
 }
