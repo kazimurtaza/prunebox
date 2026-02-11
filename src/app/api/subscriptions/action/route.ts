@@ -2,20 +2,22 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/modules/auth/auth';
 import { db } from '@/lib/db';
 import { queueUnsubscribe } from '@/modules/queues';
+import { ApiErrorResponse, withErrorHandling, requireFields } from '@/lib/errors';
 
 export async function POST(request: Request) {
-  const session = await auth();
+  return withErrorHandling(async () => {
+    const session = await auth();
 
-  if (!session?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+    if (!session?.user) {
+      return ApiErrorResponse.unauthorized();
+    }
 
-  try {
     const body = await request.json();
     const { subscriptionId, action } = body;
 
-    if (!subscriptionId || !action) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    const validation = requireFields(body, ['subscriptionId', 'action']);
+    if (!validation.valid) {
+      return ApiErrorResponse.missingFields(validation.missing);
     }
 
     // Get subscription to verify ownership
@@ -24,7 +26,7 @@ export async function POST(request: Request) {
     });
 
     if (!subscription || subscription.userId !== session.user.id) {
-      return NextResponse.json({ error: 'Subscription not found' }, { status: 404 });
+      return ApiErrorResponse.notFound('Subscription');
     }
 
     // Upsert preference
@@ -47,7 +49,7 @@ export async function POST(request: Request) {
     });
 
     if (!session.accessToken) {
-      return NextResponse.json({ error: 'No Gmail access token' }, { status: 400 });
+      return ApiErrorResponse.badRequest('No Gmail access token');
     }
 
     // If unsubscribe action, queue the unsubscription job
@@ -61,8 +63,5 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('Error updating subscription action:', error);
-    return NextResponse.json({ error: 'Failed to update action' }, { status: 500 });
-  }
+  }, 'Failed to update subscription action');
 }
