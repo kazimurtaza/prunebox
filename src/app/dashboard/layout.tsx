@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { signOut } from '@/modules/auth/auth';
 import Link from 'next/link';
+import { Providers } from '@/components/providers/session-provider';
 
 export default async function DashboardLayout({
   children,
@@ -65,7 +66,7 @@ export default async function DashboardLayout({
       </header>
 
       <main className="container mx-auto px-4 py-6">
-        {children}
+        <Providers>{children}</Providers>
       </main>
     </div>
   );
