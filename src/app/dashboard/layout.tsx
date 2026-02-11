@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { signOut } from '@/modules/auth/auth';
+import Link from 'next/link';
 
 export default async function DashboardLayout({
   children,
@@ -20,23 +21,23 @@ export default async function DashboardLayout({
       <header className="bg-white dark:bg-gray-800 border-b">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <a href="/" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <svg className="h-6 w-6 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                 <path d="M22 6l-10 7L2 6" />
               </svg>
               <span className="font-bold text-lg">Prunebox</span>
-            </a>
+            </Link>
             <nav className="hidden md:flex items-center gap-4">
-              <a href="/dashboard" className="text-sm font-medium text-green-600">
+              <Link href="/dashboard" className="text-sm font-medium text-green-600">
                 Subscriptions
-              </a>
-              <a href="/dashboard/rollup" className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100">
+              </Link>
+              <Link href="/dashboard/rollup" className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100">
                 Rollup
-              </a>
-              <a href="/dashboard/settings" className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100">
+              </Link>
+              <Link href="/dashboard/settings" className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100">
                 Settings
-              </a>
+              </Link>
             </nav>
           </div>
 
