@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { logger } from './logger';
 
 /**
  * Standard error response format
@@ -67,9 +68,9 @@ export function apiError(
 ): NextResponse<ApiError> {
   // Log error for debugging
   if (status >= 500) {
-    console.error(`[API Error] ${status} ${error}: ${message}`);
+    logger.error(`[API Error] ${status} ${error}: ${message}`);
   } else {
-    console.warn(`[API Error] ${status} ${error}: ${message}`);
+    logger.warn(`[API Error] ${status} ${error}: ${message}`);
   }
 
   return NextResponse.json(
@@ -147,7 +148,7 @@ export async function withErrorHandling<T = any>(
   try {
     return await handler();
   } catch (error) {
-    console.error('Unhandled error in API route:', error);
+    logger.error('Unhandled error in API route:', error);
 
     // Handle Prisma errors
     if (error && typeof error === 'object' && 'code' in error) {

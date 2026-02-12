@@ -3,6 +3,17 @@ import { auth } from '@/modules/auth/auth';
 import { db } from '@/lib/db';
 import { queueUnsubscribe } from '@/modules/queues';
 import { ApiErrorResponse, withErrorHandling, requireFields } from '@/lib/errors';
+import { z } from 'zod';
+
+// Validation schema for subscription action request
+const SubscriptionActionSchema = z.object({
+  subscriptionId: z.string().min(1, 'subscriptionId is required').cuid('Invalid subscription ID format'),
+  action: z.enum(['keep', 'unsubscribe', 'rollup'], {
+    errorMap: () => ({ message: 'action must be one of: keep, unsubscribe, rollup' }),
+  }),
+});
+
+type SubscriptionActionRequest = z.infer<typeof SubscriptionActionSchema>;
 
 export async function POST(request: Request) {
   return withErrorHandling(async () => {
@@ -12,13 +23,35 @@ export async function POST(request: Request) {
       return ApiErrorResponse.unauthorized();
     }
 
-    const body = await request.json();
-    const { subscriptionId, action } = body;
-
-    const validation = requireFields(body, ['subscriptionId', 'action']);
-    if (!validation.valid) {
-      return ApiErrorResponse.missingFields(validation.missing);
+    // Parse and validate request body
+    let body: SubscriptionActionRequest;
+    try {
+      body = await request.json();
+    } catch {
+      return ApiErrorResponse.badRequest('Invalid JSON in request body');
     }
+
+    // Validate against schema
+    const validationResult = SubscriptionActionSchema.safeParse(body);
+    if (!validationResult.success) {
+      const errors = validationResult.error.errors.map((e) => ({
+        field: e.path.join('.'),
+        message: e.message,
+      }));
+      return NextResponse.json(
+        {
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Invalid request data',
+            details: errors,
+            status: 400,
+          },
+        },
+        { status: 400 }
+      );
+    }
+
+    const { subscriptionId, action } = validationResult.data;
 
     // Get subscription to verify ownership
     const subscription = await db.subscription.findUnique({

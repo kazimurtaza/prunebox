@@ -3,6 +3,7 @@ import { auth } from '@/modules/auth/auth';
 import { queueEmailScan } from '@/modules/queues';
 import { db } from '@/lib/db';
 import { ApiErrorResponse, withErrorHandling, ErrorType } from '@/lib/errors';
+import { withRateLimit, RATE_LIMITS } from '@/lib/rate-limiter';
 
 export async function POST(request: Request) {
   return withErrorHandling(async () => {
@@ -10,6 +11,16 @@ export async function POST(request: Request) {
 
     if (!session?.user) {
       return ApiErrorResponse.unauthorized();
+    }
+
+    // Apply rate limiting - 1 scan per minute per user
+    const rateLimitResponse = await withRateLimit(
+      `scan:${session.user.id}`,
+      RATE_LIMITS.SCAN
+    );
+
+    if (rateLimitResponse) {
+      return rateLimitResponse;
     }
 
     if (!session.accessToken) {

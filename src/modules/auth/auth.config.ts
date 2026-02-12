@@ -1,5 +1,6 @@
 import type { NextAuthConfig } from 'next-auth';
 import Google from 'next-auth/providers/google';
+import { logger } from '@/lib/logger';
 
 export const authConfig: NextAuthConfig = {
   providers: [
@@ -26,7 +27,7 @@ export const authConfig: NextAuthConfig = {
   ],
   callbacks: {
     async jwt({ token, account, user }) {
-      console.log('JWT Callback', { hasUser: !!user, hasAccount: !!account });
+      logger.debug('JWT Callback', { hasUser: !!user, hasAccount: !!account });
       // Initial sign in - store the access token and refresh token
       if (user) {
         token.id = user.id;
@@ -41,7 +42,7 @@ export const authConfig: NextAuthConfig = {
       return token;
     },
     async session({ session, token }) {
-      console.log('Session Callback', { hasToken: !!token });
+      logger.debug('Session Callback', { hasToken: !!token });
       // Add the access token and refresh token to the session
       if (token && session.user) {
         session.accessToken = token.accessToken as string;

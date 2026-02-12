@@ -3,6 +3,7 @@ import { getConnection, QUEUE_NAMES } from './client';
 import { listMessages, getMessage, getMessageHeaders } from '../gmail/client';
 import { detectSubscription, parseSender } from '../gmail/detection';
 import { db } from '@/lib/db';
+import { logger } from '@/lib/logger';
 import Redis from 'ioredis';
 
 // Get Redis connection for workers
@@ -29,7 +30,7 @@ export function createEmailScanWorker() {
         forceFullScan?: boolean;
       };
 
-      console.log(`Starting email scan for user ${userId}`);
+      logger.info(`Starting email scan for user ${userId}`);
 
       // Update sync state
       await db.gmailSyncState.upsert({
@@ -51,10 +52,19 @@ export function createEmailScanWorker() {
           ? '-in:spam -in:trash' // Search everywhere except spam and trash
           : '-in:spam -in:trash newer_than:90d (unsubscribe OR "list-id" OR from:noreply OR from:newsletter OR from:marketing OR from:updates)';
 
-        const messageIds = await listMessages(accessToken, refreshToken, query, 5000);
+        // Limit the maximum messages to scan to prevent overwhelming the system
+        // Gmail API recommends processing in batches of 100-500 messages
+        // Read from env or use sensible defaults
+        const defaultMaxScan = parseInt(process.env.MAX_EMAIL_SCAN_LIMIT || '1000', 10);
+        const maxFullScan = parseInt(process.env.MAX_FULL_SCAN_LIMIT || '5000', 10);
+        const maxMessagesToScan = forceFullScan ? maxFullScan : defaultMaxScan;
+
+        logger.info(`Scanning up to ${maxMessagesToScan} messages for user ${userId}`);
+
+        const messageIds = await listMessages(accessToken, refreshToken, query, maxMessagesToScan);
         const totalMessages = messageIds.length;
 
-        console.log(`Found ${totalMessages} messages to scan for user ${userId}`);
+        logger.debug(`Found ${totalMessages} messages to scan for user ${userId}`);
 
         await db.gmailSyncState.update({
           where: { userId },
@@ -70,18 +80,18 @@ export function createEmailScanWorker() {
             const message = await getMessage(accessToken, refreshToken, messageId, 'full');
 
             if (!message) {
-              console.log(`Could not fetch message ${messageId}`);
+              logger.warn(`Could not fetch message ${messageId}`);
               continue;
             }
 
             const headers = getMessageHeaders(message);
             const detection = detectSubscription(headers);
 
-            console.log(`Processing message ${messageId}: isSubscription=${detection.isSubscription}, confidence=${detection.confidence}`);
+            logger.debug(`Processing message ${messageId}: isSubscription=${detection.isSubscription}, confidence=${detection.confidence}`);
 
             if (detection.isSubscription && detection.confidence >= 50) {
               const { email: senderEmail, name: senderName } = parseSender(headers['From'] || '');
-              console.log(`Found subscription: ${senderEmail} (${senderName})`);
+              logger.info(`Found subscription: ${senderEmail} (${senderName})`);
 
               // Upsert subscription
               await db.subscription.upsert({
@@ -130,10 +140,10 @@ export function createEmailScanWorker() {
           },
         });
 
-        console.log(`Completed email scan for user ${userId}`);
+        logger.info(`Completed email scan for user ${userId}`);
         return { success: true, subscriptionsFound: totalMessages };
       } catch (error) {
-        console.error(`Error in email scan for user ${userId}:`, error);
+        logger.error(`Error in email scan for user ${userId}:`, error);
 
         await db.gmailSyncState.update({
           where: { userId },
@@ -165,7 +175,7 @@ export function createUnsubscribeWorker() {
         refreshToken?: string;
       };
 
-      console.log(`Processing unsubscribe for subscription ${subscriptionId}`);
+      logger.info(`Processing unsubscribe for subscription ${subscriptionId}`);
 
       // Get subscription details
       const subscription = await db.subscription.findUnique({
@@ -244,7 +254,7 @@ export function createBulkDeleteWorker() {
         refreshToken?: string;
       };
 
-      console.log(`Starting bulk delete for ${senderEmail}`);
+      logger.info(`Starting bulk delete for ${senderEmail}`);
 
       // Create job record
       const deleteJob = await db.bulkDeletionJob.create({
@@ -290,7 +300,7 @@ export function createBulkDeleteWorker() {
           },
         });
 
-        console.log(`Deleted ${messageIds.length} messages from ${senderEmail}`);
+        logger.info(`Deleted ${messageIds.length} messages from ${senderEmail}`);
         return { success: true, deletedCount: messageIds.length };
       } catch (error) {
         await db.bulkDeletionJob.update({
@@ -322,7 +332,7 @@ export function createRollupWorker() {
         refreshToken?: string;
       };
 
-      console.log(`Generating rollup digest for user ${userId}`);
+      logger.info(`Generating rollup digest for user ${userId}`);
 
       try {
         // Get user's rollup settings
@@ -423,7 +433,7 @@ export function createRollupWorker() {
 
         return { success: true, digestSize: digestContent.length };
       } catch (error) {
-        console.error(`Error generating rollup for user ${userId}:`, error);
+        logger.error(`Error generating rollup for user ${userId}:`, error);
         throw error;
       }
     },

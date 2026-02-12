@@ -1,5 +1,6 @@
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
+import { logger } from '@/lib/logger';
 
 const GMAIL_SCOPES = [
   'https://www.googleapis.com/auth/gmail.readonly',
@@ -28,12 +29,19 @@ export interface GmailMessage {
 
 /**
  * Create an OAuth2 client with the user's access/refresh tokens
+ * @param userId - User ID for token persistence (optional, for worker contexts)
  */
-export function createOAuth2Client(accessToken: string, refreshToken?: string): OAuth2Client {
+export function createOAuth2Client(
+  accessToken: string,
+  refreshToken?: string,
+  userId?: string
+): OAuth2Client {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`
+    `${appUrl}/api/auth/callback`
   );
 
   oauth2Client.setCredentials({
@@ -41,14 +49,65 @@ export function createOAuth2Client(accessToken: string, refreshToken?: string): 
     refresh_token: refreshToken,
   });
 
-  // Set up token refresh
-  oauth2Client.on('tokens', (tokens) => {
-    if (tokens.refresh_token) {
-      // Store new refresh token if provided
-      console.log('New refresh token received');
+  // Set up token refresh with database persistence
+  oauth2Client.on('tokens', async (tokens) => {
+    if (!userId) {
+      // No userId provided, can't persist to database
+      logger.warn('Token refreshed but no userId provided - skipping database persistence');
+      if (tokens.refresh_token) {
+        logger.info('New refresh token received (not persisted)');
+      }
+      if (tokens.access_token) {
+        logger.debug('New access token received (not persisted)');
+      }
+      return;
     }
-    if (tokens.access_token) {
-      console.log('New access token received');
+
+    try {
+      // Import db dynamically to avoid circular dependencies in worker context
+      const { db } = await import('@/lib/db');
+
+      // Find the Google account for this user
+      const account = await db.account.findFirst({
+        where: {
+          userId,
+          provider: 'google',
+        },
+      });
+
+      if (!account) {
+        logger.warn(`No Google account found for userId ${userId} - cannot persist tokens`);
+        return;
+      }
+
+      // Prepare update data
+      const updateData: {
+        access_token?: string;
+        refresh_token?: string | null;
+        expires_at?: number;
+      } = {};
+
+      if (tokens.access_token) {
+        updateData.access_token = tokens.access_token;
+        // Calculate expires_at (1 hour from now for Google tokens)
+        updateData.expires_at = Math.floor(Date.now() / 1000) + 3600;
+        logger.info(`Persisting new access token for user ${userId}`);
+      }
+
+      if (tokens.refresh_token) {
+        updateData.refresh_token = tokens.refresh_token;
+        logger.info(`Persisting new refresh token for user ${userId}`);
+      }
+
+      // Update the account with new tokens
+      await db.account.update({
+        where: { id: account.id },
+        data: updateData,
+      });
+
+      logger.debug(`Successfully persisted tokens for user ${userId}`);
+    } catch (error) {
+      logger.error(`Failed to persist refreshed tokens for user ${userId}:`, error);
     }
   });
 
@@ -57,15 +116,20 @@ export function createOAuth2Client(accessToken: string, refreshToken?: string): 
 
 /**
  * Create a Gmail API client for a user
+ * @param userId - User ID for token persistence (optional, for worker contexts)
  */
-export async function createGmailClient(accessToken: string, refreshToken?: string) {
-  const oauth2Client = createOAuth2Client(accessToken, refreshToken);
+export async function createGmailClient(
+  accessToken: string,
+  refreshToken?: string,
+  userId?: string
+) {
+  const oauth2Client = createOAuth2Client(accessToken, refreshToken, userId);
 
   // Try to refresh if token is expired
   try {
     await oauth2Client.getAccessToken();
   } catch (error) {
-    console.error('Error refreshing access token:', error);
+    logger.error('Error refreshing access token:', error);
     throw new Error('Failed to refresh Gmail access token');
   }
 
@@ -73,31 +137,67 @@ export async function createGmailClient(accessToken: string, refreshToken?: stri
 }
 
 /**
- * List messages matching a query
+ * List messages matching a query with retry logic for rate limits
+ * @param accessToken - User's access token
+ * @param refreshToken - User's refresh token
+ * @param query - Gmail search query
+ * @param maxResults - Maximum total results to return (hard limit across all pages)
+ * @param userId - User ID for token persistence (optional)
+ * @returns Array of message IDs
  */
 export async function listMessages(
   accessToken: string,
   refreshToken: string | undefined,
   query: string,
-  maxResults = 2000
+  maxResults = 2000,
+  userId?: string
 ): Promise<string[]> {
-  const gmail = await createGmailClient(accessToken, refreshToken);
+  const gmail = await createGmailClient(accessToken, refreshToken, userId);
   const messageIds: string[] = [];
+  const perPageLimit = Math.min(maxResults, 500); // Gmail API max per page is 500
 
   let pageToken: string | undefined;
+  let retryCount = 0;
+  const maxRetries = 3;
+
   do {
-    const response = await gmail.users.messages.list({
-      userId: 'me',
-      q: query,
-      maxResults,
-      pageToken,
-    });
+    try {
+      const response = await gmail.users.messages.list({
+        userId: 'me',
+        q: query,
+        maxResults: perPageLimit,
+        pageToken,
+      });
 
-    if (response.data.messages) {
-      messageIds.push(...response.data.messages.map((m) => m.id!));
+      if (response.data.messages) {
+        const pageMessages = response.data.messages.map((m) => m.id!);
+        // Only add messages up to the maxResults limit
+        const remaining = maxResults - messageIds.length;
+        if (remaining <= 0) {
+          break; // We've reached the limit
+        }
+        messageIds.push(...pageMessages.slice(0, remaining));
+      }
+
+      // Stop if we've reached our limit
+      if (messageIds.length >= maxResults) {
+        break;
+      }
+
+      pageToken = response.data.nextPageToken || undefined;
+      retryCount = 0; // Reset retry count on success
+    } catch (error: any) {
+      // Handle rate limit errors (429) with exponential backoff
+      if (error?.code === 429 && retryCount < maxRetries) {
+        const delayMs = Math.pow(2, retryCount) * 1000 + Math.random() * 1000;
+        logger.warn(`Rate limit hit, retrying in ${delayMs}ms (attempt ${retryCount + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+        retryCount++;
+        continue; // Retry the same page
+      }
+      // If it's not a rate limit error or we've exhausted retries, throw
+      throw error;
     }
-
-    pageToken = response.data.nextPageToken || undefined;
   } while (pageToken);
 
   return messageIds;
@@ -122,7 +222,7 @@ export async function getMessage(
     });
     return response.data as GmailMessage;
   } catch (error) {
-    console.error(`Error fetching message ${messageId}:`, error);
+    logger.error(`Error fetching message ${messageId}:`, error);
     return null;
   }
 }

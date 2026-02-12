@@ -5,8 +5,9 @@ import {
     createBulkDeleteWorker,
     createRollupWorker
 } from './workers';
+import { logger } from '@/lib/logger';
 
-console.log('🚀 Starting Prunebox Workers...');
+logger.info('🚀 Starting Prunebox Workers...');
 
 try {
     const scanWorker = createEmailScanWorker();
@@ -14,11 +15,11 @@ try {
     const bulkWorker = createBulkDeleteWorker();
     const rollupWorker = createRollupWorker();
 
-    console.log('✅ All workers initialized and listening for jobs');
+    logger.info('✅ All workers initialized and listening for jobs');
 
     // Handle graceful shutdown
     const shutdown = async () => {
-        console.log('Shutting down workers...');
+        logger.info('Shutting down workers...');
         await Promise.all([
             scanWorker.close(),
             unsubWorker.close(),
@@ -31,6 +32,6 @@ try {
     process.on('SIGINT', shutdown);
     process.on('SIGTERM', shutdown);
 } catch (error) {
-    console.error('Failed to start workers:', error);
+    logger.error('Failed to start workers:', error);
     process.exit(1);
 }

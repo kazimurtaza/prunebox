@@ -3,6 +3,21 @@ import { auth } from '@/modules/auth/auth';
 import { db } from '@/lib/db';
 import { queueUnsubscribe, queueBulkDelete } from '@/modules/queues';
 import { ApiErrorResponse, withErrorHandling, requireFields } from '@/lib/errors';
+import { z } from 'zod';
+
+// Validation schema for bulk action request
+const BulkActionSchema = z.object({
+  subscriptionIds: z.array(z.string().cuid('Invalid subscription ID format')).optional(),
+  senderEmails: z.array(z.string().email('Invalid email format')).optional(),
+  action: z.enum(['delete', 'unsubscribe', 'rollup'], {
+    errorMap: () => ({ message: 'action must be one of: delete, unsubscribe, rollup' }),
+  }),
+}).refine(
+  (data) => data.subscriptionIds || data.senderEmails,
+  { message: 'Either subscriptionIds or senderEmails must be provided' }
+);
+
+type BulkActionRequest = z.infer<typeof BulkActionSchema>;
 
 export async function POST(request: Request) {
   return withErrorHandling(async () => {
@@ -19,11 +34,43 @@ export async function POST(request: Request) {
     const accessToken = session.accessToken;
     const refreshToken = session.refreshToken;
 
-    const body = await request.json();
-    const { subscriptionIds, action, senderEmails } = body;
+    // Parse and validate request body
+    let body: BulkActionRequest;
+    try {
+      body = await request.json();
+    } catch {
+      return ApiErrorResponse.badRequest('Invalid JSON in request body');
+    }
+
+    // Validate against schema
+    const validationResult = BulkActionSchema.safeParse(body);
+    if (!validationResult.success) {
+      const errors = validationResult.error.errors.map((e) => ({
+        field: e.path.join('.'),
+        message: e.message,
+      }));
+      return NextResponse.json(
+        {
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Invalid request data',
+            details: errors,
+            status: 400,
+          },
+        },
+        { status: 400 }
+      );
+    }
+
+    const { subscriptionIds, action, senderEmails } = validationResult.data;
 
     // Handle delete by sender emails (for non-subscription senders)
-    if (action === 'delete' && Array.isArray(senderEmails)) {
+    if (action === 'delete' && senderEmails && senderEmails.length > 0) {
+      // Validate email count limit
+      if (senderEmails.length > 100) {
+        return ApiErrorResponse.badRequest('Cannot delete more than 100 sender emails at once');
+      }
+
       const jobs = senderEmails.map((senderEmail: string) =>
         queueBulkDelete({
           userId: session.user.id,
@@ -36,8 +83,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, count: senderEmails.length });
     }
 
-    if (!Array.isArray(subscriptionIds) || !action) {
-      return ApiErrorResponse.badRequest('subscriptionIds (array) and action are required');
+    if (!subscriptionIds || subscriptionIds.length === 0) {
+      return ApiErrorResponse.badRequest('subscriptionIds array is required for this action');
+    }
+
+    // Validate subscription count limit
+    if (subscriptionIds.length > 100) {
+      return ApiErrorResponse.badRequest('Cannot process more than 100 subscriptions at once');
     }
 
     // Verify user owns all subscriptions
