@@ -1,3 +1,5 @@
+'use client';
+
 import Link from "next/link";
 
 export default function NotFound() {
@@ -22,6 +24,12 @@ export default function NotFound() {
           >
             Dashboard
           </Link>
+          <button
+            onClick={() => window.history.back()}
+            className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            Go back
+          </button>
         </div>
       </div>
     </div>
