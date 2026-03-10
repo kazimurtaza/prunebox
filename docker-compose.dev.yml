@@ -1,0 +1,41 @@
+services:
+  prunebox:
+    image: ghcr.io/kazimurtaza/prunebox:develop
+    container_name: prunebox-dev
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - DATABASE_URL=postgresql://prunebox:CHANGE_ME_POSTGRES_PASSWORD@localhost:5432/prunebox
+      - POSTGRES_PASSWORD=CHANGE_ME_POSTGRES_PASSWORD
+      - REDIS_URL=redis://localhost:6379
+      - NODE_ENV=production
+      - NEXTAUTH_URL=https://dev.prunebox.example.com
+      - NEXTAUTH_SECRET=CHANGE_ME_NEXTAUTH_SECRET
+      - GOOGLE_CLIENT_ID=CHANGE_ME_GOOGLE_CLIENT_ID.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=CHANGE_ME_GOOGLE_CLIENT_SECRET
+      - GOOGLE_OAUTH_SCOPES=gmail.readonly gmail.modify gmail.labels gmail.send
+      - ENCRYPTION_KEY=CHANGE_ME_32_CHAR_ENCRYPTION_KEY
+      - NEXT_PUBLIC_APP_URL=https://dev.prunebox.example.com
+      - NEXT_PUBLIC_APP_NAME=DevPrunebox
+      - GMAIL_WEBHOOK_SECRET=CHANGE_ME_WEBHOOK_SECRET
+      - ROLLUP_FROM_EMAIL=noreply@prunebox.local
+      - ROLLUP_FROM_NAME=Prunebox Digest
+      - MAX_FREE_UNSUBSCRIBES=10
+      - FREE_SCAN_LIMIT=1000
+      - MAX_EMAIL_SCAN_LIMIT=1000
+      - MAX_FULL_SCAN_LIMIT=50000
+    volumes:
+      - prunebox_dev_postgres:/var/lib/postgresql/data
+      - prunebox_dev_redis:/var/lib/redis
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+volumes:
+  prunebox_dev_postgres:
+
+  prunebox_dev_redis:

@@ -1,0 +1,16 @@
+node_modules
+.next
+.git
+.gitignore
+.env*.local
+README.md
+.vscode
+.idea
+*.log
+coverage
+.DS_Store
+*.md
+!package.json
+!package-lock.json
+*.test.ts
+*.spec.ts

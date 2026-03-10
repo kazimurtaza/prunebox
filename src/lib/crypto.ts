@@ -1,0 +1,90 @@
+import crypto from 'crypto';
+
+const ALGORITHM = 'aes-256-gcm';
+const IV_LENGTH = 16;
+const SALT_LENGTH = 64;
+const TAG_LENGTH = 16;
+const TAG_POSITION = SALT_LENGTH + IV_LENGTH;
+const ENCRYPTED_POSITION = TAG_POSITION + TAG_LENGTH;
+
+/**
+ * Encrypt sensitive data using AES-256-GCM
+ * @param plaintext - The data to encrypt
+ * @returns Base64 encoded string containing salt:iv:authTag:encrypted
+ */
+export function encrypt(plaintext: string): string {
+  if (!plaintext) return '';
+
+  const iv = crypto.randomBytes(IV_LENGTH);
+  const salt = crypto.randomBytes(SALT_LENGTH);
+  const key = crypto.pbkdf2Sync(
+    process.env.ENCRYPTION_KEY!,
+    salt,
+    100000,
+    32,
+    'sha256'
+  );
+
+  const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
+
+  let encrypted = cipher.update(plaintext, 'utf8', 'binary');
+  encrypted += cipher.final('binary');
+
+  const authTag = cipher.getAuthTag();
+
+  // Combine: salt + iv + authTag + encrypted
+  const combined = Buffer.concat([
+    salt,
+    iv,
+    authTag,
+    Buffer.from(encrypted, 'binary')
+  ]);
+
+  return combined.toString('base64');
+}
+
+/**
+ * Decrypt data that was encrypted using encrypt()
+ * @param ciphertext - Base64 encoded string from encrypt()
+ * @returns The original plaintext
+ * @throws Error if decryption fails or data is tampered with
+ */
+export function decrypt(ciphertext: string): string {
+  if (!ciphertext) return '';
+
+  const combined = Buffer.from(ciphertext, 'base64');
+
+  // Extract components
+  const salt = combined.subarray(0, SALT_LENGTH);
+  const iv = combined.subarray(SALT_LENGTH, TAG_POSITION);
+  const authTag = combined.subarray(TAG_POSITION, ENCRYPTED_POSITION);
+  const encrypted = combined.subarray(ENCRYPTED_POSITION);
+
+  // Derive key using the same salt
+  const key = crypto.pbkdf2Sync(
+    process.env.ENCRYPTION_KEY!,
+    salt,
+    100000,
+    32,
+    'sha256'
+  );
+
+  const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
+  decipher.setAuthTag(authTag);
+
+  let decrypted = decipher.update(encrypted, undefined, 'binary') as string;
+  decrypted += decipher.final('binary');
+
+  return decrypted;
+}
+
+/**
+ * Hash a token for comparison (one-way)
+ * Use this when you need to verify a token matches without decrypting
+ */
+export function hashToken(token: string): string {
+  return crypto
+    .createHash('sha256')
+    .update(token + process.env.ENCRYPTION_KEY!)
+    .digest('hex');
+}

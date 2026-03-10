@@ -1,0 +1,14 @@
+# Prunebox robots.txt
+# https://www.robotstxt.org/robotstxt.html
+
+User-agent: *
+Allow: /
+
+# Disallow API routes
+Disallow: /api/
+
+# Disallow authentication routes
+Disallow: /auth/
+
+# Sitemap
+Sitemap: https://prunebox.com/sitemap.xml

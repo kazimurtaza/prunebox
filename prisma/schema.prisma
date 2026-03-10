@@ -1,0 +1,158 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String                   @id @default(cuid())
+  email          String                   @unique
+  emailVerified  DateTime?
+  name           String?
+  image          String?
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+  accounts       Account[]
+  gmailSyncState GmailSyncState?
+  rollupSettings RollupSettings?
+  sessions       Session[]
+  subscriptions  Subscription[]
+  preferences    SubscriptionPreference[]
+
+  @@index([email])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Subscription {
+  id                    String                   @id @default(cuid())
+  userId                String
+  senderEmail           String                   @db.VarChar(320)
+  senderName            String?
+  listUnsubscribeHeader String?
+  unsubscribeMethod     String                   @db.VarChar(50)
+  unsubscribeUrl        String?
+  unsubscribeMailto     String?
+  messageCount          Int                      @default(1)
+  firstSeenAt           DateTime                 @default(now())
+  lastSeenAt            DateTime                 @default(now())
+  confidenceScore       Int                      @default(50)
+  recentSubject         String?
+  recentSnippet         String?
+  user                  User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  preferences           SubscriptionPreference[]
+
+  @@unique([userId, senderEmail])
+  @@index([userId, senderEmail])
+  @@index([userId, lastSeenAt])
+}
+
+model SubscriptionPreference {
+  id              String       @id @default(cuid())
+  userId          String
+  subscriptionId  String
+  action          String       @default("keep")
+  rollupFrequency String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  subscription    Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, subscriptionId])
+  @@index([userId])
+}
+
+model GmailSyncState {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  historyId       BigInt?
+  watchExpiration DateTime?
+  lastSyncAt      DateTime  @default(now())
+  scanStatus      String    @default("idle")
+  scanProgress    Int?
+  scanTotal       Int?
+  errorMessage    String?
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model RollupSettings {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  enabled      Boolean   @default(false)
+  deliveryTime String    @default("08:00")
+  timezone     String    @default("UTC")
+  digestName   String    @default("My Daily Rollup")
+  lastSentAt   DateTime?
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model UnsubscriptionAttempt {
+  id             String    @id @default(cuid())
+  userId         String
+  subscriptionId String
+  method         String
+  status         String
+  errorMessage   String?
+  attemptedAt    DateTime  @default(now())
+  completedAt    DateTime?
+
+  @@index([userId, subscriptionId])
+  @@index([status])
+}
+
+model BulkDeletionJob {
+  id              String    @id @default(cuid())
+  userId          String
+  senderEmail     String
+  status          String    @default("pending")
+  totalMessages   Int
+  deletedMessages Int       @default(0)
+  errorMessage    String?
+  createdAt       DateTime  @default(now())
+  completedAt     DateTime?
+
+  @@index([userId, status])
+}
