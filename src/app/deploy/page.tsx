@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Copy, Download, Docker, Server, Shield, Zap } from "lucide-react";
+import { Copy, Download, Package, Server, Shield, Zap } from "lucide-react";
 
 export default function DeployPage() {
   return (
@@ -36,7 +36,7 @@ export default function DeployPage() {
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                <Docker className="h-6 w-6 text-primary" />
+                <Package className="h-6 w-6 text-primary" />
               </div>
               <div>
                 <CardTitle>Option 1: Docker Compose (Recommended)</CardTitle>
@@ -209,7 +209,7 @@ export default function DeployPage() {
             </Card>
             <Card>
               <CardContent className="p-6 text-center">
-                <Docker className="h-8 w-8 text-primary mx-auto mb-2" />
+                <Package className="h-8 w-8 text-primary mx-auto mb-2" />
                 <h4 className="font-medium">Deployment</h4>
                 <p className="text-sm text-muted-foreground">Docker, BullMQ, Prisma</p>
               </CardContent>
