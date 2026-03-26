@@ -30,7 +30,8 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 100);
+    const parsedLimit = parseInt(searchParams.get('limit') || '50', 10);
+    const limit = Number.isNaN(parsedLimit) ? 50 : Math.min(parsedLimit, 100);
     const cursor = searchParams.get('cursor');
 
     // Build where clause with cursor

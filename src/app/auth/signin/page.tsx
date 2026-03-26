@@ -70,12 +70,9 @@ function SignInContent() {
         <div className="space-y-4">
           <Button
             onClick={async () => {
-              console.warn('SignIn button clicked');
               setIsLoading(true);
               try {
-                console.warn('Calling signIn...');
                 await signIn('google', { callbackUrl: '/dashboard' });
-                console.warn('SignIn completed');
               } catch (error) {
                 console.error('SignIn error:', error);
                 setIsLoading(false);

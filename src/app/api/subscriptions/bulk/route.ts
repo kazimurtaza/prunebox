@@ -72,20 +72,24 @@ export async function POST(request: Request) {
         return ApiErrorResponse.badRequest('Cannot delete more than 100 sender emails at once');
       }
 
-      logger.info(`BULK DELETE: Queuing ${senderEmails.length} delete jobs for user ${session.user.id}`, {
+      logger.info(`BULK DELETE: Starting ${senderEmails.length} deletes for user ${session.user.id}`, {
         senderEmails,
       });
 
-      await Promise.all(senderEmails.map((senderEmail: string) =>
+      // Fire-and-forget — don't block the HTTP response while deleting
+      Promise.all(senderEmails.map((senderEmail: string) =>
         runBulkDelete({
           userId: session.user.id,
           senderEmail,
           accessToken: tokens.accessToken!,
           refreshToken: tokens.refreshToken ?? undefined,
         })
-      ));
+      )).then(() => {
+        logger.info(`BULK DELETE: Completed all ${senderEmails.length} deletes`);
+      }).catch((err) => {
+        logger.error(`BULK DELETE: Error during delete`, err);
+      });
 
-      logger.info(`BULK DELETE: Completed all ${senderEmails.length} deletes`);
       return NextResponse.json({ success: true, count: senderEmails.length });
     }
 
@@ -110,16 +114,18 @@ export async function POST(request: Request) {
       return ApiErrorResponse.notFound('Some subscriptions');
     }
 
-    // Handle delete action - queue bulk delete jobs
+    // Handle delete action - fire-and-forget to avoid blocking the response
     if (action === 'delete') {
-      await Promise.all(subscriptions.map((sub) =>
+      Promise.all(subscriptions.map((sub) =>
         runBulkDelete({
           userId: session.user.id,
           senderEmail: sub.senderEmail,
           accessToken: tokens.accessToken!,
           refreshToken: tokens.refreshToken ?? undefined,
         })
-      ));
+      )).catch((err) => {
+        logger.error(`BULK DELETE: Error during subscription delete`, err);
+      });
 
       return NextResponse.json({ success: true, count: subscriptions.length });
     }
