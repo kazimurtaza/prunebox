@@ -37,6 +37,7 @@ export interface BulkDeleteJobData {
  */
 export async function runEmailScan(data: EmailScanJobData) {
   const { userId, accessToken, refreshToken, forceFullScan } = data;
+  const scanStart = Date.now();
 
   logger.info(`Starting email scan for user ${userId}`);
 
@@ -204,10 +205,13 @@ export async function runEmailScan(data: EmailScanJobData) {
         where: { userId },
         data: { scanProgress: i + batch.length },
       });
+
+      logger.debug(`Batch progress: ${Math.min(i + batch.length, totalMessages)}/${totalMessages} messages processed, ${senderMessageCounts.size} unique senders so far`);
     }
 
     // Batch update/create subscriptions — avoids N+1 individual writes
     const scannedEmails = new Set(senderMessageCounts.keys());
+    const dbStart = Date.now();
 
     // Fetch existing subscriptions for this user in a single query
     const existingSubs = await db.subscription.findMany({
@@ -215,6 +219,8 @@ export async function runEmailScan(data: EmailScanJobData) {
       select: { id: true, senderEmail: true },
     });
     const existingByEmail = new Map(existingSubs.map(s => [s.senderEmail, s.id]));
+
+    logger.info(`Message processing complete in ${Date.now() - scanStart}ms. ${scannedEmails.size} unique senders, ${existingSubs.length} existing subscriptions`);
 
     const newEntries: { userId: string; senderEmail: string; senderName: string; listUnsubscribeHeader: string | undefined; unsubscribeMethod: string; unsubscribeUrl: string | undefined; unsubscribeMailto: string | undefined; confidenceScore: number; messageCount: number; recentSubject: string | undefined; recentSnippet: string | undefined; firstSeenAt: Date; lastSeenAt: Date }[] = [];
     const updatePayloads: { id: string; listUnsubscribeHeader: string | undefined; unsubscribeMethod: string; unsubscribeUrl: string | undefined; unsubscribeMailto: string | undefined; confidenceScore: number; messageCount: number; recentSubject: string | undefined; recentSnippet: string | undefined; lastSeenAt: Date }[] = [];
@@ -288,6 +294,8 @@ export async function runEmailScan(data: EmailScanJobData) {
     }
 
     // Mark scan as complete
+    logger.info(`DB writes complete in ${Date.now() - dbStart}ms: ${newEntries.length} created, ${updatePayloads.length} updated, ${staleIds.length} stale`);
+
     await db.gmailSyncState.update({
       where: { userId },
       data: {
@@ -296,7 +304,8 @@ export async function runEmailScan(data: EmailScanJobData) {
       },
     });
 
-    logger.info(`Completed email scan for user ${userId}`);
+    const totalMs = Date.now() - scanStart;
+    logger.info(`Completed email scan for user ${userId} in ${totalMs}ms (${(totalMs/1000).toFixed(1)}s)`);
     return { success: true, subscriptionsFound: totalMessages };
   } catch (error) {
     logger.error(`Error in email scan for user ${userId}:`, error);

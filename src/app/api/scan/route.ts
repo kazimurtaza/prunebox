@@ -15,6 +15,8 @@ export async function POST(request: Request) {
       return ApiErrorResponse.unauthorized();
     }
 
+    logger.debug(`Scan request from user ${session.user.id}`);
+
     // Apply rate limiting - 1 scan per minute per user
     const rateLimitResponse = await withRateLimit(
       `scan:${session.user.id}`,
@@ -22,6 +24,7 @@ export async function POST(request: Request) {
     );
 
     if (rateLimitResponse) {
+      logger.debug(`Scan rate limited for user ${session.user.id}`);
       return rateLimitResponse;
     }
 
@@ -31,6 +34,7 @@ export async function POST(request: Request) {
     });
 
     if (syncState?.scanStatus === 'scanning') {
+      logger.debug(`Scan already in progress for user ${session.user.id}`);
       return ApiErrorResponse.conflict('Scan already in progress');
     }
 
@@ -55,6 +59,8 @@ export async function POST(request: Request) {
     if (!tokens || !tokens.accessToken) {
       return ApiErrorResponse.badRequest('No Gmail account found. Please reconnect your Google account.');
     }
+
+    logger.info(`Starting scan for user ${session.user.id}: firstScan=${isFirstScan}, forceFull=${forceFullScan}`);
 
     // Fire-and-forget the scan job (progress tracked via db.gmailSyncState)
     runEmailScan({
