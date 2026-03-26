@@ -189,30 +189,6 @@ export function parseSender(fromHeader: string): { email: string; name: string }
 }
 
 /**
- * Build Gmail search query for subscription detection
- */
-export function buildSubscriptionQuery(daysBack = 30): string {
-  return [
-    'in:inbox',
-    `newer_than:${daysBack}d`,
-    // Common list indicators
-    'list:"unsubscribe"', // This searches for the header
-    'OR',
-    'list:"list-id"',
-    'OR',
-    'from:noreply@',
-    'OR',
-    'from:newsletter@',
-    'OR',
-    'from:marketing@',
-    'OR',
-    'from:updates@',
-    'OR',
-    'from:notifications@',
-  ].join(' ');
-}
-
-/**
  * Parse mailto unsubscribe link
  */
 export function parseMailtoUnsubscribe(mailtoUrl: string): { to: string; subject?: string; body?: string } {

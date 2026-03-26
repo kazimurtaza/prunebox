@@ -45,7 +45,6 @@ export const authConfig: NextAuthConfig = {
       return true;
     },
     async jwt({ token, account, user, profile }) {
-      logger.debug('JWT Callback', { hasUser: !!user, hasAccount: !!account });
       // Initial sign in - store the access token and refresh token
       if (user) {
         token.id = user.id;
@@ -63,7 +62,6 @@ export const authConfig: NextAuthConfig = {
       return token;
     },
     async session({ session, token }) {
-      logger.debug('Session Callback', { hasToken: !!token });
       // Add user info to the session
       if (token && session.user) {
         session.user.id = token.id as string;

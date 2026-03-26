@@ -180,20 +180,18 @@ export async function runEmailScan(data: EmailScanJobData) {
             const currentCount = senderMessageCounts.get(senderEmail) || 0;
             senderMessageCounts.set(senderEmail, currentCount + 1);
 
-            // Store the most recent message data for this sender
-            // Only update if we don't have data yet, or if this message is more recent
-            if (!senderData.has(senderEmail)) {
-              senderData.set(senderEmail, {
-                senderName: senderName || senderEmail.split('@')[0],
-                listUnsubscribeHeader: headers['List-Unsubscribe'],
-                unsubscribeMethod: detection.method || 'none',
-                unsubscribeUrl: detection.unsubscribeUrl,
-                unsubscribeMailto: detection.unsubscribeMailto,
-                confidenceScore: cappedConfidence,
-                recentSubject: headers['Subject'],
-                recentSnippet: message.snippet,
-              });
-            }
+            // Always use the latest message data — later messages may have better
+            // unsubscribe headers (e.g., RFC 8058 one-click) than earlier ones.
+            senderData.set(senderEmail, {
+              senderName: senderName || senderEmail.split('@')[0],
+              listUnsubscribeHeader: headers['List-Unsubscribe'],
+              unsubscribeMethod: detection.method || 'none',
+              unsubscribeUrl: detection.unsubscribeUrl,
+              unsubscribeMailto: detection.unsubscribeMailto,
+              confidenceScore: cappedConfidence,
+              recentSubject: headers['Subject'],
+              recentSnippet: message.snippet,
+            });
           } catch (error) {
             logger.error(`Error processing message ${messageId}:`, error);
           }
@@ -216,29 +214,29 @@ export async function runEmailScan(data: EmailScanJobData) {
     // Fetch existing subscriptions for this user in a single query
     const existingSubs = await db.subscription.findMany({
       where: { userId },
-      select: { id: true, senderEmail: true },
+      select: { id: true, senderEmail: true, messageCount: true },
     });
-    const existingByEmail = new Map(existingSubs.map(s => [s.senderEmail, s.id]));
+    const existingByEmail = new Map(existingSubs.map(s => [s.senderEmail, { id: s.id, messageCount: s.messageCount }]));
 
     logger.info(`Message processing complete in ${Date.now() - scanStart}ms. ${scannedEmails.size} unique senders, ${existingSubs.length} existing subscriptions`);
 
     const newEntries: { userId: string; senderEmail: string; senderName: string; listUnsubscribeHeader: string | undefined; unsubscribeMethod: string; unsubscribeUrl: string | undefined; unsubscribeMailto: string | undefined; confidenceScore: number; messageCount: number; recentSubject: string | undefined; recentSnippet: string | undefined; firstSeenAt: Date; lastSeenAt: Date }[] = [];
     const updatePayloads: { id: string; listUnsubscribeHeader: string | undefined; unsubscribeMethod: string; unsubscribeUrl: string | undefined; unsubscribeMailto: string | undefined; confidenceScore: number; messageCount: number; recentSubject: string | undefined; recentSnippet: string | undefined; lastSeenAt: Date }[] = [];
-    const staleIds: string[] = [];
+    const staleCount = existingSubs.filter(s => !scannedEmails.has(s.senderEmail)).length;
 
     for (const [senderEmail, count] of senderMessageCounts.entries()) {
       const data = senderData.get(senderEmail)!;
-      const existingId = existingByEmail.get(senderEmail);
+      const existing = existingByEmail.get(senderEmail);
 
-      if (existingId) {
+      if (existing) {
         updatePayloads.push({
-          id: existingId,
+          id: existing.id,
           listUnsubscribeHeader: data.listUnsubscribeHeader,
           unsubscribeMethod: data.unsubscribeMethod,
           unsubscribeUrl: data.unsubscribeUrl,
           unsubscribeMailto: data.unsubscribeMailto,
           confidenceScore: data.confidenceScore,
-          messageCount: count,
+          messageCount: existing.messageCount + count,
           recentSubject: data.recentSubject,
           recentSnippet: data.recentSnippet,
           lastSeenAt: new Date(),
@@ -262,25 +260,11 @@ export async function runEmailScan(data: EmailScanJobData) {
       }
     }
 
-    // Identify subscriptions not found in this scan (stale)
-    for (const sub of existingSubs) {
-      if (!scannedEmails.has(sub.senderEmail)) {
-        staleIds.push(sub.id);
-      }
-    }
-
     // Execute in a transaction
     await db.$transaction([
       // Batch create new subscriptions
       ...(newEntries.length > 0
         ? [db.subscription.createMany({ data: newEntries })]
-        : []),
-      // Batch update stale subscriptions (touch lastSeenAt only)
-      ...(staleIds.length > 0
-        ? [db.subscription.updateMany({
-            where: { id: { in: staleIds } },
-            data: { lastSeenAt: new Date() },
-          })]
         : []),
     ]);
 
@@ -294,7 +278,7 @@ export async function runEmailScan(data: EmailScanJobData) {
     }
 
     // Mark scan as complete
-    logger.info(`DB writes complete in ${Date.now() - dbStart}ms: ${newEntries.length} created, ${updatePayloads.length} updated, ${staleIds.length} stale`);
+    logger.info(`DB writes complete in ${Date.now() - dbStart}ms: ${newEntries.length} created, ${updatePayloads.length} updated, ${staleCount} stale`);
 
     await db.gmailSyncState.update({
       where: { userId },

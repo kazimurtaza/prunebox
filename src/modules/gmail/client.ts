@@ -389,11 +389,14 @@ export async function sendEmail(
 ) {
   const gmail = await createGmailClient(accessToken, refreshToken);
 
+  const safeTo = to.replace(/\r?\n/g, '');
+  const safeSubject = subject.replace(/\r?\n/g, '');
+
   const message = [
-    `To: ${to}`,
+    `To: ${safeTo}`,
     'Content-Type: text/plain; charset=utf-8',
     'MIME-Version: 1.0',
-    `Subject: ${subject}`,
+    `Subject: ${safeSubject}`,
     '',
     body,
   ].join('\r\n');
