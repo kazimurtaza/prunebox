@@ -8,4 +8,20 @@ const envSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string().min(1),
 });
 
-export const env = envSchema.parse(process.env);
+// Lazy validation — only parses at first runtime access, not during next build
+// static analysis. Avoids build failures when env vars are absent in CI.
+let _env: z.infer<typeof envSchema> | undefined;
+
+export function getEnv(): z.infer<typeof envSchema> {
+  if (!_env) {
+    _env = envSchema.parse(process.env);
+  }
+  return _env;
+}
+
+// Convenience alias for existing imports
+export const env = new Proxy({} as z.infer<typeof envSchema>, {
+  get(_, prop) {
+    return getEnv()[prop as keyof z.infer<typeof envSchema>];
+  },
+});
