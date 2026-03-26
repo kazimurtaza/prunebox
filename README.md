@@ -61,6 +61,8 @@
 
    The app will be available at `http://localhost:3000`
 
+   For advanced setups, see `docker-compose.production.yml` (production) and `docker-compose.dev.yml` (development).
+
 ### Option 2: Pre-built Docker Image
 
 ```bash
@@ -70,12 +72,33 @@ docker run -p 3000:3000 --env-file .env ghcr.io/kazimurtaza/prunebox:latest
 
 ### Option 3: Build from Source
 
+**Prerequisites:**
+- Node.js 18+
+- PostgreSQL 14+
+- Redis 7+
+
 ```bash
+# 1. Install dependencies
 npm install
+
+# 2. Set up environment variables
+cp .env.example .env
+# Edit .env — set DATABASE_URL, REDIS_URL, and OAuth credentials (see Configuration below)
+
+# 3. Set up the database
+npx prisma migrate deploy
+
+# 4. Build
 npm run build:worker
 npm run build:next
+
+# 5. Start the application (requires a separate worker process)
 npm start
+# In another terminal:
+npm run start:worker
 ```
+
+> **Note:** Building from source requires running both the Next.js app and the BullMQ worker. The Docker images handle this automatically via supervisord.
 
 ## ⚙️ Configuration
 

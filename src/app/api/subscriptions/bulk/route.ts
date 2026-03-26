@@ -5,6 +5,7 @@ import { queueUnsubscribe, queueBulkDelete } from '@/modules/queues';
 import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
+import { getUserTokens } from '@/lib/get-user-tokens';
 
 // Validation schema for bulk action request
 const BulkActionSchema = z.object({
@@ -27,13 +28,6 @@ export async function POST(request: Request) {
     if (!session?.user) {
       return ApiErrorResponse.unauthorized();
     }
-
-    if (!session.accessToken) {
-      return ApiErrorResponse.badRequest('No Gmail access token');
-    }
-
-    const accessToken = session.accessToken;
-    const refreshToken = session.refreshToken;
 
     // Parse and validate request body
     let body: BulkActionRequest;
@@ -65,6 +59,12 @@ export async function POST(request: Request) {
 
     const { subscriptionIds, action, senderEmails } = validationResult.data;
 
+    // Get tokens from database instead of session
+    const tokens = await getUserTokens(session.user.id);
+    if (!tokens || !tokens.accessToken) {
+      return ApiErrorResponse.badRequest('No Gmail account found. Please reconnect your Google account.');
+    }
+
     // Handle delete by sender emails (for non-subscription senders)
     if (action === 'delete' && senderEmails && senderEmails.length > 0) {
       // Validate email count limit
@@ -80,8 +80,8 @@ export async function POST(request: Request) {
         queueBulkDelete({
           userId: session.user.id,
           senderEmail,
-          accessToken,
-          refreshToken,
+          accessToken: tokens.accessToken!,
+          refreshToken: tokens.refreshToken ?? undefined,
         })
       ));
 
@@ -118,8 +118,8 @@ export async function POST(request: Request) {
         queueBulkDelete({
           userId: session.user.id,
           senderEmail: sub.senderEmail,
-          accessToken,
-          refreshToken,
+          accessToken: tokens.accessToken!,
+          refreshToken: tokens.refreshToken ?? undefined,
         })
       ));
 
@@ -155,8 +155,8 @@ export async function POST(request: Request) {
         queueUnsubscribe({
           userId: session.user.id,
           subscriptionId,
-          accessToken,
-          refreshToken,
+          accessToken: tokens.accessToken!,
+          refreshToken: tokens.refreshToken ?? undefined,
         })
       );
       await Promise.all(jobs);

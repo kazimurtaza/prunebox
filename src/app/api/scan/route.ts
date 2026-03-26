@@ -4,6 +4,7 @@ import { queueEmailScan } from '@/modules/queues';
 import { db } from '@/lib/db';
 import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
 import { withRateLimit, RATE_LIMITS } from '@/lib/rate-limiter';
+import { getUserTokens } from '@/lib/get-user-tokens';
 
 export async function POST(request: Request) {
   return withErrorHandling(async () => {
@@ -21,10 +22,6 @@ export async function POST(request: Request) {
 
     if (rateLimitResponse) {
       return rateLimitResponse;
-    }
-
-    if (!session.accessToken) {
-      return ApiErrorResponse.badRequest('No Gmail access token');
     }
 
     // Check if already scanning and detect first scan
@@ -52,11 +49,17 @@ export async function POST(request: Request) {
       forceFullScan = true;
     }
 
+    // Get tokens from database instead of session
+    const tokens = await getUserTokens(session.user.id);
+    if (!tokens || !tokens.accessToken) {
+      return ApiErrorResponse.badRequest('No Gmail account found. Please reconnect your Google account.');
+    }
+
     // Queue the scan job
     await queueEmailScan({
       userId: session.user.id,
-      accessToken: session.accessToken,
-      refreshToken: session.refreshToken,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken ?? undefined,
       forceFullScan,
     });
 

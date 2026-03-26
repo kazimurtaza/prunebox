@@ -1,12 +1,13 @@
 import type { NextAuthConfig } from 'next-auth';
 import Google from 'next-auth/providers/google';
 import { logger } from '@/lib/logger';
+import { env } from '@/lib/env';
 
 export const authConfig: NextAuthConfig = {
   providers: [
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
       authorization: {
         params: {
           prompt: 'consent',
@@ -52,8 +53,6 @@ export const authConfig: NextAuthConfig = {
         token.email = user.email; // Store the email from the user
       }
       if (account) {
-        token.accessToken = account.access_token;
-        token.refreshToken = account.refresh_token;
         token.expiresAt = account.expires_at;
         token.provider = account.provider;
       }
@@ -66,10 +65,8 @@ export const authConfig: NextAuthConfig = {
     },
     async session({ session, token }) {
       logger.debug('Session Callback', { hasToken: !!token });
-      // Add the access token and refresh token to the session
+      // Add user info to the session
       if (token && session.user) {
-        session.accessToken = token.accessToken as string;
-        session.refreshToken = token.refreshToken as string;
         session.user.id = token.id as string;
         // Use the current account email if available, otherwise fall back to user email
         session.user.email = (token.currentEmail as string) || session.user.email;

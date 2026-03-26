@@ -2,8 +2,15 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/modules/auth/auth';
 import { db } from '@/lib/db';
 import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
+import { z } from 'zod';
 import { listMessages, getMessage, getMessageHeaders } from '@/modules/gmail/client';
 import { detectSubscription, parseSender } from '@/modules/gmail/detection';
+import { getUserTokens } from '@/lib/get-user-tokens';
+
+const ScanSenderSchema = z.object({
+  senderEmail: z.string().email('Invalid email format'),
+  senderName: z.string().min(1).max(200).optional(),
+});
 
 export async function POST(request: Request) {
   return withErrorHandling(async () => {
@@ -13,29 +20,28 @@ export async function POST(request: Request) {
       return ApiErrorResponse.unauthorized();
     }
 
-    if (!session.accessToken) {
-      return ApiErrorResponse.badRequest('No Gmail access token');
-    }
-
     const body = await request.json();
-    const { senderEmail, senderName } = body;
+    const parsed = ScanSenderSchema.safeParse(body);
 
-    if (!senderEmail && !senderName) {
-      return ApiErrorResponse.badRequest('senderEmail or senderName is required');
+    if (!parsed.success) {
+      return ApiErrorResponse.badRequest(parsed.error.errors[0].message);
     }
+
+    const { senderEmail, senderName } = parsed.data;
 
     // Prefer senderName if both provided (more specific for email groups)
     const searchEmail = senderName || senderEmail;
 
-    if (!searchEmail) {
-      return ApiErrorResponse.badRequest('senderEmail is required');
+    const tokens = await getUserTokens(session.user.id);
+    if (!tokens || !tokens.accessToken) {
+      return ApiErrorResponse.badRequest('No Gmail account found. Please reconnect your Google account.');
     }
 
     // Find ALL subscriptions matching this sender name
-    const query = `from:{searchEmail}`;
+    const query = `from:${searchEmail}`;
     const messageIds = await listMessages(
-      session.accessToken,
-      session.refreshToken,
+      tokens.accessToken,
+      tokens.refreshToken ?? undefined,
       query,
       1000, // max 1000 messages
       session.user.id
@@ -54,8 +60,8 @@ export async function POST(request: Request) {
 
     // Get the latest message to update subscription info
     const latestMessage = await getMessage(
-      session.accessToken,
-      session.refreshToken,
+      tokens.accessToken,
+      tokens.refreshToken ?? undefined,
       messageIds[0],
       'full',
       session.user.id

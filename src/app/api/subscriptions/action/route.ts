@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import { queueUnsubscribe } from '@/modules/queues';
 import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
 import { z } from 'zod';
+import { getUserTokens } from '@/lib/get-user-tokens';
 
 // Validation schema for subscription action request
 const SubscriptionActionSchema = z.object({
@@ -81,17 +82,18 @@ export async function POST(request: Request) {
       },
     });
 
-    if (!session.accessToken) {
-      return ApiErrorResponse.badRequest('No Gmail access token');
-    }
-
     // If unsubscribe action, queue the unsubscription job
     if (action === 'unsubscribe') {
+      const tokens = await getUserTokens(session.user.id);
+      if (!tokens || !tokens.accessToken) {
+        return ApiErrorResponse.badRequest('No Gmail account found. Please reconnect your Google account.');
+      }
+
       await queueUnsubscribe({
         userId: session.user.id,
         subscriptionId,
-        accessToken: session.accessToken,
-        refreshToken: session.refreshToken || undefined,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken || undefined,
       });
     }
 

@@ -3,6 +3,7 @@ import { auth } from '@/modules/auth/auth';
 import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
 import { listMessages, getMessage } from '@/modules/gmail/client';
 import { logger } from '@/lib/logger';
+import { getUserTokens } from '@/lib/get-user-tokens';
 
 export async function GET(request: Request) {
   return withErrorHandling(async () => {
@@ -12,8 +13,9 @@ export async function GET(request: Request) {
       return ApiErrorResponse.unauthorized();
     }
 
-    if (!session.accessToken) {
-      return ApiErrorResponse.badRequest('No Gmail access token');
+    const tokens = await getUserTokens(session.user.id);
+    if (!tokens || !tokens.accessToken) {
+      return ApiErrorResponse.badRequest('No Gmail account found. Please reconnect your Google account.');
     }
 
     const { searchParams } = new URL(request.url);
@@ -33,8 +35,8 @@ export async function GET(request: Request) {
 
     // Get message IDs (limit to 15 most recent for performance)
     const messageIds = await listMessages(
-      session.accessToken,
-      session.refreshToken,
+      tokens.accessToken,
+      tokens.refreshToken ?? undefined,
       query,
       15,
       session.user.id
@@ -46,8 +48,8 @@ export async function GET(request: Request) {
     const subjects: string[] = [];
     for (const messageId of messageIds) {
       const message = await getMessage(
-        session.accessToken,
-        session.refreshToken,
+        tokens.accessToken,
+        tokens.refreshToken ?? undefined,
         messageId,
         'metadata', // Use 'metadata' to get headers (lighter than 'full')
         session.user.id,
