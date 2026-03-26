@@ -1,5 +1,4 @@
 import { google } from 'googleapis';
-import { OAuth2Client } from 'google-auth-library';
 import { logger } from '@/lib/logger';
 
 /**
@@ -11,13 +10,6 @@ export class InvalidTokenError extends Error {
     this.name = 'InvalidTokenError';
   }
 }
-
-const GMAIL_SCOPES = [
-  'https://www.googleapis.com/auth/gmail.readonly',
-  'https://www.googleapis.com/auth/gmail.modify',
-  'https://www.googleapis.com/auth/gmail.labels',
-  'https://www.googleapis.com/auth/gmail.send',
-];
 
 export interface GmailMessageHeader {
   name: string;
@@ -45,7 +37,7 @@ export function createOAuth2Client(
   accessToken: string,
   refreshToken?: string,
   userId?: string
-): OAuth2Client {
+) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
   const oauth2Client = new google.auth.OAuth2(
@@ -328,56 +320,6 @@ export async function batchDeleteMessages(
 }
 
 /**
- * Get history for incremental sync
- */
-export async function getHistory(
-  accessToken: string,
-  refreshToken: string | undefined,
-  startHistoryId?: string
-) {
-  const gmail = await createGmailClient(accessToken, refreshToken);
-
-  const response = await gmail.users.history.list({
-    userId: 'me',
-    startHistoryId,
-  });
-
-  return response.data;
-}
-
-/**
- * Watch for mailbox changes (Push Notifications)
- */
-export async function watchMailbox(
-  accessToken: string,
-  refreshToken: string | undefined,
-  topicName: string
-) {
-  const gmail = await createGmailClient(accessToken, refreshToken);
-
-  const response = await gmail.users.watch({
-    userId: 'me',
-    requestBody: {
-      topicName,
-      labelIds: ['INBOX'],
-    },
-  });
-
-  return response.data;
-}
-
-/**
- * Stop watching mailbox
- */
-export async function stopWatching(accessToken: string, refreshToken: string | undefined) {
-  const gmail = await createGmailClient(accessToken, refreshToken);
-
-  await gmail.users.stop({
-    userId: 'me',
-  });
-}
-
-/**
  * Send an email (for rollup digest or unsubscribe mailto)
  */
 export async function sendEmail(
@@ -416,5 +358,3 @@ export async function sendEmail(
 
   return response.data;
 }
-
-export { GMAIL_SCOPES };
