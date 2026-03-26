@@ -1,6 +1,5 @@
 import crypto from 'crypto';
 import { promisify } from 'util';
-import { env } from '@/lib/env';
 
 const pbkdf2 = promisify(crypto.pbkdf2);
 
@@ -22,7 +21,7 @@ export async function encrypt(plaintext: string): Promise<string> {
   const iv = crypto.randomBytes(IV_LENGTH);
   const salt = crypto.randomBytes(SALT_LENGTH);
   const key = await pbkdf2(
-    env.ENCRYPTION_KEY,
+    process.env.ENCRYPTION_KEY!,
     salt,
     100000,
     32,
@@ -66,7 +65,7 @@ export async function decrypt(ciphertext: string): Promise<string> {
 
   // Derive key using the same salt
   const key = await pbkdf2(
-    env.ENCRYPTION_KEY,
+    process.env.ENCRYPTION_KEY!,
     salt,
     100000,
     32,
