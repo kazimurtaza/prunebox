@@ -19,7 +19,6 @@
 - **UI**: TailwindCSS, shadcn/ui components
 - **Backend**: Next.js API Routes
 - **Database**: PostgreSQL with Prisma ORM
-- **Job Queue**: BullMQ with Redis
 - **Auth**: NextAuth.js v5 (Google OAuth)
 - **Email API**: Gmail API with googleapis
 
@@ -35,31 +34,22 @@
 
 2. **Set up environment variables:**
    ```bash
+   # Option A: Use the setup script (generates secrets automatically)
+   bash scripts/setup.sh
+
+   # Option B: Manual setup
    cp .env.example .env
    # Edit .env with your values (see Configuration section)
    ```
 
-3. **Generate encryption keys:**
-   ```bash
-   # Generate POSTGRES_PASSWORD
-   openssl rand -base64 32
-
-   # Generate NEXTAUTH_SECRET
-   openssl rand -base64 32
-
-   # Generate ENCRYPTION_KEY (for OAuth tokens)
-   openssl rand -base64 48
-
-   # Generate GMAIL_WEBHOOK_SECRET
-   openssl rand -base64 64
-   ```
-
-4. **Run with Docker Compose:**
+3. **Run with Docker Compose:**
    ```bash
    docker-compose up -d
    ```
 
    The app will be available at `http://localhost:3000`
+
+   For advanced setups, see `docker-compose.production.yml` (production) and `docker-compose.dev.yml` (development).
 
 ### Option 2: Pre-built Docker Image
 
@@ -70,10 +60,25 @@ docker run -p 3000:3000 --env-file .env ghcr.io/kazimurtaza/prunebox:latest
 
 ### Option 3: Build from Source
 
+**Prerequisites:**
+- Node.js 18+
+- PostgreSQL 14+
+
 ```bash
+# 1. Install dependencies
 npm install
-npm run build:worker
-npm run build:next
+
+# 2. Set up environment variables
+cp .env.example .env
+# Edit .env — set DATABASE_URL and OAuth credentials (see Configuration below)
+
+# 3. Set up the database
+npx prisma migrate deploy
+
+# 4. Build
+npm run build
+
+# 5. Start the application
 npm start
 ```
 
@@ -85,7 +90,6 @@ npm start
 |----------|-------------|---------|
 | `DATABASE_URL` | PostgreSQL connection string | `postgresql://prunebox:password@localhost:5432/prunebox` |
 | `POSTGRES_PASSWORD` | Database password | `random-32-char-string` |
-| `REDIS_URL` | Redis connection string | `redis://localhost:6379` |
 | `NEXTAUTH_URL` | Your app's public URL | `https://prunebox.example.com` |
 | `NEXTAUTH_SECRET` | NextAuth session secret | `random-32-char-string` |
 | `ENCRYPTION_KEY` | Encrypts OAuth tokens in DB | `32-character-encryption-key` |
@@ -101,6 +105,39 @@ npm start
    - `http://localhost:3000/api/auth/callback` (dev)
    - `https://yourdomain.com/api/auth/callback` (prod)
 6. Copy `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` to `.env`
+
+#### OAuth Consent Screen
+
+1. In Google Cloud Console, go to **APIs & Services > OAuth consent screen**
+2. Set **User Type** to **External** (unless you have a Google Workspace)
+3. Fill in the required app information (app name, user support email, developer contact email)
+4. Under **Scopes**, add the following (they should appear automatically when users sign in):
+   - `gmail.readonly`
+   - `gmail.modify`
+   - `gmail.labels`
+   - `gmail.send`
+   - `openid` (added automatically by NextAuth)
+   - `email` and `profile` (added automatically by NextAuth)
+5. Click **Save and Continue** through each step
+
+#### Adding Test Users
+
+If your app is not verified, you must add test users before they can sign in:
+
+1. Go to **APIs & Services > OAuth consent screen > Test users**
+2. Click **Add Users** and enter the Gmail addresses of users who need access
+3. Test users will see an "Unverified App" warning but can proceed by clicking **Advanced > Go to (your app)**
+
+#### Publishing Your App
+
+Unverified apps are limited to **100 test users**. To allow anyone to sign up:
+
+1. Go through Google's [OAuth app verification process](https://support.google.com/cloud/answer/9110914)
+2. You'll need to complete a verification assessment, including:
+   - A privacy policy URL
+   - A terms of service URL
+   - Justification for each sensitive scope requested
+3. Once verified, the "Unverified App" screen is removed and any Google user can sign in
 
 ### Gmail API Scopes
 

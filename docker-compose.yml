@@ -1,0 +1,23 @@
+# Prunebox - Self-hosted email cleanup tool
+# Quick start: cp .env.example .env (edit values) && docker-compose up -d
+
+services:
+  prunebox:
+    image: ghcr.io/kazimurtaza/prunebox:latest
+    container_name: prunebox
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - prunebox_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+volumes:
+  prunebox_postgres:

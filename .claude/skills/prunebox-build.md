@@ -68,37 +68,20 @@ vX.Y.Z tags
 | `.dockerignore` | Excludes test files, dev artifacts |
 | `docker-compose.production.yml` | Production deployment (uses env_file) |
 | `docker-compose.dev.yml` | Development deployment |
-| `docker/supervisord.conf` | Runs compiled worker (not tsx) |
+| `docker/supervisord.conf` | Runs app and PostgreSQL |
 
 ### Build Configuration
 | File | Purpose |
 |------|---------|
-| `tsconfig.worker.json` | Compiles worker TypeScript to CommonJS |
-| `package.json` | Has `build:worker` script with tsc-alias |
+| `package.json` | Build script: `npm run build` (Next.js only) |
 
 ## How Docker Optimization Works
 
-The Dockerfile uses multi-stage builds to achieve ~1.36GB (70% reduction):
+The Dockerfile uses multi-stage builds:
 
 1. **deps** - Install all dependencies
-2. **builder** - Build Next.js app AND compile worker to JS
+2. **builder** - Build Next.js app
 3. **runner** - Minimal runtime with production deps
-
-**Key optimization:** Worker is compiled to JavaScript during build, so we don't need:
-- TypeScript compiler
-- tsx runtime
-- Source code
-- Dev dependencies
-
-## Worker Compilation
-
-**Before:** `tsx src/modules/queues/workers.run.ts` (required all dev deps)
-**After:** `node dist/src/modules/queues/workers.run.js` (compiled CommonJS)
-
-To compile worker locally:
-```bash
-npm run build:worker
-```
 
 ## Environment Setup
 
@@ -107,7 +90,6 @@ npm run build:worker
    - Database credentials
    - Auth secrets (NEXTAUTH_SECRET, ENCRYPTION_KEY)
    - OAuth credentials
-   - Redis URL
    - GA_MEASUREMENT_ID
 
 ### Deploy
@@ -162,10 +144,8 @@ docker images | grep prunebox
 | Production not triggering | Push to `master` branch |
 | `:latest` not updating | Check pushing to `master`, not `develop` |
 | `:develop` tag not found | Push to `develop` branch, don't use `:dev` |
-| Image too large | ~1.36GB is expected (optimized from 4.56GB) |
-| Worker failing | Check `tsconfig.worker.json` and `tsc-alias` runs |
+| Image too large | ~1.2GB is expected (no Redis/worker overhead) |
 | Portainer not updating | Wait 24h for auto-deploy OR manually redeploy |
-| Worker MODULE_NOT_FOUND | Full node_modules now included (not standalone) |
 | Duplicate empty states | Fixed - SubscriptionList handles empty state |
 
 ## Quality Gates

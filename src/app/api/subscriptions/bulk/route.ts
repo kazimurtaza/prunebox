@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/modules/auth/auth';
 import { db } from '@/lib/db';
-import { queueUnsubscribe, queueBulkDelete } from '@/modules/queues';
+import { runBulkDelete, runUnsubscribe } from '@/modules/queues/jobs';
 import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
+import { getUserTokens } from '@/lib/get-user-tokens';
 
 // Validation schema for bulk action request
 const BulkActionSchema = z.object({
@@ -27,13 +28,6 @@ export async function POST(request: Request) {
     if (!session?.user) {
       return ApiErrorResponse.unauthorized();
     }
-
-    if (!session.accessToken) {
-      return ApiErrorResponse.badRequest('No Gmail access token');
-    }
-
-    const accessToken = session.accessToken;
-    const refreshToken = session.refreshToken;
 
     // Parse and validate request body
     let body: BulkActionRequest;
@@ -65,6 +59,12 @@ export async function POST(request: Request) {
 
     const { subscriptionIds, action, senderEmails } = validationResult.data;
 
+    // Get tokens from database instead of session
+    const tokens = await getUserTokens(session.user.id);
+    if (!tokens || !tokens.accessToken) {
+      return ApiErrorResponse.badRequest('No Gmail account found. Please reconnect your Google account.');
+    }
+
     // Handle delete by sender emails (for non-subscription senders)
     if (action === 'delete' && senderEmails && senderEmails.length > 0) {
       // Validate email count limit
@@ -72,23 +72,25 @@ export async function POST(request: Request) {
         return ApiErrorResponse.badRequest('Cannot delete more than 100 sender emails at once');
       }
 
-      logger.info(`BULK DELETE: Queuing ${senderEmails.length} delete jobs for user ${session.user.id}`, {
+      logger.info(`BULK DELETE: Starting ${senderEmails.length} deletes for user ${session.user.id}`, {
         senderEmails,
       });
 
-      const jobs = await Promise.all(senderEmails.map((senderEmail: string) =>
-        queueBulkDelete({
+      // Fire-and-forget — don't block the HTTP response while deleting
+      Promise.all(senderEmails.map((senderEmail: string) =>
+        runBulkDelete({
           userId: session.user.id,
           senderEmail,
-          accessToken,
-          refreshToken,
+          accessToken: tokens.accessToken!,
+          refreshToken: tokens.refreshToken ?? undefined,
         })
-      ));
+      )).then(() => {
+        logger.info(`BULK DELETE: Completed all ${senderEmails.length} deletes`);
+      }).catch((err) => {
+        logger.error(`BULK DELETE: Error during delete`, err);
+      });
 
-      const jobIds = jobs.map(job => job.id);
-
-      logger.info(`BULK DELETE: Queued all ${senderEmails.length} jobs`);
-      return NextResponse.json({ success: true, count: senderEmails.length, jobIds });
+      return NextResponse.json({ success: true, count: senderEmails.length });
     }
 
     if (!subscriptionIds || subscriptionIds.length === 0) {
@@ -112,20 +114,20 @@ export async function POST(request: Request) {
       return ApiErrorResponse.notFound('Some subscriptions');
     }
 
-    // Handle delete action - queue bulk delete jobs
+    // Handle delete action - fire-and-forget to avoid blocking the response
     if (action === 'delete') {
-      const jobs = await Promise.all(subscriptions.map((sub) =>
-        queueBulkDelete({
+      Promise.all(subscriptions.map((sub) =>
+        runBulkDelete({
           userId: session.user.id,
           senderEmail: sub.senderEmail,
-          accessToken,
-          refreshToken,
+          accessToken: tokens.accessToken!,
+          refreshToken: tokens.refreshToken ?? undefined,
         })
-      ));
+      )).catch((err) => {
+        logger.error(`BULK DELETE: Error during subscription delete`, err);
+      });
 
-      const jobIds = jobs.map(job => job.id);
-
-      return NextResponse.json({ success: true, count: subscriptions.length, jobIds });
+      return NextResponse.json({ success: true, count: subscriptions.length });
     }
 
     // For unsubscribe and rollup, create/update preferences
@@ -151,15 +153,15 @@ export async function POST(request: Request) {
 
     // If unsubscribe action, queue unsubscription jobs
     if (action === 'unsubscribe') {
-      const jobs = subscriptionIds.map((subscriptionId: string) =>
-        queueUnsubscribe({
+      const unsubPromises = subscriptionIds.map((subscriptionId: string) =>
+        runUnsubscribe({
           userId: session.user.id,
           subscriptionId,
-          accessToken,
-          refreshToken,
+          accessToken: tokens.accessToken!,
+          refreshToken: tokens.refreshToken ?? undefined,
         })
       );
-      await Promise.all(jobs);
+      await Promise.all(unsubPromises);
     }
 
     return NextResponse.json({ success: true, count: subscriptionIds.length });

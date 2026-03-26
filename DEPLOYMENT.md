@@ -52,7 +52,6 @@ openssl rand -base64 16
 |----------|-------------|---------|
 | `DATABASE_URL` | PostgreSQL connection | `postgresql://prunebox:pass@localhost:5432/prunebox` |
 | `POSTGRES_PASSWORD` | PostgreSQL password | Strong random string |
-| `REDIS_URL` | Redis connection | `redis://localhost:6379` |
 | `NEXTAUTH_URL` | NextAuth URL | `https://yourdomain.com` |
 | `NEXTAUTH_SECRET` | NextAuth secret | Strong random string |
 | `GOOGLE_CLIENT_ID` | Google OAuth Client ID | `xxx.apps.googleusercontent.com` |

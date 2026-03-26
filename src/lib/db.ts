@@ -23,10 +23,10 @@ function createExtendedPrismaClient() {
         async create({ args, query }) {
           if (args.data) {
             if (args.data.access_token) {
-              args.data.access_token = encrypt(args.data.access_token);
+              args.data.access_token = await encrypt(args.data.access_token);
             }
             if (args.data.refresh_token) {
-              args.data.refresh_token = encrypt(args.data.refresh_token);
+              args.data.refresh_token = await encrypt(args.data.refresh_token);
             }
           }
           return query(args);
@@ -36,10 +36,10 @@ function createExtendedPrismaClient() {
           if (args.data && Array.isArray(args.data)) {
             for (const item of args.data) {
               if (item.access_token) {
-                item.access_token = encrypt(item.access_token);
+                item.access_token = await encrypt(item.access_token);
               }
               if (item.refresh_token) {
-                item.refresh_token = encrypt(item.refresh_token);
+                item.refresh_token = await encrypt(item.refresh_token);
               }
             }
           }
@@ -49,10 +49,10 @@ function createExtendedPrismaClient() {
         async update({ args, query }) {
           if (args.data) {
             if (args.data.access_token && typeof args.data.access_token === 'string') {
-              args.data.access_token = encrypt(args.data.access_token);
+              args.data.access_token = await encrypt(args.data.access_token);
             }
             if (args.data.refresh_token && typeof args.data.refresh_token === 'string') {
-              args.data.refresh_token = encrypt(args.data.refresh_token);
+              args.data.refresh_token = await encrypt(args.data.refresh_token);
             }
           }
           return query(args);
@@ -61,18 +61,18 @@ function createExtendedPrismaClient() {
         async upsert({ args, query }) {
           if (args.create) {
             if (args.create.access_token && typeof args.create.access_token === 'string') {
-              args.create.access_token = encrypt(args.create.access_token);
+              args.create.access_token = await encrypt(args.create.access_token);
             }
             if (args.create.refresh_token && typeof args.create.refresh_token === 'string') {
-              args.create.refresh_token = encrypt(args.create.refresh_token);
+              args.create.refresh_token = await encrypt(args.create.refresh_token);
             }
           }
           if (args.update) {
             if (args.update.access_token && typeof args.update.access_token === 'string') {
-              args.update.access_token = encrypt(args.update.access_token);
+              args.update.access_token = await encrypt(args.update.access_token);
             }
             if (args.update.refresh_token && typeof args.update.refresh_token === 'string') {
-              args.update.refresh_token = encrypt(args.update.refresh_token);
+              args.update.refresh_token = await encrypt(args.update.refresh_token);
             }
           }
           return query(args);
@@ -84,10 +84,10 @@ function createExtendedPrismaClient() {
           if (Array.isArray(result)) {
             for (const item of result) {
               if (item.access_token) {
-                item.access_token = decrypt(item.access_token);
+                item.access_token = await decrypt(item.access_token);
               }
               if (item.refresh_token) {
-                item.refresh_token = decrypt(item.refresh_token);
+                item.refresh_token = await decrypt(item.refresh_token);
               }
             }
           }
@@ -98,10 +98,10 @@ function createExtendedPrismaClient() {
           const result = await query(args);
           if (result) {
             if (result.access_token) {
-              result.access_token = decrypt(result.access_token);
+              result.access_token = await decrypt(result.access_token);
             }
             if (result.refresh_token) {
-              result.refresh_token = decrypt(result.refresh_token);
+              result.refresh_token = await decrypt(result.refresh_token);
             }
           }
           return result;
@@ -111,10 +111,10 @@ function createExtendedPrismaClient() {
           const result = await query(args);
           if (result) {
             if (result.access_token) {
-              result.access_token = decrypt(result.access_token);
+              result.access_token = await decrypt(result.access_token);
             }
             if (result.refresh_token) {
-              result.refresh_token = decrypt(result.refresh_token);
+              result.refresh_token = await decrypt(result.refresh_token);
             }
           }
           return result;
@@ -124,10 +124,10 @@ function createExtendedPrismaClient() {
           const result = await query(args);
           if (result) {
             if (result.access_token) {
-              result.access_token = decrypt(result.access_token);
+              result.access_token = await decrypt(result.access_token);
             }
             if (result.refresh_token) {
-              result.refresh_token = decrypt(result.refresh_token);
+              result.refresh_token = await decrypt(result.refresh_token);
             }
           }
           return result;

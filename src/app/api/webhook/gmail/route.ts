@@ -14,8 +14,8 @@ function verifyWebhookSignature(
 ): boolean {
   // If no secret is configured, skip verification (not recommended for production)
   if (!secret) {
-    logger.warn('Webhook secret not configured, skipping signature verification');
-    return true;
+    logger.error('Webhook secret not configured, rejecting request');
+    return false;
   }
 
   // If no signature provided, reject
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     }
 
     // Parse body after verification
-    let body: { message?: { data?: string; acknowledgeUrl?: string } };
+    let body: { message?: { data?: string } };
     try {
       body = JSON.parse(bodyText);
     } catch {
@@ -90,21 +90,6 @@ export async function POST(request: Request) {
 
     // Queue a scan for this user
     // await queueEmailScan({ userId, ... });
-
-    // Acknowledge the message
-    const acknowledgeUrl = message.acknowledgeUrl || '';
-    if (acknowledgeUrl) {
-      try {
-        await fetch(acknowledgeUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ack: true }),
-        });
-        logger.debug(`Webhook acknowledged for ${emailAddress}`);
-      } catch (error) {
-        logger.error(`Failed to acknowledge webhook for ${emailAddress}:`, error);
-      }
-    }
 
     return NextResponse.json({ success: true });
   }, 'Failed to process Gmail webhook');

@@ -6,7 +6,6 @@ import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { Mail } from 'lucide-react';
-import { trackEvent, trackError } from '@/lib/analytics';
 
 function SignInContent() {
   const searchParams = useSearchParams();
@@ -16,9 +15,6 @@ function SignInContent() {
   useEffect(() => {
     const error = searchParams.get('error');
     if (error) {
-      // Track the error
-      trackError(error, 'auth_signin');
-
       const errorMessages: Record<string, { title: string; description: string }> = {
         OAuthAccountNotLinked: {
           title: 'Account Not Linked',
@@ -74,17 +70,11 @@ function SignInContent() {
         <div className="space-y-4">
           <Button
             onClick={async () => {
-              console.warn('SignIn button clicked');
-              trackEvent('auth', 'sign_in_started');
               setIsLoading(true);
               try {
-                console.warn('Calling signIn...');
                 await signIn('google', { callbackUrl: '/dashboard' });
-                console.warn('SignIn completed');
-                trackEvent('auth', 'sign_in_success');
               } catch (error) {
                 console.error('SignIn error:', error);
-                trackError(error instanceof Error ? error.message : 'Unknown error', 'auth_signin');
                 setIsLoading(false);
               }
             }}

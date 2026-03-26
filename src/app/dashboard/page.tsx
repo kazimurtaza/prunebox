@@ -34,7 +34,7 @@ export default function DashboardPage() {
 
       if (subsResponse.ok) {
         const data = await subsResponse.json();
-        setSubscriptions(data);
+        setSubscriptions(data.subscriptions);
       }
     } catch (error) {
       clientError('Failed to fetch dashboard data', error);

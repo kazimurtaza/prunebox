@@ -13,8 +13,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 // Type extensions for next-auth
 declare module 'next-auth' {
   interface Session {
-    accessToken?: string;
-    refreshToken?: string;
     user: {
       id: string;
       email: string;

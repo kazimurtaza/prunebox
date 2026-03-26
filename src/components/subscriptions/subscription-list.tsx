@@ -3,7 +3,6 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { clientError } from "@/lib/client-logger";
-import { trackEvent } from "@/lib/analytics";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -81,6 +80,11 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
     subscriptionIds?: string[];
     count: number;
   }>({ open: false, senderEmails: [], count: 0 });
+
+  // Pagination state
+  const [hasMore, setHasMore] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   // Mobile filters toggle state
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -180,20 +184,37 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
     setSubscriptions(initialSubscriptions || []);
     onUpdate?.(initialSubscriptions || []);
     setLoading(false);
+    // Reset pagination when initialSubscriptions change (e.g., after scan)
+    setHasMore(false);
+    setNextCursor(null);
   }, [initialSubscriptions, onUpdate]);
 
-  const fetchSubscriptions = async () => {
+  const fetchSubscriptions = async (cursor?: string | null) => {
     try {
-      const response = await fetch("/api/subscriptions");
+      setLoading(cursor === undefined); // Only show full loading on initial fetch
+      if (cursor) setLoadingMore(true);
+
+      let url = "/api/subscriptions";
+      if (cursor) url += `?cursor=${encodeURIComponent(cursor)}`;
+
+      const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
-        setSubscriptions(data);
-        onUpdate?.(data);
+        if (cursor) {
+          // Append to existing subscriptions
+          setSubscriptions(prev => [...prev, ...data.subscriptions]);
+        } else {
+          setSubscriptions(data.subscriptions);
+          onUpdate?.(data.subscriptions);
+        }
+        setHasMore(data.hasMore);
+        setNextCursor(data.nextCursor);
       }
     } catch (error) {
       clientError("Failed to fetch subscriptions", error);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
@@ -212,7 +233,6 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
       setSelectedIds(new Set());
     } else {
       setSelectedIds(new Set(filteredSubscriptions.map((s) => s.id)));
-      trackEvent('subscription', 'bulk_select_all', undefined, filteredSubscriptions.length);
     }
   };
 
@@ -275,7 +295,6 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
 
     if (action === "delete") {
       const selectedSubs = subscriptions.filter((s) => selectedIds.has(s.id));
-      trackEvent('subscription', 'bulk_delete', undefined, selectedSubs.length);
       setDeleteConfirm({
         open: true,
         senderEmails: selectedSubs.map((s) => s.senderEmail),
@@ -284,9 +303,6 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
       });
       return;
     }
-
-    // Track bulk unsubscribe
-    trackEvent('subscription', 'bulk_unsubscribe', undefined, selectedIds.size);
 
     try {
       const response = await fetch("/api/subscriptions/bulk", {
@@ -305,7 +321,6 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
   };
 
   const deleteFromSender = async (senderEmail: string, _senderName: string) => {
-    trackEvent('subscription', 'delete_individual');
     setDeleteConfirm({
       open: true,
       senderEmails: [senderEmail],
@@ -314,27 +329,7 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
   };
 
   const handleUnsubscribe = async (subscription: Subscription) => {
-    trackEvent('subscription', 'unsubscribe_individual');
     await updateAction(subscription.id, "unsubscribe");
-  };
-
-  // Poll job status until completion or timeout
-  const pollJobStatus = async (jobId: string): Promise<boolean> => {
-    const maxAttempts = 20; // 20 * 500ms = 10 seconds max
-    for (let i = 0; i < maxAttempts; i++) {
-      try {
-        const response = await fetch(`/api/jobs/status?id=${encodeURIComponent(jobId)}`);
-        if (response.ok) {
-          const { status } = await response.json();
-          if (status === 'completed') return true;
-          if (status === 'failed') return false;
-        }
-      } catch (error) {
-        console.error(`Error polling job ${jobId}:`, error);
-      }
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
-    return false; // Timeout
   };
 
   const confirmDelete = async () => {
@@ -353,13 +348,6 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
       });
 
       if (response.ok) {
-        const result = await response.json();
-
-        // Poll job status if jobIds are available
-        if (result.jobIds && result.jobIds.length > 0) {
-          await Promise.all(result.jobIds.map((jobId: string) => pollJobStatus(jobId)));
-        }
-
         // Close dialog and clear selection
         setDeleteConfirm({ open: false, senderEmails: [], count: 0 });
         setSelectedIds(new Set());
@@ -511,7 +499,6 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
               size="sm"
               onClick={() => {
                 setFilter("all");
-                trackEvent('subscription', 'filter_changed', 'all');
               }}
             >
               All ({subscriptions.length})
@@ -521,7 +508,6 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
               size="sm"
               onClick={() => {
                 setFilter("high-confidence");
-                trackEvent('subscription', 'filter_changed', 'high-confidence');
               }}
             >
               High Confidence
@@ -531,7 +517,6 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
               size="sm"
               onClick={() => {
                 setFilter("low-confidence");
-                trackEvent('subscription', 'filter_changed', 'low-confidence');
               }}
             >
               Low Confidence
@@ -541,7 +526,6 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
               size="sm"
               onClick={() => {
                 setFilter("has-unsubscribe");
-                trackEvent('subscription', 'filter_changed', 'has-unsubscribe');
               }}
             >
               Has Unsubscribe
@@ -821,6 +805,26 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
             ))
           )}
         </div>
+
+        {hasMore && (
+          <div className="flex justify-center py-4">
+            <Button
+              variant="outline"
+              onClick={() => fetchSubscriptions(nextCursor)}
+              disabled={loadingMore}
+              className="min-w-[200px]"
+            >
+              {loadingMore ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                  Loading...
+                </>
+              ) : (
+                'Load More'
+              )}
+            </Button>
+          </div>
+        )}
         </div>
 
         {/* Resize Handle */}

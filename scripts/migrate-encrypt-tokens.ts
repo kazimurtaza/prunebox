@@ -77,12 +77,12 @@ async function migrateTokens() {
         const updateData: { access_token?: string; refresh_token?: string } = {};
 
         if (account.access_token && !accessTokenEncrypted) {
-          updateData.access_token = encrypt(account.access_token);
+          updateData.access_token = await encrypt(account.access_token);
           console.log(`  🔒 Encrypted access_token for ${accountIdentifier}`);
         }
 
         if (account.refresh_token && !refreshTokenEncrypted) {
-          updateData.refresh_token = encrypt(account.refresh_token);
+          updateData.refresh_token = await encrypt(account.refresh_token);
           console.log(`  🔒 Encrypted refresh_token for ${accountIdentifier}`);
         }
 

@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/modules/auth/auth';
-import { queueEmailScan } from '@/modules/queues';
+import { runEmailScan } from '@/modules/queues/jobs';
 import { db } from '@/lib/db';
 import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
 import { withRateLimit, RATE_LIMITS } from '@/lib/rate-limiter';
+import { logger } from '@/lib/logger';
+import { getUserTokens } from '@/lib/get-user-tokens';
 
 export async function POST(request: Request) {
   return withErrorHandling(async () => {
@@ -13,6 +15,8 @@ export async function POST(request: Request) {
       return ApiErrorResponse.unauthorized();
     }
 
+    logger.debug(`Scan request from user ${session.user.id}`);
+
     // Apply rate limiting - 1 scan per minute per user
     const rateLimitResponse = await withRateLimit(
       `scan:${session.user.id}`,
@@ -20,11 +24,8 @@ export async function POST(request: Request) {
     );
 
     if (rateLimitResponse) {
+      logger.debug(`Scan rate limited for user ${session.user.id}`);
       return rateLimitResponse;
-    }
-
-    if (!session.accessToken) {
-      return ApiErrorResponse.badRequest('No Gmail access token');
     }
 
     // Check if already scanning and detect first scan
@@ -33,6 +34,7 @@ export async function POST(request: Request) {
     });
 
     if (syncState?.scanStatus === 'scanning') {
+      logger.debug(`Scan already in progress for user ${session.user.id}`);
       return ApiErrorResponse.conflict('Scan already in progress');
     }
 
@@ -52,13 +54,21 @@ export async function POST(request: Request) {
       forceFullScan = true;
     }
 
-    // Queue the scan job
-    await queueEmailScan({
+    // Get tokens from database instead of session
+    const tokens = await getUserTokens(session.user.id);
+    if (!tokens || !tokens.accessToken) {
+      return ApiErrorResponse.badRequest('No Gmail account found. Please reconnect your Google account.');
+    }
+
+    logger.info(`Starting scan for user ${session.user.id}: firstScan=${isFirstScan}, forceFull=${forceFullScan}`);
+
+    // Fire-and-forget the scan job (progress tracked via db.gmailSyncState)
+    runEmailScan({
       userId: session.user.id,
-      accessToken: session.accessToken,
-      refreshToken: session.refreshToken,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken ?? undefined,
       forceFullScan,
-    });
+    }).catch(err => logger.error('Background scan failed:', err));
 
     return NextResponse.json({ success: true, message: 'Scan started' });
   }, 'Failed to start scan');

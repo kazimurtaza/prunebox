@@ -113,7 +113,6 @@ export function detectSubscription(headers: Record<string, string>): Subscriptio
     'hi@',
     'mail@',
     'email@',
-    'notifications@',
     'update@',
     'daily@',
     'weekly@',
@@ -187,30 +186,6 @@ export function parseSender(fromHeader: string): { email: string; name: string }
     email: email.toLowerCase(), // Normalize to lowercase
     name: formattedName,
   };
-}
-
-/**
- * Build Gmail search query for subscription detection
- */
-export function buildSubscriptionQuery(daysBack = 30): string {
-  return [
-    'in:inbox',
-    `newer_than:${daysBack}d`,
-    // Common list indicators
-    'list:"unsubscribe"', // This searches for the header
-    'OR',
-    'list:"list-id"',
-    'OR',
-    'from:noreply@',
-    'OR',
-    'from:newsletter@',
-    'OR',
-    'from:marketing@',
-    'OR',
-    'from:updates@',
-    'OR',
-    'from:notifications@',
-  ].join(' ');
 }
 
 /**

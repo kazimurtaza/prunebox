@@ -51,7 +51,6 @@ fi
 
 # Ensure proper permissions
 chown -R postgres:postgres /var/lib/postgresql/data 2>/dev/null || true
-chown -R node:node /var/lib/redis 2>/dev/null || true
 
 # Start PostgreSQL temporarily for schema setup
 echo "🔄 Starting PostgreSQL temporarily for schema setup..."
@@ -74,7 +73,11 @@ if [ -n "$DATABASE_URL" ]; then
     # Try migrations first, then db push if no migrations exist
     if npx prisma migrate deploy 2>/dev/null | grep -q "No migration"; then
         echo "📦 No migrations found, applying schema directly..."
-        npx prisma db push --skip-generate --accept-data-loss || echo "⚠️  Schema setup failed"
+        if ! npx prisma db push --skip-generate; then
+            echo "❌ Schema setup failed. Please check your database configuration."
+            echo "   You may need to run: npx prisma migrate dev --name init"
+            exit 1
+        fi
     fi
 fi
 

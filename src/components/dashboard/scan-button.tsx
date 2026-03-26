@@ -21,7 +21,6 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/components/ui/use-toast';
-import { trackEvent, trackError } from '@/lib/analytics';
 
 interface ScanButtonProps {
     initialStatus?: string;
@@ -85,7 +84,6 @@ export function ScanButton({ initialStatus, onScanComplete }: ScanButtonProps) {
                             pollingIntervalRef.current = null;
                         }
                         setStatus('idle');
-                        trackEvent('scan', 'scan_completed', undefined, data.scanTotal || 0);
                         if (onScanComplete) {
                             onScanComplete();
                         }
@@ -101,7 +99,6 @@ export function ScanButton({ initialStatus, onScanComplete }: ScanButtonProps) {
                         }
                         setStatus('idle');
                         const errorMsg = (data as { errorMessage?: string }).errorMessage;
-                        trackError(errorMsg || 'Scan failed', 'scan');
                         toast({
                             title: "Scan failed",
                             description: errorMsg || "An error occurred while scanning your inbox.",
@@ -159,13 +156,6 @@ export function ScanButton({ initialStatus, onScanComplete }: ScanButtonProps) {
         setScanProgress(0);
         setScanTotal(0);
 
-        // Track scan start
-        if (forceFullScan) {
-            trackEvent('scan', 'complete_scan_started');
-        } else {
-            trackEvent('scan', 'quick_scan_started');
-        }
-
         try {
             const response = await fetch('/api/scan', {
                 method: 'POST',
@@ -188,14 +178,12 @@ export function ScanButton({ initialStatus, onScanComplete }: ScanButtonProps) {
                 // Check for rate limit error
                 if (response.status === 429 || error?.error?.code === 'TOO_MANY_REQUESTS') {
                     setRetryAfter(60);
-                    trackError('Rate limit exceeded', 'scan');
                     toast({
                         title: "Rate limit exceeded",
                         description: "Too many scan requests. Please wait 60 seconds before trying again.",
                         variant: "destructive",
                     });
                 } else {
-                    trackError(error.error?.message || 'Scan failed', 'scan');
                     toast({
                         title: "Scan failed",
                         description: error.error?.message || "Could not start scan",
@@ -205,7 +193,6 @@ export function ScanButton({ initialStatus, onScanComplete }: ScanButtonProps) {
                 setStatus('idle');
             }
         } catch {
-            trackError('Unexpected error during scan', 'scan');
             toast({
                 title: "Error",
                 description: "An unexpected error occurred",
@@ -217,7 +204,6 @@ export function ScanButton({ initialStatus, onScanComplete }: ScanButtonProps) {
 
     const handleReset = async () => {
         setIsResetting(true);
-        trackEvent('data', 'reset_all');
 
         try {
             const response = await fetch('/api/sync/reset', {
@@ -236,7 +222,6 @@ export function ScanButton({ initialStatus, onScanComplete }: ScanButtonProps) {
                 }
             } else {
                 const error = await response.json();
-                trackError(error.error || 'Reset failed', 'data');
                 toast({
                     title: "Reset failed",
                     description: error.error || "Could not reset data",
@@ -244,7 +229,6 @@ export function ScanButton({ initialStatus, onScanComplete }: ScanButtonProps) {
                 });
             }
         } catch {
-            trackError('Unexpected error during reset', 'data');
             toast({
                 title: "Error",
                 description: "An unexpected error occurred",

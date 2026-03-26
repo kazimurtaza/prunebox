@@ -1,4 +1,7 @@
 import crypto from 'crypto';
+import { promisify } from 'util';
+
+const pbkdf2 = promisify(crypto.pbkdf2);
 
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
@@ -12,12 +15,12 @@ const ENCRYPTED_POSITION = TAG_POSITION + TAG_LENGTH;
  * @param plaintext - The data to encrypt
  * @returns Base64 encoded string containing salt:iv:authTag:encrypted
  */
-export function encrypt(plaintext: string): string {
+export async function encrypt(plaintext: string): Promise<string> {
   if (!plaintext) return '';
 
   const iv = crypto.randomBytes(IV_LENGTH);
   const salt = crypto.randomBytes(SALT_LENGTH);
-  const key = crypto.pbkdf2Sync(
+  const key = await pbkdf2(
     process.env.ENCRYPTION_KEY!,
     salt,
     100000,
@@ -49,7 +52,7 @@ export function encrypt(plaintext: string): string {
  * @returns The original plaintext
  * @throws Error if decryption fails or data is tampered with
  */
-export function decrypt(ciphertext: string): string {
+export async function decrypt(ciphertext: string): Promise<string> {
   if (!ciphertext) return '';
 
   const combined = Buffer.from(ciphertext, 'base64');
@@ -61,7 +64,7 @@ export function decrypt(ciphertext: string): string {
   const encrypted = combined.subarray(ENCRYPTED_POSITION);
 
   // Derive key using the same salt
-  const key = crypto.pbkdf2Sync(
+  const key = await pbkdf2(
     process.env.ENCRYPTION_KEY!,
     salt,
     100000,
@@ -78,13 +81,3 @@ export function decrypt(ciphertext: string): string {
   return decrypted;
 }
 
-/**
- * Hash a token for comparison (one-way)
- * Use this when you need to verify a token matches without decrypting
- */
-export function hashToken(token: string): string {
-  return crypto
-    .createHash('sha256')
-    .update(token + process.env.ENCRYPTION_KEY!)
-    .digest('hex');
-}

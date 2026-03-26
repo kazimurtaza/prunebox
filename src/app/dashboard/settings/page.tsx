@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { User, Shield, Bell, Trash2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { trackEvent } from '@/lib/analytics';
 
 type Tab = 'account' | 'notifications' | 'privacy';
 
@@ -39,7 +38,6 @@ export default function SettingsPage() {
                             variant="ghost"
                             onClick={() => {
                                 setActiveTab(tab.id);
-                                trackEvent('settings', 'tab_viewed', tab.id);
                             }}
                             className={`w-full justify-start font-medium ${
                                 activeTab === tab.id
@@ -98,7 +96,7 @@ export default function SettingsPage() {
                                     <div className="bg-destructive/10 p-4 rounded-md border border-destructive/20 text-sm text-destructive-foreground">
                                         Prunebox has &quot;Restricted&quot; access to your Gmail. This access is only used to manage your email groups as per our privacy policy.
                                     </div>
-                                    <Button variant="outline" className="w-full">Revoke Gmail Access</Button>
+                                    <Button variant="outline" className="w-full" disabled>Revoke Gmail Access (Coming soon)</Button>
                                 </CardContent>
                             </Card>
                         </>
@@ -137,8 +135,8 @@ export default function SettingsPage() {
                                                 We only scan headers to identify email groups. No email content is stored.
                                             </div>
                                         </div>
-                                        <Button variant="outline" size="sm" onClick={() => trackEvent('settings', 'data_exported')}>
-                                            Export Data
+                                        <Button variant="outline" size="sm" disabled>
+                                            Export Data (Coming soon)
                                         </Button>
                                     </div>
                                     <Separator />
@@ -149,9 +147,9 @@ export default function SettingsPage() {
                                                 Permanently delete your account and all associated data.
                                             </div>
                                         </div>
-                                        <Button variant="destructive" size="sm" onClick={() => trackEvent('settings', 'account_deleted')}>
+                                        <Button variant="destructive" size="sm" disabled>
                                             <Trash2 className="mr-2 h-4 w-4" />
-                                            Delete Everything
+                                            Delete Everything (Coming soon)
                                         </Button>
                                     </div>
                                 </CardContent>

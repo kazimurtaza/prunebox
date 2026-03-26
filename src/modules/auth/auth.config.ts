@@ -45,15 +45,12 @@ export const authConfig: NextAuthConfig = {
       return true;
     },
     async jwt({ token, account, user, profile }) {
-      logger.debug('JWT Callback', { hasUser: !!user, hasAccount: !!account });
       // Initial sign in - store the access token and refresh token
       if (user) {
         token.id = user.id;
         token.email = user.email; // Store the email from the user
       }
       if (account) {
-        token.accessToken = account.access_token;
-        token.refreshToken = account.refresh_token;
         token.expiresAt = account.expires_at;
         token.provider = account.provider;
       }
@@ -65,11 +62,8 @@ export const authConfig: NextAuthConfig = {
       return token;
     },
     async session({ session, token }) {
-      logger.debug('Session Callback', { hasToken: !!token });
-      // Add the access token and refresh token to the session
+      // Add user info to the session
       if (token && session.user) {
-        session.accessToken = token.accessToken as string;
-        session.refreshToken = token.refreshToken as string;
         session.user.id = token.id as string;
         // Use the current account email if available, otherwise fall back to user email
         session.user.email = (token.currentEmail as string) || session.user.email;
