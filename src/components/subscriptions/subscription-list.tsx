@@ -203,7 +203,6 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
         if (cursor) {
           // Append to existing subscriptions
           setSubscriptions(prev => [...prev, ...data.subscriptions]);
-          onUpdate?.([...subscriptions, ...data.subscriptions]);
         } else {
           setSubscriptions(data.subscriptions);
           onUpdate?.(data.subscriptions);
@@ -333,25 +332,6 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
     await updateAction(subscription.id, "unsubscribe");
   };
 
-  // Poll job status until completion or timeout
-  const pollJobStatus = async (jobId: string): Promise<boolean> => {
-    const maxAttempts = 20; // 20 * 500ms = 10 seconds max
-    for (let i = 0; i < maxAttempts; i++) {
-      try {
-        const response = await fetch(`/api/jobs/status?id=${encodeURIComponent(jobId)}`);
-        if (response.ok) {
-          const { status } = await response.json();
-          if (status === 'completed') return true;
-          if (status === 'failed') return false;
-        }
-      } catch (error) {
-        console.error(`Error polling job ${jobId}:`, error);
-      }
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
-    return false; // Timeout
-  };
-
   const confirmDelete = async () => {
     // Mark senders as processing
     setProcessingSenderEmails(new Set(deleteConfirm.senderEmails));
@@ -368,13 +348,6 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
       });
 
       if (response.ok) {
-        const result = await response.json();
-
-        // Poll job status if jobIds are available
-        if (result.jobIds && result.jobIds.length > 0) {
-          await Promise.all(result.jobIds.map((jobId: string) => pollJobStatus(jobId)));
-        }
-
         // Close dialog and clear selection
         setDeleteConfirm({ open: false, senderEmails: [], count: 0 });
         setSelectedIds(new Set());

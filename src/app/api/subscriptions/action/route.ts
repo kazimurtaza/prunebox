@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/modules/auth/auth';
 import { db } from '@/lib/db';
-import { queueUnsubscribe } from '@/modules/queues';
+import { runUnsubscribe } from '@/modules/queues/jobs';
 import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
 import { z } from 'zod';
 import { getUserTokens } from '@/lib/get-user-tokens';
@@ -89,7 +89,7 @@ export async function POST(request: Request) {
         return ApiErrorResponse.badRequest('No Gmail account found. Please reconnect your Google account.');
       }
 
-      await queueUnsubscribe({
+      await runUnsubscribe({
         userId: session.user.id,
         subscriptionId,
         accessToken: tokens.accessToken,

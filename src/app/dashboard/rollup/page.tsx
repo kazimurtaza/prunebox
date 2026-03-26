@@ -1,11 +1,9 @@
 
-
 import { auth } from '@/modules/auth/auth';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { TrackedActionButton } from '@/components/analytics/tracked-button';
 import { Mail, Settings2, Clock, Calendar } from 'lucide-react';
 
 async function getRollupData(userId: string) {
@@ -45,10 +43,10 @@ export default async function RollupPage() {
                         Daily digest of your selected email groups
                     </p>
                 </div>
-                <TrackedActionButton eventLabel="configure_digest">
+                <Button variant="outline">
                     <Settings2 className="mr-2 h-4 w-4" />
                     Configure Digest
-                </TrackedActionButton>
+                </Button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -119,17 +117,16 @@ export default async function RollupPage() {
                             <CardTitle>Quick Actions</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-2">
-                            <TrackedActionButton className="w-full" eventLabel="send_test">
+                            <Button className="w-full">
                                 Send Test Digest
-                            </TrackedActionButton>
-                            <TrackedActionButton
+                            </Button>
+                            <Button
                                 className="w-full"
                                 variant="destructive"
                                 disabled={!settings?.enabled}
-                                eventLabel="disabled"
                             >
                                 Disable Rollup
-                            </TrackedActionButton>
+                            </Button>
                         </CardContent>
                     </Card>
                 </div>

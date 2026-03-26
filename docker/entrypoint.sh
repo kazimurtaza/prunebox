@@ -51,7 +51,6 @@ fi
 
 # Ensure proper permissions
 chown -R postgres:postgres /var/lib/postgresql/data 2>/dev/null || true
-chown -R node:node /var/lib/redis 2>/dev/null || true
 
 # Start PostgreSQL temporarily for schema setup
 echo "🔄 Starting PostgreSQL temporarily for schema setup..."

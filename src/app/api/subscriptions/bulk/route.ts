@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/modules/auth/auth';
 import { db } from '@/lib/db';
-import { queueUnsubscribe, queueBulkDelete } from '@/modules/queues';
+import { runBulkDelete, runUnsubscribe } from '@/modules/queues/jobs';
 import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
@@ -76,8 +76,8 @@ export async function POST(request: Request) {
         senderEmails,
       });
 
-      const jobs = await Promise.all(senderEmails.map((senderEmail: string) =>
-        queueBulkDelete({
+      await Promise.all(senderEmails.map((senderEmail: string) =>
+        runBulkDelete({
           userId: session.user.id,
           senderEmail,
           accessToken: tokens.accessToken!,
@@ -85,10 +85,8 @@ export async function POST(request: Request) {
         })
       ));
 
-      const jobIds = jobs.map(job => job.id);
-
-      logger.info(`BULK DELETE: Queued all ${senderEmails.length} jobs`);
-      return NextResponse.json({ success: true, count: senderEmails.length, jobIds });
+      logger.info(`BULK DELETE: Completed all ${senderEmails.length} deletes`);
+      return NextResponse.json({ success: true, count: senderEmails.length });
     }
 
     if (!subscriptionIds || subscriptionIds.length === 0) {
@@ -114,8 +112,8 @@ export async function POST(request: Request) {
 
     // Handle delete action - queue bulk delete jobs
     if (action === 'delete') {
-      const jobs = await Promise.all(subscriptions.map((sub) =>
-        queueBulkDelete({
+      await Promise.all(subscriptions.map((sub) =>
+        runBulkDelete({
           userId: session.user.id,
           senderEmail: sub.senderEmail,
           accessToken: tokens.accessToken!,
@@ -123,9 +121,7 @@ export async function POST(request: Request) {
         })
       ));
 
-      const jobIds = jobs.map(job => job.id);
-
-      return NextResponse.json({ success: true, count: subscriptions.length, jobIds });
+      return NextResponse.json({ success: true, count: subscriptions.length });
     }
 
     // For unsubscribe and rollup, create/update preferences
@@ -151,15 +147,15 @@ export async function POST(request: Request) {
 
     // If unsubscribe action, queue unsubscription jobs
     if (action === 'unsubscribe') {
-      const jobs = subscriptionIds.map((subscriptionId: string) =>
-        queueUnsubscribe({
+      const unsubPromises = subscriptionIds.map((subscriptionId: string) =>
+        runUnsubscribe({
           userId: session.user.id,
           subscriptionId,
           accessToken: tokens.accessToken!,
           refreshToken: tokens.refreshToken ?? undefined,
         })
       );
-      await Promise.all(jobs);
+      await Promise.all(unsubPromises);
     }
 
     return NextResponse.json({ success: true, count: subscriptionIds.length });

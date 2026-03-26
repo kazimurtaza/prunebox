@@ -1,5 +1,20 @@
-import { TrackedButton } from "@/components/analytics/tracked-link";
 import { Shield, Mail, Trash2, Zap } from "lucide-react";
+import Link from "next/link";
+import { Button, ButtonProps } from "@/components/ui/button";
+import { ReactNode } from "react";
+
+interface LinkButtonProps extends Omit<ButtonProps, 'onClick'> {
+  href: string;
+  children: ReactNode;
+}
+
+function LinkButton({ href, children, ...props }: LinkButtonProps) {
+  return (
+    <Link href={href}>
+      <Button {...props}>{children}</Button>
+    </Link>
+  );
+}
 
 export default function HomePage() {
   return (
@@ -11,12 +26,12 @@ export default function HomePage() {
             <span className="text-xl font-bold">Prunebox</span>
           </div>
           <nav className="flex items-center gap-4">
-            <TrackedButton href="/deploy" eventCategory="landing_nav" eventLabel="deploy" variant="ghost">
+            <LinkButton href="/deploy" variant="ghost">
               Self-Host
-            </TrackedButton>
-            <TrackedButton href="/auth/signin" eventCategory="landing_cta" eventLabel="sign_in">
+            </LinkButton>
+            <LinkButton href="/auth/signin">
               Sign In
-            </TrackedButton>
+            </LinkButton>
           </nav>
         </div>
       </header>
@@ -35,13 +50,13 @@ export default function HomePage() {
             Plus one-click unsubscribe for mailing lists. Your data stays private.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <TrackedButton href="/auth/signin" eventCategory="landing_cta" eventLabel="get_started" size="lg" className="text-lg">
+            <LinkButton href="/auth/signin" size="lg" className="text-lg">
               <Zap className="mr-2 h-5 w-5" />
               Get Started Free
-            </TrackedButton>
-            <TrackedButton href="/deploy" eventCategory="landing_nav" eventLabel="self_host" size="lg" variant="outline" className="text-lg">
+            </LinkButton>
+            <LinkButton href="/deploy" size="lg" variant="outline" className="text-lg">
               Self-Host
-            </TrackedButton>
+            </LinkButton>
           </div>
         </div>
 

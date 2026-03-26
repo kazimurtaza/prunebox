@@ -113,7 +113,6 @@ export function detectSubscription(headers: Record<string, string>): Subscriptio
     'hi@',
     'mail@',
     'email@',
-    'notifications@',
     'update@',
     'daily@',
     'weekly@',

@@ -251,15 +251,17 @@ export async function listMessages(
 
 /**
  * Get a message with full headers
+ * @param gmailClient - Optional pre-created Gmail client to reuse (avoids per-message client churn)
  */
 export async function getMessage(
   accessToken: string,
   refreshToken: string | undefined,
   messageId: string,
   format: 'minimal' | 'full' | 'raw' | 'metadata' = 'full',
-  userId?: string
+  userId?: string,
+  gmailClient?: Awaited<ReturnType<typeof createGmailClient>>
 ): Promise<GmailMessage | null> {
-  const gmail = await createGmailClient(accessToken, refreshToken, userId);
+  const gmail = gmailClient || await createGmailClient(accessToken, refreshToken, userId);
 
   try {
     const response = await gmail.users.messages.get({
@@ -291,23 +293,24 @@ export function getMessageHeaders(message: GmailMessage): Record<string, string>
 
 /**
  * Batch move messages to trash (safer than permanent delete and works with gmail.modify scope)
+ * @param gmailClient - Optional pre-created Gmail client to reuse (avoids per-batch client churn)
  */
 export async function batchDeleteMessages(
   accessToken: string,
   refreshToken: string | undefined,
   messageIds: string[],
-  userId?: string
+  userId?: string,
+  gmailClient?: Awaited<ReturnType<typeof createGmailClient>>
 ): Promise<void> {
   if (messageIds.length === 0) return;
+
+  const gmail = gmailClient || await createGmailClient(accessToken, refreshToken, userId);
 
   // Move to trash using individual calls as batchModify doesn't support system labels like TRASH
   // We process in chunks to avoid hitting rate limits too hard
   const chunkSize = 20;
   for (let i = 0; i < messageIds.length; i += chunkSize) {
     const chunk = messageIds.slice(i, i + chunkSize);
-
-    // Create a fresh client for each batch to ensure tokens are refreshed
-    const gmail = await createGmailClient(accessToken, refreshToken, userId);
 
     // Process sequentially to better handle errors and token refresh
     for (const id of chunk) {

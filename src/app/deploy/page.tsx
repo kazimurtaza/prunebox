@@ -95,8 +95,7 @@ export default function DeployPage() {
           <CardContent className="space-y-4">
             <div className="bg-muted p-4 rounded-lg space-y-2">
               <code className="text-sm block">npm install</code>
-              <code className="text-sm block">npm run build:worker</code>
-              <code className="text-sm block">npm run build:next</code>
+              <code className="text-sm block">npm run build</code>
               <code className="text-sm block">npm start</code>
             </div>
           </CardContent>
@@ -118,12 +117,6 @@ export default function DeployPage() {
                     <label className="text-sm font-medium">DATABASE_URL</label>
                     <code className="block bg-muted p-2 rounded text-xs">
                       postgresql://prunebox:password@localhost:5432/prunebox
-                    </code>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">REDIS_URL</label>
-                    <code className="block bg-muted p-2 rounded text-xs">
-                      redis://localhost:6379
                     </code>
                   </div>
                   <div className="space-y-1">
@@ -204,14 +197,14 @@ export default function DeployPage() {
               <CardContent className="p-6 text-center">
                 <Server className="h-8 w-8 text-primary mx-auto mb-2" />
                 <h4 className="font-medium">Backend</h4>
-                <p className="text-sm text-muted-foreground">Next.js API, PostgreSQL, Redis</p>
+                <p className="text-sm text-muted-foreground">Next.js API, PostgreSQL</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6 text-center">
                 <Package className="h-8 w-8 text-primary mx-auto mb-2" />
                 <h4 className="font-medium">Deployment</h4>
-                <p className="text-sm text-muted-foreground">Docker, BullMQ, Prisma</p>
+                <p className="text-sm text-muted-foreground">Docker, Prisma</p>
               </CardContent>
             </Card>
           </div>

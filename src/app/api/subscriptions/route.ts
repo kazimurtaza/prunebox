@@ -36,10 +36,18 @@ export async function GET(request: Request) {
     // Build where clause with cursor
     const where: Prisma.SubscriptionWhereInput = { userId: session.user.id };
     if (cursor) {
-      const [cursorDate, cursorId] = cursor.split('_');
+      const parts = cursor.split('_');
+      if (parts.length !== 2) {
+        return ApiErrorResponse.badRequest('Invalid cursor format');
+      }
+      const [cursorDate, cursorId] = parts;
+      const parsedDate = new Date(cursorDate);
+      if (isNaN(parsedDate.getTime()) || !cursorId) {
+        return ApiErrorResponse.badRequest('Invalid cursor');
+      }
       where.OR = [
-        { lastSeenAt: { lt: new Date(cursorDate) } },
-        { lastSeenAt: new Date(cursorDate), id: { lt: cursorId } },
+        { lastSeenAt: { lt: parsedDate } },
+        { lastSeenAt: parsedDate, id: { lt: cursorId } },
       ];
     }
 

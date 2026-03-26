@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/modules/auth/auth';
-import { queueEmailScan } from '@/modules/queues';
+import { runEmailScan } from '@/modules/queues/jobs';
 import { db } from '@/lib/db';
 import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
 import { withRateLimit, RATE_LIMITS } from '@/lib/rate-limiter';
+import { logger } from '@/lib/logger';
 import { getUserTokens } from '@/lib/get-user-tokens';
 
 export async function POST(request: Request) {
@@ -55,13 +56,13 @@ export async function POST(request: Request) {
       return ApiErrorResponse.badRequest('No Gmail account found. Please reconnect your Google account.');
     }
 
-    // Queue the scan job
-    await queueEmailScan({
+    // Fire-and-forget the scan job (progress tracked via db.gmailSyncState)
+    runEmailScan({
       userId: session.user.id,
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken ?? undefined,
       forceFullScan,
-    });
+    }).catch(err => logger.error('Background scan failed:', err));
 
     return NextResponse.json({ success: true, message: 'Scan started' });
   }, 'Failed to start scan');

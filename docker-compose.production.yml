@@ -8,7 +8,6 @@ services:
     environment:
       - DATABASE_URL=postgresql://prunebox:CHANGE_ME_POSTGRES_PASSWORD@localhost:5432/prunebox
       - POSTGRES_PASSWORD=CHANGE_ME_POSTGRES_PASSWORD
-      - REDIS_URL=redis://localhost:6379
       - NODE_ENV=production
       - NEXTAUTH_URL=https://prunebox.example.com
       - NEXTAUTH_SECRET=CHANGE_ME_NEXTAUTH_SECRET
@@ -27,7 +26,6 @@ services:
       - MAX_FULL_SCAN_LIMIT=50000
     volumes:
       - prunebox_postgres:/var/lib/postgresql/data
-      - prunebox_redis:/var/lib/redis
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
       interval: 30s
@@ -37,5 +35,3 @@ services:
 
 volumes:
   prunebox_postgres:
-
-  prunebox_redis:
