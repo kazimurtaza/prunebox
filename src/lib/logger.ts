@@ -28,7 +28,7 @@ class Logger {
   constructor() {
     this.isProduction = process.env.NODE_ENV === 'production';
     const envLevel = process.env.LOG_LEVEL?.toUpperCase();
-    this.minLevel = this.parseLogLevel(envLevel) || (this.isProduction ? LogLevel.INFO : LogLevel.DEBUG);
+    this.minLevel = this.parseLogLevel(envLevel) ?? (this.isProduction ? LogLevel.INFO : LogLevel.DEBUG);
   }
 
   private parseLogLevel(level?: string): LogLevel | undefined {
