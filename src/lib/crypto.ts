@@ -10,6 +10,22 @@ const TAG_LENGTH = 16;
 const TAG_POSITION = SALT_LENGTH + IV_LENGTH;
 const ENCRYPTED_POSITION = TAG_POSITION + TAG_LENGTH;
 
+let cachedEncryptionKey: string | undefined;
+
+function getEncryptionKey(): string {
+  if (cachedEncryptionKey) return cachedEncryptionKey;
+
+  const key = process.env.ENCRYPTION_KEY;
+  if (!key || key.length < 16) {
+    throw new Error(
+      'ENCRYPTION_KEY environment variable is missing or too short (minimum 16 characters). ' +
+      'Generate one with: openssl rand -base64 48'
+    );
+  }
+  cachedEncryptionKey = key;
+  return key;
+}
+
 /**
  * Encrypt sensitive data using AES-256-GCM
  * @param plaintext - The data to encrypt
@@ -21,7 +37,7 @@ export async function encrypt(plaintext: string): Promise<string> {
   const iv = crypto.randomBytes(IV_LENGTH);
   const salt = crypto.randomBytes(SALT_LENGTH);
   const key = await pbkdf2(
-    process.env.ENCRYPTION_KEY!,
+    getEncryptionKey(),
     salt,
     100000,
     32,
@@ -65,7 +81,7 @@ export async function decrypt(ciphertext: string): Promise<string> {
 
   // Derive key using the same salt
   const key = await pbkdf2(
-    process.env.ENCRYPTION_KEY!,
+    getEncryptionKey(),
     salt,
     100000,
     32,
