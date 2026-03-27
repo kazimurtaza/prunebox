@@ -106,7 +106,7 @@ model GmailSyncState {
   userId          String    @unique
   historyId       BigInt?
   watchExpiration DateTime?
-  lastSyncAt      DateTime  @default(now())
+  lastSyncAt      DateTime?
   scanStatus      String    @default("idle")
   scanProgress    Int?
   scanTotal       Int?
