@@ -82,12 +82,13 @@ class Logger {
 
     const formattedMessage = this.formatMessage(entry);
 
-    // Use appropriate console method (only warn/error allowed by ESLint)
+    // Use appropriate console method
     switch (level) {
       case LogLevel.DEBUG:
+        console.debug(formattedMessage);
+        break;
       case LogLevel.INFO:
-        // Use console.warn for info/debug since console.info/debug are not allowed
-        console.warn(formattedMessage);
+        console.info(formattedMessage);
         break;
       case LogLevel.WARN:
         console.warn(formattedMessage);

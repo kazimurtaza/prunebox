@@ -429,6 +429,13 @@ export async function runUnsubscribe(data: UnsubscribeJobData) {
 export async function runBulkDelete(data: BulkDeleteJobData) {
   const { userId, senderEmail } = data;
 
+  // Dry-run mode: log what would happen without calling the Gmail API
+  if (process.env.NODE_ENV === 'development') {
+    logger.info(`[DRY RUN] Would delete emails from ${senderEmail} for user ${userId}`);
+    logger.info(`[DRY RUN] Search patterns: from:${senderEmail}, from:${senderEmail.includes('@') ? senderEmail.split('@')[1] : senderEmail}`);
+    return { success: true, deletedCount: 0, dryRun: true };
+  }
+
   logger.info(`Starting bulk delete for ${senderEmail}`);
 
   try {

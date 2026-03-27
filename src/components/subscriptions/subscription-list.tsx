@@ -79,7 +79,8 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
     senderEmails: string[];
     subscriptionIds?: string[];
     count: number;
-  }>({ open: false, senderEmails: [], count: 0 });
+    totalEmails: number;
+  }>({ open: false, senderEmails: [], count: 0, totalEmails: 0 });
 
   // Pagination state
   const [hasMore, setHasMore] = useState(false);
@@ -300,6 +301,7 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
         senderEmails: selectedSubs.map((s) => s.senderEmail),
         subscriptionIds: Array.from(selectedIds),
         count: selectedSubs.length,
+        totalEmails: selectedSubs.reduce((sum, s) => sum + s.messageCount, 0),
       });
       return;
     }
@@ -321,10 +323,12 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
   };
 
   const deleteFromSender = async (senderEmail: string, _senderName: string) => {
+    const sub = subscriptions.find((s) => s.senderEmail === senderEmail);
     setDeleteConfirm({
       open: true,
       senderEmails: [senderEmail],
       count: 1,
+      totalEmails: sub?.messageCount ?? 0,
     });
   };
 
@@ -349,7 +353,7 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
 
       if (response.ok) {
         // Close dialog and clear selection
-        setDeleteConfirm({ open: false, senderEmails: [], count: 0 });
+        setDeleteConfirm({ open: false, senderEmails: [], count: 0, totalEmails: 0 });
         setSelectedIds(new Set());
 
         // Rescan each affected sender to update counts or remove if deleted
@@ -859,15 +863,26 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-destructive" />
-              Delete All Emails?
+              Move Emails to Trash?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete all emails from {deleteConfirm.count === 1
-                ? `"${deleteConfirm.senderEmails[0]}"`
-                : `${deleteConfirm.count} senders`
+              This will move <strong>{deleteConfirm.totalEmails.toLocaleString()} email{deleteConfirm.totalEmails !== 1 ? 's' : ''}</strong> to Trash from {deleteConfirm.count === 1
+                ? (
+                  <span className="font-medium">&ldquo;{deleteConfirm.senderEmails[0]}&rdquo;</span>
+                )
+                : (
+                  <>
+                    {deleteConfirm.count} senders:
+                    <span className="block mt-1 max-h-24 overflow-y-auto text-xs font-mono">
+                      {deleteConfirm.senderEmails.join(', ')}
+                    </span>
+                  </>
+                )
               }.
               <br /><br />
-              <strong className="text-destructive">This action cannot be undone.</strong>
+              Deleted emails can be recovered from Gmail&apos;s Trash for up to 30 days.
+              <br /><br />
+              <strong className="text-destructive">This action cannot be undone through Prunebox.</strong>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -876,7 +891,7 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
               onClick={confirmDelete}
               className="bg-destructive hover:bg-destructive/90"
             >
-              Delete All Emails
+              Move to Trash
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

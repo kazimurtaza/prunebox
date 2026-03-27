@@ -70,14 +70,22 @@ done
 if [ -n "$DATABASE_URL" ]; then
     echo "🔄 Running database schema setup..."
     cd /app
-    # Try migrations first, then db push if no migrations exist
-    if npx prisma migrate deploy 2>/dev/null | grep -q "No migration"; then
+    # Try migrations first; fall back to db push only on "no migrations" status
+    migrate_output=$(npx prisma migrate deploy 2>&1)
+    migrate_exit=$?
+    if echo "$migrate_output" | grep -qi "no migration"; then
         echo "📦 No migrations found, applying schema directly..."
         if ! npx prisma db push --skip-generate; then
             echo "❌ Schema setup failed. Please check your database configuration."
             echo "   You may need to run: npx prisma migrate dev --name init"
             exit 1
         fi
+    elif [ $migrate_exit -ne 0 ]; then
+        echo "❌ Prisma migration failed (exit code $migrate_exit):"
+        echo "$migrate_output"
+        exit 1
+    else
+        echo "✅ Migrations applied successfully"
     fi
 fi
 
