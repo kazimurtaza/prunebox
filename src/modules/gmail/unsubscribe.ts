@@ -20,13 +20,15 @@ export async function oneClickUnsubscribe(unsubscribeUrl: string): Promise<Unsub
       body: 'List-Unsubscribe=One-Click',
     });
 
-    if (response.ok || response.status === 200 || response.status === 204) {
+    if (response.ok && (response.status === 200 || response.status === 204)) {
       return { success: true, method: 'one_click' };
     }
 
-    // Some services return 200 OK even if unsubscribe fails
-    // We'll assume success for MVP
-    return { success: true, method: 'one_click' };
+    return {
+      success: false,
+      method: 'one_click',
+      error: `Unsubscribe failed: HTTP ${response.status} ${response.statusText}`
+    };
   } catch (error) {
     return {
       success: false,

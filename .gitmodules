@@ -1,0 +1,4 @@
+[submodule "lazydave"]
+	path = lazydave
+	url = https://github.com/kazimurtaza/lazydave
+	branch = feature/ouroboros
