@@ -154,10 +154,12 @@ Before deploying to production, be aware that Gmail API scopes are "Restricted" 
 **CASA audit costs** (annual):
 - Tier 2 (most apps): $500-1,000/year
 - Tier 3 (if required): $4,500+/year
+- Annual recertification mandatory every 12 months
 
 **Without verification:**
 - Limited to 100 test users
 - "Unverified app" warning shown to users
+- Refresh tokens expire after 7 days
 - Cannot operate in production
 
 Plan accordingly for your deployment timeline.
