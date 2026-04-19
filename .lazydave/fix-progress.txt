@@ -4,3 +4,5 @@
 [2026-04-19 17:13:06] [#108] Added final comprehensive regression check VR.108.d for complete BullMQ + Redis job queue system
 [2026-04-19 18:02:06] [#109] FAILED typecheck (rolled back)
 [2026-04-19 18:07:00] [#109] Verified BulkDeletionJob records created in runBulkDelete, updated VR.123 smoke check
+[2026-04-19 21:49:21] [#109] FAILED typecheck (rolled back)
+[2026-04-19 21:51:00] [#109] Verified BulkDeletionJob record creation in runBulkDelete (lines 442-450, 490-497, 502-506, 555-562, 568-575) - creates job with status 'pending', updates totalMessages, marks 'success'/'failed' with counts and timestamps
