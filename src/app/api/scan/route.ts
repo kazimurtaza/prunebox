@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/modules/auth/auth';
-import { emailScanQueue } from '@/modules/queues/queues';
+import { getEmailScanQueue } from '@/modules/queues/queues';
 import { db } from '@/lib/db';
 import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
 import { withRateLimit, RATE_LIMITS } from '@/lib/rate-limiter';
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
     logger.info(`Starting scan for user ${session.user.id}: firstScan=${isFirstScan}, forceFull=${forceFullScan}`);
 
     // Add job to queue (progress tracked via db.gmailSyncState)
-    await emailScanQueue.add('email-scan', {
+    await getEmailScanQueue().add('email-scan', {
       userId: session.user.id,
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken ?? undefined,

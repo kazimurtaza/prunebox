@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/modules/auth/auth';
 import { db } from '@/lib/db';
-import { bulkDeleteQueue, unsubscribeQueue, scheduleDailyRollup, removeScheduledRollup } from '@/modules/queues/queues';
+import { getBulkDeleteQueue, getUnsubscribeQueue, scheduleDailyRollup, removeScheduledRollup } from '@/modules/queues/queues';
 import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
 
       // Add jobs to queue
       for (const senderEmail of senderEmails) {
-        await bulkDeleteQueue.add('bulk-delete', {
+        await getBulkDeleteQueue().add('bulk-delete', {
           userId: session.user.id,
           senderEmail,
           accessToken: tokens.accessToken!,
@@ -115,7 +115,7 @@ export async function POST(request: Request) {
     // Handle delete action - add to queue
     if (action === 'delete') {
       for (const sub of subscriptions) {
-        await bulkDeleteQueue.add('bulk-delete', {
+        await getBulkDeleteQueue().add('bulk-delete', {
           userId: session.user.id,
           senderEmail: sub.senderEmail,
           accessToken: tokens.accessToken!,
@@ -152,7 +152,7 @@ export async function POST(request: Request) {
     // If unsubscribe action, queue unsubscription jobs
     if (action === 'unsubscribe') {
       for (const subscriptionId of subscriptionIds) {
-        await unsubscribeQueue.add('unsubscribe', {
+        await getUnsubscribeQueue().add('unsubscribe', {
           userId: session.user.id,
           subscriptionId,
           accessToken: tokens.accessToken!,

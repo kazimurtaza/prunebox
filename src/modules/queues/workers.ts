@@ -1,5 +1,5 @@
 import { Worker } from 'bullmq';
-import { redisConnection } from './config';
+import { getRedisConnection } from './config';
 import { runEmailScan, runUnsubscribe, runBulkDelete, runRollup } from './jobs';
 import { logger } from '@/lib/logger';
 
@@ -10,6 +10,8 @@ export function initializeWorkers() {
     logger.info('Workers already initialized');
     return workers;
   }
+
+  const redisConnection = getRedisConnection();
 
   const emailScanWorker = new Worker(
     'email-scan',

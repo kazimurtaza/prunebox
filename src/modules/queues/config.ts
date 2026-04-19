@@ -1,16 +1,25 @@
 import { Redis } from 'ioredis';
+import { logger } from '@/lib/logger';
 
 const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 
-export const redisConnection = new Redis(redisUrl, {
-  maxRetriesPerRequest: null,
-  enableReadyCheck: false,
-});
+let redisConnection: Redis | null = null;
 
-redisConnection.on('error', (err) => {
-  console.error('Redis connection error:', err);
-});
+export function getRedisConnection(): Redis {
+  if (!redisConnection) {
+    redisConnection = new Redis(redisUrl, {
+      maxRetriesPerRequest: null,
+      enableReadyCheck: false,
+    });
 
-redisConnection.on('connect', () => {
-  console.log('Connected to Redis');
-});
+    redisConnection.on('error', (err) => {
+      logger.error('Redis connection error:', err);
+    });
+
+    redisConnection.on('connect', () => {
+      logger.info('Connected to Redis');
+    });
+  }
+
+  return redisConnection;
+}
