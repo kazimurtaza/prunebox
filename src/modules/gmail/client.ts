@@ -284,7 +284,7 @@ export function getMessageHeaders(message: GmailMessage): Record<string, string>
 }
 
 /**
- * Batch move messages to trash (safer than permanent delete and works with gmail.modify scope)
+ * Batch delete messages using Gmail batchDelete API
  * @param gmailClient - Optional pre-created Gmail client to reuse (avoids per-batch client churn)
  */
 export async function batchDeleteMessages(
@@ -298,24 +298,14 @@ export async function batchDeleteMessages(
 
   const gmail = gmailClient || await createGmailClient(accessToken, refreshToken, userId);
 
-  // Move to trash using individual calls as batchModify doesn't support system labels like TRASH
-  // We process in chunks to avoid hitting rate limits too hard
-  const chunkSize = 20;
+  const chunkSize = 1000;
   for (let i = 0; i < messageIds.length; i += chunkSize) {
     const chunk = messageIds.slice(i, i + chunkSize);
 
-    // Process sequentially to better handle errors and token refresh
-    for (const id of chunk) {
-      await gmail.users.messages.trash({
-        userId: 'me',
-        id,
-      });
-    }
-
-    // Add a small delay between batches to avoid rate limits
-    if (i + chunkSize < messageIds.length) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
+    await gmail.users.messages.batchDelete({
+      userId: 'me',
+      requestBody: { ids: chunk },
+    });
   }
 }
 
