@@ -39,6 +39,8 @@ openssl rand -base64 16
 
 ## Google OAuth Setup
 
+> **Important:** Gmail API scopes are "Restricted" and require Google's OAuth verification process before production use. This takes 4-8 weeks minimum and may require a CASA security audit ($500-1,000/year). See README.md for details.
+
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project
 3. Enable Gmail API

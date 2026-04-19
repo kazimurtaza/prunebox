@@ -139,6 +139,29 @@ Unverified apps are limited to **100 test users**. To allow anyone to sign up:
    - Justification for each sensitive scope requested
 3. Once verified, the "Unverified App" screen is removed and any Google user can sign in
 
+#### Google Verification Timeline and Costs
+
+Before deploying to production, be aware that Gmail API scopes are "Restricted" and require Google's verification process:
+
+| Phase | Duration |
+|-------|----------|
+| Brand verification (domain, privacy policy) | 2-3 business days |
+| Initial OAuth scope review | 1-4 weeks |
+| CASA Tier 2 security assessment | 1-3 weeks |
+| **Total minimum** | **4-8 weeks** |
+| With issues/remediation | **3-6 months** |
+
+**CASA audit costs** (annual):
+- Tier 2 (most apps): $500-1,000/year
+- Tier 3 (if required): $4,500+/year
+
+**Without verification:**
+- Limited to 100 test users
+- "Unverified app" warning shown to users
+- Cannot operate in production
+
+Plan accordingly for your deployment timeline.
+
 ### Gmail API Scopes
 
 This app uses the following Gmail scopes (all are "Restricted" and require verification):
