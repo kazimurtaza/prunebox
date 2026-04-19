@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/modules/auth/auth';
 import { db } from '@/lib/db';
-import { unsubscribeQueue, scheduleDailyRollup } from '@/modules/queues/queues';
+import { unsubscribeQueue, scheduleDailyRollup, removeScheduledRollup } from '@/modules/queues/queues';
 import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
 import { z } from 'zod';
 import { getUserTokens } from '@/lib/get-user-tokens';
@@ -106,6 +106,16 @@ export async function POST(request: Request) {
         return ApiErrorResponse.badRequest('No Gmail account found. Please reconnect your Google account.');
       }
       await scheduleDailyRollup(session.user.id, tokens.accessToken, tokens.refreshToken || undefined);
+    } else if (action === 'keep' || action === 'unsubscribe') {
+      const remainingRollupCount = await db.subscriptionPreference.count({
+        where: {
+          userId: session.user.id,
+          action: 'rollup',
+        },
+      });
+      if (remainingRollupCount === 0) {
+        await removeScheduledRollup(session.user.id);
+      }
     }
 
     return NextResponse.json({ success: true });
