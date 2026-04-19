@@ -182,13 +182,11 @@ export default function HowItWorksPage() {
               <Shield className="h-12 w-12 text-primary mx-auto mb-4" />
               <h2 className="text-xl font-bold mb-2">Your Privacy, Guaranteed</h2>
               <p className="text-muted-foreground mb-4">
-                We never sell, rent, or share your data. Your email content is used only to provide the email group management service. Full GDPR compliance with right to erasure.
+                We never sell, rent, or share your data. Your email content is used only to provide the email group management service. We comply with Google Limited Use policy - your data is used only for subscription management.
               </p>
               <ul className="text-sm text-muted-foreground space-y-1">
                 <li>✓ No data selling, ever</li>
                 <li>✓ No ads or tracking</li>
-                <li>✓ Data deletion on request</li>
-                <li>✓ GDPR Article 17 compliant</li>
               </ul>
             </CardContent>
           </Card>
