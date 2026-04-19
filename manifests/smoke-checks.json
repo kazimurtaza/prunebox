@@ -1,0 +1,5 @@
+{
+  "checks": [
+    {"id": "VR.40", "title": "Regression: BullMQ + Redis job queue system implemented", "category": "regression", "verified": true, "notes": "Verified at fix time - bullmq and ioredis packages installed, queues created for email-scan/unsubscribe/bulk-delete/rollup-digest, API routes updated to use queue.add() instead of direct function calls, docker-compose.yml includes Redis service, .env.example has REDIS_URL configuration"}
+  ]
+}
