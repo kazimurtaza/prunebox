@@ -82,5 +82,3 @@ export async function closeWorkers() {
     logger.info('BullMQ workers closed');
   }
 }
-
-initializeWorkers();

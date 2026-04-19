@@ -1,1 +1,3 @@
 [2026-04-19 15:25:50] [#108] FAILED typecheck (rolled back)
+[2026-04-19 15:27:05] [#108] FAILED typecheck (rolled back)
+[2026-04-19 15:29:24] [#108] Added instrumentation.ts for proper BullMQ worker lifecycle management
