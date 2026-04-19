@@ -76,3 +76,29 @@ export const rollupQueue = new Queue('rollup-digest', {
     },
   },
 });
+
+export async function scheduleDailyRollup(userId: string, accessToken: string, refreshToken?: string) {
+  const jobId = `daily-digest-${userId}`;
+  await rollupQueue.add(
+    'daily-digest',
+    {
+      userId,
+      accessToken,
+      refreshToken,
+    },
+    {
+      jobId,
+      repeat: {
+        pattern: '0 8 * * *',
+      },
+    }
+  );
+}
+
+export async function removeScheduledRollup(userId: string) {
+  const jobId = `daily-digest-${userId}`;
+  const job = await rollupQueue.getJob(jobId);
+  if (job) {
+    await job.remove();
+  }
+}

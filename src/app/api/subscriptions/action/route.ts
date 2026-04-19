@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/modules/auth/auth';
 import { db } from '@/lib/db';
-import { unsubscribeQueue } from '@/modules/queues/queues';
+import { unsubscribeQueue, scheduleDailyRollup } from '@/modules/queues/queues';
 import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
 import { z } from 'zod';
 import { getUserTokens } from '@/lib/get-user-tokens';
@@ -97,6 +97,15 @@ export async function POST(request: Request) {
       }, {
         jobId: `unsubscribe-${session.user.id}-${subscriptionId}`,
       });
+    }
+
+    // If rollup action, schedule the daily digest
+    if (action === 'rollup') {
+      const tokens = await getUserTokens(session.user.id);
+      if (!tokens || !tokens.accessToken) {
+        return ApiErrorResponse.badRequest('No Gmail account found. Please reconnect your Google account.');
+      }
+      await scheduleDailyRollup(session.user.id, tokens.accessToken, tokens.refreshToken || undefined);
     }
 
     return NextResponse.json({ success: true });

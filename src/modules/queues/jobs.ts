@@ -539,14 +539,36 @@ export async function runBulkDelete(data: BulkDeleteJobData) {
  * Sends a digest email with all subscriptions
  */
 export async function runRollup(data: RollupJobData) {
-  const { userId, accessToken, refreshToken } = data;
+  const { userId } = data;
 
   logger.info(`Starting rollup digest for user ${userId}`);
 
+  // Fetch fresh tokens from database for scheduled jobs
+  const account = await db.account.findFirst({
+    where: {
+      userId,
+      provider: 'google',
+    },
+  });
+
+  if (!account || !account.access_token) {
+    throw new Error('No valid Google account found');
+  }
+
+  const accessToken = account.access_token;
+  const refreshToken = account.refresh_token ?? undefined;
+
   try {
-    // Get all subscriptions for this user
+    // Get subscriptions marked for rollup
     const subscriptions = await db.subscription.findMany({
-      where: { userId },
+      where: {
+        userId,
+        preferences: {
+          some: {
+            action: 'rollup',
+          },
+        },
+      },
       orderBy: { senderName: 'asc' },
     });
 

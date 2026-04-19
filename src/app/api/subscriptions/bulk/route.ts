@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/modules/auth/auth';
 import { db } from '@/lib/db';
-import { bulkDeleteQueue, unsubscribeQueue } from '@/modules/queues/queues';
+import { bulkDeleteQueue, unsubscribeQueue, scheduleDailyRollup } from '@/modules/queues/queues';
 import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
@@ -161,6 +161,11 @@ export async function POST(request: Request) {
           jobId: `unsubscribe-${session.user.id}-${subscriptionId}-${Date.now()}`,
         });
       }
+    }
+
+    // If rollup action, schedule the daily digest
+    if (action === 'rollup') {
+      await scheduleDailyRollup(session.user.id, tokens.accessToken!, tokens.refreshToken ?? undefined);
     }
 
     return NextResponse.json({ success: true, count: subscriptionIds.length });
