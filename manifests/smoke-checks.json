@@ -1,5 +1,6 @@
 {
   "checks": [
-    {"id": "VR.40", "title": "Regression: BullMQ + Redis job queue system implemented", "category": "regression", "verified": true, "notes": "Verified at fix time - bullmq and ioredis packages installed, queues created for email-scan/unsubscribe/bulk-delete/rollup-digest, API routes updated to use queue.add() instead of direct function calls, docker-compose.yml includes Redis service, .env.example has REDIS_URL configuration"}
+    {"id": "VR.40", "title": "Regression: BullMQ + Redis job queue system implemented", "category": "regression", "verified": true, "notes": "Verified at fix time - bullmq and ioredis packages installed, queues created for email-scan/unsubscribe/bulk-delete/rollup-digest, API routes updated to use queue.add() instead of direct function calls, docker-compose.yml includes Redis service, .env.example has REDIS_URL configuration"},
+    {"id": "VR.39", "title": "Regression: Library modules source correctly in bash/zsh", "category": "regression", "verified": true, "notes": "Verified at fix time - V3 smoke check passes for all lib/*.sh modules in both bash and zsh. Used ${BASH_SOURCE[0]:-$0} for zsh compatibility, moved LAZYDAVE_DIR setup before source guard"}
   ]
 }
