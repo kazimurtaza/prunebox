@@ -19,6 +19,7 @@
 - **UI**: TailwindCSS, shadcn/ui components
 - **Backend**: Next.js API Routes
 - **Database**: PostgreSQL with Prisma ORM
+- **Job Queue**: BullMQ + Redis for background job processing
 - **Auth**: NextAuth.js v5 (Google OAuth)
 - **Email API**: Gmail API with googleapis
 
@@ -63,6 +64,7 @@ docker run -p 3000:3000 --env-file .env ghcr.io/kazimurtaza/prunebox:latest
 **Prerequisites:**
 - Node.js 18+
 - PostgreSQL 14+
+- Redis 7+ (for background job queue)
 
 ```bash
 # 1. Install dependencies
@@ -90,6 +92,7 @@ npm start
 |----------|-------------|---------|
 | `DATABASE_URL` | PostgreSQL connection string | `postgresql://prunebox:password@localhost:5432/prunebox` |
 | `POSTGRES_PASSWORD` | Database password | `random-32-char-string` |
+| `REDIS_URL` | Redis connection string for job queue | `redis://localhost:6379` |
 | `NEXTAUTH_URL` | Your app's public URL | `https://prunebox.example.com` |
 | `NEXTAUTH_SECRET` | NextAuth session secret | `random-32-char-string` |
 | `ENCRYPTION_KEY` | Encrypts OAuth tokens in DB | `32-character-encryption-key` |

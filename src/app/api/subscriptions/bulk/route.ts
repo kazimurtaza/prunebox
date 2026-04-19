@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/modules/auth/auth';
 import { db } from '@/lib/db';
-import { runBulkDelete, runUnsubscribe } from '@/modules/queues/jobs';
+import { bulkDeleteQueue, unsubscribeQueue } from '@/modules/queues/queues';
 import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
@@ -76,19 +76,17 @@ export async function POST(request: Request) {
         senderEmails,
       });
 
-      // Fire-and-forget — don't block the HTTP response while deleting
-      Promise.all(senderEmails.map((senderEmail: string) =>
-        runBulkDelete({
+      // Add jobs to queue
+      for (const senderEmail of senderEmails) {
+        await bulkDeleteQueue.add('bulk-delete', {
           userId: session.user.id,
           senderEmail,
           accessToken: tokens.accessToken!,
           refreshToken: tokens.refreshToken ?? undefined,
-        })
-      )).then(() => {
-        logger.info(`BULK DELETE: Completed all ${senderEmails.length} deletes`);
-      }).catch((err) => {
-        logger.error(`BULK DELETE: Error during delete`, err);
-      });
+        }, {
+          jobId: `bulk-delete-${session.user.id}-${senderEmail}-${Date.now()}`,
+        });
+      }
 
       return NextResponse.json({ success: true, count: senderEmails.length });
     }
@@ -114,18 +112,18 @@ export async function POST(request: Request) {
       return ApiErrorResponse.notFound('Some subscriptions');
     }
 
-    // Handle delete action - fire-and-forget to avoid blocking the response
+    // Handle delete action - add to queue
     if (action === 'delete') {
-      Promise.all(subscriptions.map((sub) =>
-        runBulkDelete({
+      for (const sub of subscriptions) {
+        await bulkDeleteQueue.add('bulk-delete', {
           userId: session.user.id,
           senderEmail: sub.senderEmail,
           accessToken: tokens.accessToken!,
           refreshToken: tokens.refreshToken ?? undefined,
-        })
-      )).catch((err) => {
-        logger.error(`BULK DELETE: Error during subscription delete`, err);
-      });
+        }, {
+          jobId: `bulk-delete-${session.user.id}-${sub.senderEmail}-${Date.now()}`,
+        });
+      }
 
       return NextResponse.json({ success: true, count: subscriptions.length });
     }
@@ -153,15 +151,16 @@ export async function POST(request: Request) {
 
     // If unsubscribe action, queue unsubscription jobs
     if (action === 'unsubscribe') {
-      const unsubPromises = subscriptionIds.map((subscriptionId: string) =>
-        runUnsubscribe({
+      for (const subscriptionId of subscriptionIds) {
+        await unsubscribeQueue.add('unsubscribe', {
           userId: session.user.id,
           subscriptionId,
           accessToken: tokens.accessToken!,
           refreshToken: tokens.refreshToken ?? undefined,
-        })
-      );
-      await Promise.all(unsubPromises);
+        }, {
+          jobId: `unsubscribe-${session.user.id}-${subscriptionId}-${Date.now()}`,
+        });
+      }
     }
 
     return NextResponse.json({ success: true, count: subscriptionIds.length });
