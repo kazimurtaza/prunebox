@@ -438,6 +438,17 @@ export async function runBulkDelete(data: BulkDeleteJobData) {
 
   logger.info(`Starting bulk delete for ${senderEmail}`);
 
+  // Record bulk deletion job
+  const job = await db.bulkDeletionJob.create({
+    data: {
+      userId,
+      senderEmail,
+      status: 'pending',
+      totalMessages: 0,
+      deletedMessages: 0,
+    },
+  });
+
   try {
     // Fetch fresh tokens from database to avoid stale token issues
     const account = await db.account.findFirst({
@@ -476,10 +487,23 @@ export async function runBulkDelete(data: BulkDeleteJobData) {
 
     if (messageIds.length === 0) {
       logger.info(`No messages found from ${senderEmail}`);
+      await db.bulkDeletionJob.update({
+        where: { id: job.id },
+        data: {
+          status: 'success',
+          completedAt: new Date(),
+        },
+      });
       return { success: true, deletedCount: 0 };
     }
 
     logger.info(`Found ${messageIds.length} messages from ${senderEmail}, deleting...`);
+
+    // Update total message count
+    await db.bulkDeletionJob.update({
+      where: { id: job.id },
+      data: { totalMessages: messageIds.length },
+    });
 
     // Create a single Gmail client for the entire delete job (avoids per-batch client churn)
     const gmailClient = await createGmailClient(accessToken, refreshToken, userId);
@@ -527,9 +551,28 @@ export async function runBulkDelete(data: BulkDeleteJobData) {
 
     logger.info(`Deleted ${deletedCount} messages from ${senderEmail}`);
 
+    // Mark job as completed
+    await db.bulkDeletionJob.update({
+      where: { id: job.id },
+      data: {
+        status: 'success',
+        deletedMessages: deletedCount,
+        completedAt: new Date(),
+      },
+    });
+
     return { success: true, deletedCount: messageIds.length };
   } catch (error) {
     logger.error(`Bulk delete failed for ${senderEmail}:`, error);
+    // Mark job as failed
+    await db.bulkDeletionJob.update({
+      where: { id: job.id },
+      data: {
+        status: 'failed',
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        completedAt: new Date(),
+      },
+    }).catch(() => {});
     throw error;
   }
 }
