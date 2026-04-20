@@ -6,7 +6,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://prunebox:CHANGE_ME_POSTGRES_PASSWORD@localhost:5432/prunebox
+      - DATABASE_URL=postgresql://prunebox:CHANGE_ME_POSTGRES_PASSWORD@postgres:5432/prunebox
       - POSTGRES_PASSWORD=CHANGE_ME_POSTGRES_PASSWORD
       - NODE_ENV=production
       - NEXTAUTH_URL=https://prunebox.example.com
@@ -24,6 +24,8 @@ services:
       - FREE_SCAN_LIMIT=1000
       - MAX_EMAIL_SCAN_LIMIT=1000
       - MAX_FULL_SCAN_LIMIT=50000
+    depends_on:
+      - postgres
     volumes:
       - prunebox_postgres:/var/lib/postgresql/data
     healthcheck:
@@ -32,6 +34,22 @@ services:
       timeout: 10s
       retries: 3
       start_period: 120s
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: prunebox_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: prunebox
+      POSTGRES_PASSWORD: CHANGE_ME_POSTGRES_PASSWORD
+      POSTGRES_DB: prunebox
+    volumes:
+      - prunebox_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prunebox"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
   prunebox_postgres:
