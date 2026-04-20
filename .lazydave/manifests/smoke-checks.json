@@ -191,6 +191,27 @@
       "category": "regression",
       "verified": true,
       "notes": "BullMQ (v5.74.1) and ioredis (v5.10.1) installed. Redis connection via REDIS_URL env var. All 5 queues configured: email-scan, unsubscribe, bulk-delete, rollup-digest, history-monitor. Workers with retry logic (3 attempts, exponential backoff 5s). instrumentation.ts manages worker lifecycle. All API routes use queues: scan (getEmailScanQueue), bulk (getBulkDeleteQueue/getUnsubscribeQueue), action (getUnsubscribeQueue). Scheduled jobs: daily rollup at 8 AM, history monitor every 10 min."
+    },
+    {
+      "id": "VR.108",
+      "title": "Regression: fix for #108",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.107",
+      "title": "Regression: fix for #107",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.88",
+      "title": "Regression: batchDeleteMessages uses batchDelete API (#110)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Verified at fix time - batchDeleteMessages function (src/modules/gmail/client.ts:290-310) correctly uses gmail.users.messages.batchDelete API with 1000-message chunks. No sequential trash() calls. Efficient quota usage (50 units per 1000 messages vs 10 units per individual trash)."
     }
   ]
 }

@@ -12,3 +12,7 @@
 [2026-04-20 19:57:35] [#114] fixed (5b9aede) → needs-verification
 [2026-04-20 20:11:55] [#112] fixed (e00b339) → needs-verification
 [2026-04-20 20:17:45] [#109] Verified BulkDeletionJob records created in runBulkDelete, added VR.123 smoke check
+[2026-04-20 20:17:03] [#109] fixed (e299b85) → needs-verification
+[2026-04-20 20:36:28] [#108] fixed (9fb645a) → needs-verification
+[2026-04-20 20:53:00] [#107] fixed (988377c) → needs-verification
+[2026-04-20 20:56:00] [#110] Code already correct - batchDeleteMessages uses gmail.users.messages.batchDelete API with 1000-message chunks (verified at src/modules/gmail/client.ts:290-310). Added VR.88 regression check.
