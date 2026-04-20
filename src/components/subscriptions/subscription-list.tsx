@@ -21,7 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Trash2, Mail, Trash, AlertTriangle, ArrowUpDown, Search, ChevronDown, ChevronUp, GripHorizontal, MoreVertical, MailX } from "lucide-react";
+import { Trash2, Mail, Trash, AlertTriangle, ArrowUpDown, Search, ChevronDown, ChevronUp, GripHorizontal, MoreVertical, MailX, Layers } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -237,7 +237,7 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
     }
   };
 
-  const updateAction = async (subscriptionId: string, action: "unsubscribe") => {
+  const updateAction = async (subscriptionId: string, action: "keep" | "unsubscribe" | "rollup") => {
     try {
       const response = await fetch("/api/subscriptions/action", {
         method: "POST",
@@ -704,6 +704,13 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={(e) => {
                                 e.stopPropagation();
+                                updateAction(subscription.id, "rollup");
+                              }}>
+                                <Layers className="mr-2 h-4 w-4" />
+                                Rollup
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={(e) => {
+                                e.stopPropagation();
                                 handleUnsubscribe(subscription);
                               }}>
                                 <MailX className="mr-2 h-4 w-4" />
@@ -724,6 +731,16 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
                           >
                             <Trash className="h-4 w-4 mr-1" />
                             Delete
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant={subscription.action === "rollup" ? "secondary" : "outline"}
+                            onClick={() => updateAction(subscription.id, "rollup")}
+                            disabled={processingSenderEmails.has(subscription.senderEmail)}
+                            className="h-8 px-3"
+                          >
+                            <Layers className="h-4 w-4 mr-1" />
+                            Rollup
                           </Button>
                           <Button
                             size="sm"
