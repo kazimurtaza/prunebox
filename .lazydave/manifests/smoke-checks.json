@@ -408,6 +408,27 @@
       "category": "regression",
       "verified": true,
       "notes": "Privacy policy page at /privacy includes all required elements: exact data types collected (email headers, sender patterns), purpose (subscription management only), storage location/duration (PostgreSQL, until account deletion), third parties (Google OAuth, Vercel/PostgreSQL), exact Limited Use disclosure text, data deletion instructions, GDPR rights section, and contact information. Linked from signin page and all public page footers."
+    },
+    {
+      "id": "VR.89",
+      "title": "Regression: fix for #89",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.88",
+      "title": "Regression: fix for #88",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.87",
+      "title": "Regression: Rollup supports three delivery time slots (morning/afternoon/evening)",
+      "category": "regression",
+      "verified": true,
+      "notes": "RollupSettings schema now uses DeliverySlot enum (MORNING/AFTERNOON/EVENING) instead of free-form time string. ConfigureRollupDialog shows radio buttons for three slots. UI displays selected slot with time (Morning 08:00, Afternoon 14:00, Evening 20:00). Verified at fix time - prisma/schema.prisma:119-132, src/components/dashboard/configure-rollup-dialog.tsx:108-122"
     }
   ]
 }

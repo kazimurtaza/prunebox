@@ -2,13 +2,20 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/modules/auth/auth';
 import { db } from '@/lib/db';
 import { ApiErrorResponse, withErrorHandling, requireFields } from '@/lib/errors';
+import { DeliverySlot } from '@prisma/client';
 
 interface RollupSettingsResponse {
   enabled: boolean;
-  deliveryTime: string;
+  deliverySlot: DeliverySlot;
   timezone: string;
   digestName: string;
 }
+
+const DELIVERY_SLOT_TIMES: Record<DeliverySlot, string> = {
+  MORNING: '08:00',
+  AFTERNOON: '14:00',
+  EVENING: '20:00',
+};
 
 export async function GET() {
   return withErrorHandling(async () => {
@@ -27,7 +34,7 @@ export async function GET() {
         data: {
           userId: session.user.id,
           enabled: false,
-          deliveryTime: '08:00',
+          deliverySlot: 'MORNING',
           timezone: 'UTC',
           digestName: 'My Daily Rollup',
         },
@@ -36,7 +43,7 @@ export async function GET() {
 
     const response: RollupSettingsResponse = {
       enabled: settings.enabled,
-      deliveryTime: settings.deliveryTime,
+      deliverySlot: settings.deliverySlot,
       timezone: settings.timezone,
       digestName: settings.digestName,
     };
@@ -55,19 +62,19 @@ export async function PUT(request: Request) {
 
     const body = await request.json();
 
-    const { valid, missing } = requireFields(body, ['enabled', 'deliveryTime', 'timezone', 'digestName'] as const);
+    const { valid, missing } = requireFields(body, ['enabled', 'deliverySlot', 'timezone', 'digestName'] as const);
     if (!valid) {
       return ApiErrorResponse.missingFields(missing);
     }
 
-    const { enabled, deliveryTime, timezone, digestName } = body;
+    const { enabled, deliverySlot, timezone, digestName } = body;
 
     if (typeof enabled !== 'boolean') {
       return ApiErrorResponse.badRequest('enabled must be a boolean');
     }
 
-    if (typeof deliveryTime !== 'string' || !/^\d{2}:\d{2}$/.test(deliveryTime)) {
-      return ApiErrorResponse.badRequest('deliveryTime must be in HH:MM format');
+    if (!['MORNING', 'AFTERNOON', 'EVENING'].includes(deliverySlot)) {
+      return ApiErrorResponse.badRequest('deliverySlot must be one of: MORNING, AFTERNOON, EVENING');
     }
 
     if (typeof timezone !== 'string') {
@@ -82,14 +89,14 @@ export async function PUT(request: Request) {
       where: { userId: session.user.id },
       update: {
         enabled,
-        deliveryTime,
+        deliverySlot,
         timezone,
         digestName,
       },
       create: {
         userId: session.user.id,
         enabled,
-        deliveryTime,
+        deliverySlot,
         timezone,
         digestName,
       },
@@ -97,7 +104,7 @@ export async function PUT(request: Request) {
 
     const response: RollupSettingsResponse = {
       enabled: settings.enabled,
-      deliveryTime: settings.deliveryTime,
+      deliverySlot: settings.deliverySlot,
       timezone: settings.timezone,
       digestName: settings.digestName,
     };

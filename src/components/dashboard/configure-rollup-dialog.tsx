@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -23,9 +24,11 @@ import {
 } from "@/components/ui/select";
 import { Settings2, Loader2 } from "lucide-react";
 
+type DeliverySlot = "MORNING" | "AFTERNOON" | "EVENING";
+
 interface RollupSettings {
   enabled: boolean;
-  deliveryTime: string;
+  deliverySlot: DeliverySlot;
   timezone: string;
   digestName: string;
 }
@@ -46,6 +49,12 @@ const COMMON_TIMEZONES = [
   "Australia/Sydney",
 ];
 
+const DELIVERY_SLOTS = [
+  { value: "MORNING" as const, label: "Morning (8:00 AM)", time: "08:00" },
+  { value: "AFTERNOON" as const, label: "Afternoon (2:00 PM)", time: "14:00" },
+  { value: "EVENING" as const, label: "Evening (8:00 PM)", time: "20:00" },
+];
+
 interface ConfigureRollupDialogProps {
   initialSettings?: RollupSettings;
   onSaved?: () => void;
@@ -58,7 +67,7 @@ export function ConfigureRollupDialog({ initialSettings, onSaved }: ConfigureRol
   const [settings, setSettings] = useState<RollupSettings>(
     initialSettings || {
       enabled: false,
-      deliveryTime: "08:00",
+      deliverySlot: "MORNING",
       timezone: "UTC",
       digestName: "My Daily Rollup",
     }
@@ -110,6 +119,8 @@ export function ConfigureRollupDialog({ initialSettings, onSaved }: ConfigureRol
     }
   }
 
+  const selectedSlot = DELIVERY_SLOTS.find((slot) => slot.value === settings.deliverySlot);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -158,15 +169,22 @@ export function ConfigureRollupDialog({ initialSettings, onSaved }: ConfigureRol
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="deliveryTime">Delivery Time</Label>
-              <Input
-                id="deliveryTime"
-                type="time"
-                value={settings.deliveryTime}
-                onChange={(e) =>
-                  setSettings({ ...settings, deliveryTime: e.target.value })
+              <Label>Delivery Time</Label>
+              <RadioGroup
+                value={settings.deliverySlot}
+                onValueChange={(value: DeliverySlot) =>
+                  setSettings({ ...settings, deliverySlot: value })
                 }
-              />
+              >
+                {DELIVERY_SLOTS.map((slot) => (
+                  <div key={slot.value} className="flex items-center space-x-2">
+                    <RadioGroupItem value={slot.value} id={slot.value} />
+                    <Label htmlFor={slot.value} className="font-normal cursor-pointer">
+                      {slot.label}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
             </div>
             <div className="space-y-2">
               <Label htmlFor="timezone">Timezone</Label>

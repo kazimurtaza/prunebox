@@ -34,3 +34,5 @@
 [2026-04-20 22:40:46] [#91] fixed (dd5b161) → needs-verification
 [2026-04-20 22:47:21] [#90] fixed (5bec110) → needs-verification
 [2026-04-20 22:54:49] [#89] Privacy policy page already exists at /privacy - verified all GDPR requirements met. Added VR.89 regression check.
+[2026-04-20 22:53:24] [#89] fixed (a1252ac) → needs-verification
+[2026-04-20 22:59:46] [#88] fixed (6950603) → needs-verification

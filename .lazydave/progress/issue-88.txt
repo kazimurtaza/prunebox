@@ -1,0 +1,1 @@
+[2026-04-20 23:02:39] [verified] #88 already fixed - batchDeleteMessages correctly uses gmail.users.messages.batchDelete API with 1000-message chunks. Regression check VR.88 in place.

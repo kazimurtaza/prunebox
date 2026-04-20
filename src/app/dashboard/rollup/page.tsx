@@ -7,6 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Mail, Clock, Calendar } from 'lucide-react';
 import { ConfigureRollupDialog } from '@/components/dashboard/configure-rollup-dialog';
 
+const DELIVERY_SLOT_LABELS: Record<string, { label: string; time: string }> = {
+  MORNING: { label: 'Morning', time: '08:00' },
+  AFTERNOON: { label: 'Afternoon', time: '14:00' },
+  EVENING: { label: 'Evening', time: '20:00' },
+};
+
 async function getRollupData(userId: string) {
     const settings = await db.rollupSettings.findUnique({
         where: { userId },
@@ -35,6 +41,9 @@ export default async function RollupPage() {
 
     const { settings, subscriptions } = await getRollupData(session.user.id);
 
+    const slotInfo = settings?.deliverySlot ? DELIVERY_SLOT_LABELS[settings.deliverySlot] : null;
+    const deliveryDisplay = slotInfo ? `${slotInfo.label} (${slotInfo.time})` : '08:00';
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -47,7 +56,7 @@ export default async function RollupPage() {
                 <ConfigureRollupDialog
                     initialSettings={settings ? {
                         enabled: settings.enabled,
-                        deliveryTime: settings.deliveryTime,
+                        deliverySlot: settings.deliverySlot,
                         timezone: settings.timezone,
                         digestName: settings.digestName,
                     } : undefined}
@@ -104,7 +113,7 @@ export default async function RollupPage() {
                                 <Clock className="h-5 w-5 text-muted-foreground" />
                                 <div>
                                     <div className="text-sm font-medium">Next Delivery</div>
-                                    <div className="text-2xl font-bold">{settings?.deliveryTime || '08:00'}</div>
+                                    <div className="text-2xl font-bold">{deliveryDisplay}</div>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">

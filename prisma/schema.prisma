@@ -116,15 +116,21 @@ model GmailSyncState {
   @@index([userId])
 }
 
+enum DeliverySlot {
+  MORNING
+  AFTERNOON
+  EVENING
+}
+
 model RollupSettings {
-  id           String    @id @default(cuid())
-  userId       String    @unique
-  enabled      Boolean   @default(false)
-  deliveryTime String    @default("08:00")
-  timezone     String    @default("UTC")
-  digestName   String    @default("My Daily Rollup")
+  id           String       @id @default(cuid())
+  userId       String       @unique
+  enabled      Boolean      @default(false)
+  deliverySlot DeliverySlot @default(MORNING)
+  timezone     String       @default("UTC")
+  digestName   String       @default("My Daily Rollup")
   lastSentAt   DateTime?
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
