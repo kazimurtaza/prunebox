@@ -191,11 +191,13 @@ await rollupQueue.add('daily-digest', { userId }, {
 });
 ```
 
-**Email monitoring—webhook vs polling:**
+**Email monitoring approach:**
 
-For an MVP, start with **polling** using Gmail's history API. Call `history.list` every 5-15 minutes per user to detect new subscriptions. This is simpler to implement and debug.
+The MVP uses **manual scans** triggered by the user via the scan button. Users explicitly initiate email scans to detect new subscriptions when needed.
 
-For scale, migrate to **Gmail Push Notifications** via Pub/Sub. Register with `users.watch()` to receive real-time notifications of mailbox changes. Watch expires every 7 days—implement a scheduled job to renew.
+For future enhancement, two automatic approaches are documented:
+1. **Polling**: Use Gmail's history API (`history.list`) every 5-15 minutes per user
+2. **Push Notifications**: Gmail Push Notifications via Pub/Sub with `users.watch()` (7-day renewal required)
 
 ---
 
