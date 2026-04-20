@@ -46,10 +46,10 @@ export default function DeployPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <ol className="list-decimal list-inside space-y-2 text-sm">
-              <li>Clone: <code className="bg-muted px-2 py-1 rounded">git clone https://github.com/kazimurtaza/prunebox.git</code></li>
-              <li>Copy env file: <code className="bg-muted px-2 py-1 rounded">cp .env.example .env</code></li>
-              <li>Edit <code className="bg-muted px-2 py-1 rounded">.env</code> with your values (see below)</li>
-              <li>Run: <code className="bg-muted px-2 py-1 rounded">docker-compose up -d</code></li>
+              <li>Clone: <code className="bg-muted px-2 py-1 rounded break-all">git clone https://github.com/kazimurtaza/prunebox.git</code></li>
+              <li>Copy env file: <code className="bg-muted px-2 py-1 rounded break-all">cp .env.example .env</code></li>
+              <li>Edit <code className="bg-muted px-2 py-1 rounded break-all">.env</code> with your values (see below)</li>
+              <li>Run: <code className="bg-muted px-2 py-1 rounded break-all">docker-compose up -d</code></li>
             </ol>
           </CardContent>
         </Card>
@@ -69,7 +69,7 @@ export default function DeployPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="bg-muted p-4 rounded-lg">
-              <code className="text-sm">
+              <code className="text-sm break-all">
                 docker pull ghcr.io/kazimurtaza/prunebox:latest
               </code>
             </div>
@@ -115,31 +115,31 @@ export default function DeployPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="text-sm font-medium">DATABASE_URL</label>
-                    <code className="block bg-muted p-2 rounded text-xs">
+                    <code className="block bg-muted p-2 rounded text-xs break-all">
                       postgresql://prunebox:password@localhost:5432/prunebox
                     </code>
                   </div>
                   <div className="space-y-1">
                     <label className="text-sm font-medium">NEXTAUTH_URL</label>
-                    <code className="block bg-muted p-2 rounded text-xs">
+                    <code className="block bg-muted p-2 rounded text-xs break-all">
                       https://yourdomain.com
                     </code>
                   </div>
                   <div className="space-y-1">
                     <label className="text-sm font-medium">NEXTAUTH_SECRET</label>
-                    <code className="block bg-muted p-2 rounded text-xs">
+                    <code className="block bg-muted p-2 rounded text-xs break-all">
                       openssl rand -base64 32
                     </code>
                   </div>
                   <div className="space-y-1">
                     <label className="text-sm font-medium">ENCRYPTION_KEY</label>
-                    <code className="block bg-muted p-2 rounded text-xs">
+                    <code className="block bg-muted p-2 rounded text-xs break-all">
                       openssl rand -base64 48
                     </code>
                   </div>
                   <div className="space-y-1">
                     <label className="text-sm font-medium">GMAIL_WEBHOOK_SECRET</label>
-                    <code className="block bg-muted p-2 rounded text-xs">
+                    <code className="block bg-muted p-2 rounded text-xs break-all">
                       openssl rand -base64 64
                     </code>
                   </div>
@@ -151,8 +151,8 @@ export default function DeployPage() {
                     <li>Go to Google Cloud Console</li>
                     <li>Enable Gmail API</li>
                     <li>Create OAuth 2.0 credentials (Web application)</li>
-                    <li>Add redirect: <code>https://yourdomain.com/api/auth/callback</code></li>
-                    <li>Set <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code></li>
+                    <li>Add redirect: <code className="break-all">https://yourdomain.com/api/auth/callback</code></li>
+                    <li>Set <code className="break-all">GOOGLE_CLIENT_ID</code> and <code className="break-all">GOOGLE_CLIENT_SECRET</code></li>
                   </ol>
                 </div>
               </div>
