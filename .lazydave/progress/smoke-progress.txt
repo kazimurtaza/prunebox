@@ -1,0 +1,5 @@
+[2026-04-21 00:38:19] [verify] api batch complete: V5 (health check), V9 (subscriptions API)
+[2026-04-21 02:34:00] [verify] V1: Application builds successfully - passed
+[2026-04-21 02:35:49] smoke V15 verified
+[2026-04-21 02:37:19] smoke V4 verified
+[2026-04-21 02:48:57] smoke batch verified (2 items: V11,V12,)

@@ -1,0 +1,51 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - img [ref=e6]
+          - generic [ref=e9]: Prunebox
+        - navigation [ref=e10]:
+          - link "Self-Host" [ref=e11] [cursor=pointer]:
+            - /url: /deploy
+            - button "Self-Host" [ref=e12]
+          - link "Sign In" [ref=e13] [cursor=pointer]:
+            - /url: /auth/signin
+            - button "Sign In" [ref=e14]
+    - main [ref=e15]:
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - img [ref=e18]
+          - text: Privacy-First. No data selling. Ever.
+        - heading "Take Back Control of Your Inbox" [level=1] [ref=e20]
+        - paragraph [ref=e21]: Group and bulk delete emails from any sender. Smart grouping identifies subscriptions automatically. Plus one-click unsubscribe for mailing lists. Your data stays private.
+        - generic [ref=e22]:
+          - link "Get Started Free" [ref=e23] [cursor=pointer]:
+            - /url: /auth/signin
+            - button "Get Started Free" [ref=e24]:
+              - img
+              - text: Get Started Free
+          - link "Self-Host" [ref=e25] [cursor=pointer]:
+            - /url: /deploy
+            - button "Self-Host" [ref=e26]
+      - generic [ref=e27]:
+        - generic [ref=e28]:
+          - img [ref=e30]
+          - heading "Bulk Deletion" [level=3] [ref=e33]
+          - paragraph [ref=e34]: Delete thousands of emails from specific senders in seconds. Clean up your inbox fast.
+        - generic [ref=e35]:
+          - img [ref=e37]
+          - heading "Smart Grouping" [level=3] [ref=e40]
+          - paragraph [ref=e41]: Automatically groups emails by sender. See exactly who's clogging your inbox.
+        - generic [ref=e42]:
+          - img [ref=e44]
+          - heading "True Unsubscribe" [level=3] [ref=e46]
+          - paragraph [ref=e47]: "For mailing lists: actually unsubscribe you (not just filter). Messages stop coming."
+      - generic [ref=e48]:
+        - heading "Better than Unroll.me" [level=3] [ref=e49]
+        - paragraph [ref=e50]: Unroll.me was caught selling user data to Uber. We built Prunebox to do the opposite — we prioritize bulk deletion and email grouping, with unsubscribe as a secondary option for mailing lists, and we have a strict no-data-selling policy. Your privacy is our product.
+    - contentinfo [ref=e51]:
+      - paragraph [ref=e53]: © 2026 Prunebox. Privacy-first email cleanup and grouping tool.
+  - region "Notifications (F8)":
+    - list
+  - alert [ref=e54]

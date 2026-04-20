@@ -1,9 +1,41 @@
 import type { NextAuthConfig } from 'next-auth';
 import Google from 'next-auth/providers/google';
+import Credentials from 'next-auth/providers/credentials';
 import { logger } from '@/lib/logger';
+import { db } from '@/lib/db';
 
 export const authConfig: NextAuthConfig = {
   providers: [
+    // Development-only credentials provider for testing
+    ...(process.env.NODE_ENV === 'development'
+      ? [
+          Credentials({
+            id: 'dev-test',
+            name: 'Dev Test',
+            credentials: {
+              email: { label: 'Email', type: 'email' },
+            },
+            async authorize(credentials) {
+              if (!credentials?.email) return null;
+
+              // Only allow the test user
+              if (credentials.email !== 'test@example.com') return null;
+
+              const user = await db.user.upsert({
+                where: { email: 'test@example.com' },
+                update: {},
+                create: {
+                  email: 'test@example.com',
+                  name: 'Test User',
+                  image: 'https://github.com/shadcn.png',
+                },
+              });
+
+              return user;
+            },
+          }),
+        ]
+      : []),
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,

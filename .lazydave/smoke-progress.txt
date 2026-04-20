@@ -1,0 +1,12 @@
+# Lazydave v2 — smoke Progress Log
+[2026-04-21 00:36:33] smoke iteration 1 partial (44 remaining)
+[2026-04-21 00:36:59] smoke iteration 2 partial (44 remaining)
+[2026-04-21 00:37:31] smoke batch verified (2 items: V5,V9,)
+[2026-04-21 16:49:29] smoke batch verified (1 item: V6,)
+[2026-04-21 00:38:33] smoke iteration 4 FAILED (exit 124, 1/3)
+[2026-04-21 00:58:47] smoke iteration 5 FAILED (exit 124, 2/3)
+[2026-04-21 01:19:21] smoke iteration 6 FAILED (exit 124, 3/3)
+[2026-04-21 02:18:51] smoke batch verified (1 items: V1,)
+[2026-04-21 02:34:46] smoke iteration 2 partial (37 remaining)
+[2026-04-21 02:35:12] smoke batch verified (1 items: V15,)
+[2026-04-21 02:36:05] smoke batch verified (1 items: V4,)

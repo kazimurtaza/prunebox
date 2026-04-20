@@ -9,11 +9,16 @@
       "spec_sections": [
         "4"
       ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [],
+      "status": "issues-found",
+      "notes": "Verified detection.ts (lines 15-221) implements comprehensive subscription detection with confidence scoring. SPEC GAP: Code does not check Gmail category labels (category:promotions, category:updates) as required by spec Section 4 line 87. All other spec requirements met: List-Unsubscribe header with RFC 8058 one-click detection (lines 25-58), List-Id header (60-77), Precedence header (79-97), sender patterns (119-178 - 57 patterns vs 5 in spec), domain patterns (179-218 - 18 ESPs vs 3 in spec), body parsing for unsubscribe links (297-336). IMPROVEMENTS: Auto-Submitted header detection (99-117), confidence scoring (0-100 scale), mailto parsing. Existing issue #86 covers category gap.",
+      "improvements": [
+        "Auto-Submitted header detection (spec omission)",
+        "57 sender patterns vs 5 in spec",
+        "18 ESP domain patterns vs 3 in spec",
+        "Confidence scoring (0-100 scale)"
+      ],
       "regressions": [],
-      "issues_found": []
+      "issues_found": ["https://github.com/kazimurtaza/prunebox/issues/86"]
     },
     {
       "id": "A2",
@@ -22,9 +27,14 @@
       "spec_sections": [
         "5"
       ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [],
+      "status": "passed",
+      "notes": "Verified unsubscribe.ts (lines 1-149) implements all spec requirements exactly. RFC 8058 one-click unsubscribe (13-39): POST request with Content-Type application/x-www-form-urlencoded and body List-Unsubscribe=One-Click, matches spec lines 109-117. Mailto unsubscribe (44-65): parses mailto URL via parseMailtoUnsubscribe and sends via Gmail API, matches spec lines 119-120. HTTP GET fallback (71-110): handles GET requests with redirect detection for confirmation pages, matches spec lines 122-127 edge case handling. Body parsing for unsubscribe links (detection.ts:297-336): implements regex patterns when List-Unsubscribe header missing, matches spec line 123. Error reporting via UnsubscribeResult interface includes error messages for failures (broken/expired links), matches spec line 127. Job processing (workers.ts:27-36, jobs.ts:330-427): queues unsubscription attempts with BullMQ, records attempts to UnsubscriptionAttempt table, handles token errors. IMPROVEMENTS: Database audit trail via UnsubscriptionAttempt model, 90-day data retention (jobs.ts:333-338), specific token error handling (jobs.ts:400-423), redirect detection for manual confirmation (unsubscribe.ts:79-90).",
+      "improvements": [
+        "Database audit trail via UnsubscriptionAttempt model (status tracking, error messages)",
+        "90-day data retention for unsubscription attempts (jobs.ts:333-338)",
+        "Specific token error handling with user-friendly messages (jobs.ts:400-423)",
+        "Redirect detection for confirmation pages requiring manual action (unsubscribe.ts:79-90)"
+      ],
       "regressions": [],
       "issues_found": []
     },
@@ -35,9 +45,13 @@
       "spec_sections": [
         "3"
       ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [],
+      "status": "passed",
+      "notes": "All spec requirements met. OAuth scopes correctly configured (auth.config.ts:48-56): gmail.readonly, gmail.modify, gmail.labels, gmail.send with full URIs. Critical OAuth params present: access_type=offline (line 46) and prompt=consent (line 45) for refresh token. Token management (auth.ts:69-128) includes auto-refresh with database persistence and InvalidTokenError handling. Bulk deletion uses batchDelete API (client.ts:304-324) with 1000 ID chunks per spec. Rate limit handling (listMessages:174-256, listHistory:371-425) uses exponential backoff with random jitter. History.list API implemented for incremental sync (371-446). IMPROVEMENT: Token encryption uses AES-256-GCM via lib/crypto.ts (stronger than spec's AES-256). IMPROVEMENT: Automatic token refresh on expiry (auth.ts:69-128).",
+      "improvements": [
+        "Token encryption uses AES-256-GCM mode via lib/crypto.ts (stronger than spec's base AES-256)",
+        "Automatic token refresh with database persistence (auth.ts:69-128)",
+        "InvalidTokenError custom exception for graceful revoked token handling"
+      ],
       "regressions": [],
       "issues_found": []
     },
@@ -48,8 +62,8 @@
       "spec_sections": [
         "6"
       ],
-      "status": "pending",
-      "notes": "",
+      "status": "passed",
+      "notes": "Verified all 6 database models against spec (Section 6, lines 204-288). Subscription model (schema.prisma:65-86) includes all 14 required fields: id, userId, senderEmail, senderName, listUnsubscribeHeader, unsubscribeMethod, unsubscribeUrl, unsubscribeMailto, messageCount, firstSeenAt, lastSeenAt, confidenceScore, recentSubject, recentSnippet. SubscriptionPreference model (88-101) has all 7 fields. GmailSyncState model (103-116) has all 9 fields including scanStatus, scanProgress, scanTotal for UX. UnsubscriptionAttempt model (137-149) has all 8 fields for audit trail. BulkDeletionJob model (151-163) has all 9 fields for async operations. RollupSettings model (124-135) has all 7 fields with DeliverySlot enum (MORNING, AFTERNOON, EVENING). All indexes match spec recommendations. No drift found.",
       "improvements": [],
       "regressions": [],
       "issues_found": []
@@ -61,9 +75,12 @@
       "spec_sections": [
         "7"
       ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [],
+      "status": "passed",
+      "notes": "Technology stack fully matches: Next.js 15.1.0, NextAuth v5, Prisma 7.7.0, BullMQ 5.74.1, googleapis 144.0.0. OAuth correctly configured with access_type=offline and prompt=consent (auth.config.ts:45-46). Token encryption uses AES-256-GCM with PBKDF2 key derivation (src/lib/crypto.ts) - actually stronger than spec's AES-256. All required queues implemented: email-scan, unsubscribe, rollup-digest. Daily digest scheduling with cron '0 8 * * *' working (src/modules/queues/queues.ts:79-95). Email monitoring via manual scans implemented. IMPROVEMENT: Code includes historyMonitorQueue for polling Gmail history API (spec listed this as future enhancement).",
+      "improvements": [
+        "Token encryption uses AES-256-GCM mode (stronger than spec's AES-256)",
+        "History monitoring via historyMonitorQueue implemented (spec listed as future)"
+      ],
       "regressions": [],
       "issues_found": []
     },
@@ -74,9 +91,11 @@
       "spec_sections": [
         "8"
       ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [],
+      "status": "passed",
+      "notes": "Section 8 describes external compliance requirements (Google OAuth verification, CASA audits) rather than code functionality. Codebase appropriately documents these requirements: README.md (lines 136-168) contains comprehensive verification timeline table (4-8 weeks minimum, 3-6 months with issues), CASA Tier 2/3 costs ($500-1000/$4500+ annually), unverified app limitations (100 user limit, 7-day refresh token expiry). DEPLOYMENT.md (line 42) includes restricted scope warning. auth.config.ts (lines 48-56) correctly uses all required restricted scopes (gmail.readonly, gmail.modify, gmail.labels, gmail.send). Documentation is more comprehensive than spec with OAuth consent screen setup guidance and test user instructions. NEUTRAL: External compliance process, not code implementation.",
+      "improvements": [
+        "README.md verification documentation more comprehensive than spec (includes test user guidance, OAuth consent setup)"
+      ],
       "regressions": [],
       "issues_found": []
     },
@@ -87,11 +106,18 @@
       "spec_sections": [
         "9"
       ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [],
-      "regressions": [],
-      "issues_found": []
+      "status": "issues-found",
+      "notes": "Google Limited Use policy FULLY COMPLIANT: privacy page (41) includes exact disclosure text, no data selling (96), no advertising (97), no AI training (98), user deletion (settings/page.tsx:203-258, delete/route.ts). Data types listed (56-62), purpose stated (75-83), storage/duration (127-131), third parties disclosed (140-152). Disclosure appears on privacy page (39-42), signin page (118), settings (147-149), how-it-works (187). Right to erasure implemented via cascade delete in schema (User model lines 20-25, Account/Sessions/Subscription/Preference/GmailSyncState/RollupSettings all cascade). Data export API exists (export/route.ts). GDPR Rights section covers all 5 rights (158-175). SPEC GAP: No Terms of Service page (footer only links Privacy). REGRESSION: UnsubscriptionAttempt (137-149) and BulkDeletionJob (151-163) models lack onDelete Cascade - user deletion leaves audit trail data orphaned, violating GDPR right to erasure. GDPR compliance mechanisms (DPA, SCC, breach notification) documented in existing issue #92.",
+      "improvements": [
+        "Data export functionality for GDPR portability (export/route.ts)",
+        "All 5 GDPR rights explicitly listed (access, rectification, erasure, portability, objection)",
+        "Limited Use disclosure appears in 4 locations (privacy, signin, settings, how-it-works)"
+      ],
+      "regressions": [
+        "UnsubscriptionAttempt model (schema.prisma:137-149) missing onDelete Cascade - audit data orphaned after user deletion",
+        "BulkDeletionJob model (schema.prisma:151-163) missing onDelete Cascade - job records orphaned after user deletion"
+      ],
+      "issues_found": ["https://github.com/kazimurtaza/prunebox/issues/92", "https://github.com/kazimurtaza/prunebox/issues/118"]
     },
     {
       "id": "A8",
@@ -100,9 +126,12 @@
       "spec_sections": [
         "10"
       ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [],
+      "status": "passed",
+      "notes": "Phase 1 MVP architecture FULLY COMPLIANT: Next.js 15.1.0 confirmed (package.json:44), NextAuth v5 beta (src/modules/auth/auth.config.ts), googleapis v144.0.0 (package.json:41), subscriptions module (src/modules/gmail/), PostgreSQL via Prisma 7.7.0, Redis via ioredis 5.10.1 + BullMQ 5.74.1 (src/modules/queues/queues.ts:2-77). All 5 required queues implemented: email-scan, unsubscribe, rollup-digest, bulk-delete, history-monitor. Phase 2 scale requirement neutral - workers correctly embedded in MVP (spec states Phase 2 extracts workers for scale). shadcn/ui components: 13 of 15 spec-required components present (button, card, table, dialog, dropdown-menu, select, checkbox, badge, tabs, toast, avatar, scroll-area, alert-dialog, separator, switch, radio-group). SPEC GAP: data-table and skeleton components not implemented - basic table.tsx used instead, skeleton implemented inline in dashboard/page.tsx:119-134 rather than as reusable component. Not critical for MVP.",
+      "improvements": [
+        "history-monitor queue for Gmail API polling (spec listed as future enhancement)",
+        "Inline skeleton implementation in dashboard (simple, effective pattern)"
+      ],
       "regressions": [],
       "issues_found": []
     },
@@ -113,11 +142,15 @@
       "spec_sections": [
         "2"
       ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [],
+      "status": "issues-found",
+      "notes": "Section 2 is informational market analysis. Competitive positioning against Unroll.me is well-implemented: homepage (page.tsx:44-46, 98-106) and how-it-works page (page.tsx:126-174) explicitly reference data selling scandal and privacy-first positioning. GDPR compliance implemented (privacy/page.tsx:158-175) with Article 17 right to erasure, data portability, and Delete Account feature. Bulk deletion fully implemented (gmail/client.ts:304-324) with 1000-message batches per spec. Responsive web design implemented (layout.tsx:25-30, viewport metadata). SPEC GAP: Pricing page linked (how-it-works/page.tsx:47-49) but /pricing route does not exist - documented in existing issue #102. NEUTRAL: No payment integration (MVP is free tier as indicated by 'Get Started Free'). NEUTRAL: No native mobile app (responsive web only).",
+      "improvements": [
+        "GDPR compliance implementation exceeds spec with full rights page (Article 17, portability, access, rectification, objection)",
+        "Explicit competitive differentiation against Unroll.me on homepage and how-it-works page",
+        "Self-host option provided as additional differentiation (homepage:59-61)"
+      ],
       "regressions": [],
-      "issues_found": []
+      "issues_found": ["https://github.com/murtazajaffer/prunebox/issues/102"]
     },
     {
       "id": "A10",
@@ -126,9 +159,14 @@
       "spec_sections": [
         "1"
       ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [],
+      "status": "passed",
+      "notes": "Section 1 describes Unroll.me's actual functionality and limitations for competitive positioning. Homepage (page.tsx:99-105) and how-it-works page (page.tsx:149-173) accurately describe Unroll.me's filtering-only behavior, data selling scandal, and differentiate Prunebox as privacy-first alternative. Subscription detection (detection.ts:15-221) implements all spec methods: List-Unsubscribe header (25-58), List-Id (60-77), Precedence (79-97), sender patterns (119-178), domain patterns (179-218), recurring email detection (via messageCount grouping). True unsubscription implemented (unsubscribe.ts:1-149) with RFC 8058 one-click (13-39), mailto (44-65), http (71-110), and fallback methods. Database schema matches spec exactly (schema.prisma:65-163). IMPROVEMENTS: Auto-Submitted header detection (99-117), 57 sender patterns vs 5 in spec, 18 ESP domains vs 3 in spec, confidence scoring (0-100).",
+      "improvements": [
+        "Auto-Submitted header detection for auto-generated emails (detection.ts:99-117)",
+        "57 sender patterns vs 5 in spec (newsletter@, noreply@, no-reply@, marketing@, updates@, news@, digest@, notifications@, etc.)",
+        "18 ESP domain patterns vs 3 in spec (Mailchimp, SendGrid, Constant Contact, Campaign Monitor, ConvertKit, Revue, Substack, beehiiv, etc.)",
+        "Confidence scoring system (0-100 scale) for subscription detection"
+      ],
       "regressions": [],
       "issues_found": []
     }

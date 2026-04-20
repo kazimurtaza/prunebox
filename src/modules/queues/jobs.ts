@@ -220,13 +220,13 @@ export async function runEmailScan(data: EmailScanJobData) {
       where: { userId },
       select: { id: true, senderEmail: true, messageCount: true },
     });
-    const existingByEmail = new Map(existingSubs.map(s => [s.senderEmail, { id: s.id, messageCount: s.messageCount }]));
+    const existingByEmail = new Map<string, { id: string; messageCount: number }>(existingSubs.map((s: { id: string; senderEmail: string; messageCount: number }) => [s.senderEmail, { id: s.id, messageCount: s.messageCount }]));
 
     logger.info(`Message processing complete in ${Date.now() - scanStart}ms. ${scannedEmails.size} unique senders, ${existingSubs.length} existing subscriptions`);
 
     const newEntries: { userId: string; senderEmail: string; senderName: string; listUnsubscribeHeader: string | undefined; unsubscribeMethod: string; unsubscribeUrl: string | undefined; unsubscribeMailto: string | undefined; confidenceScore: number; messageCount: number; recentSubject: string | undefined; recentSnippet: string | undefined; firstSeenAt: Date; lastSeenAt: Date }[] = [];
     const updatePayloads: { id: string; listUnsubscribeHeader: string | undefined; unsubscribeMethod: string; unsubscribeUrl: string | undefined; unsubscribeMailto: string | undefined; confidenceScore: number; messageCount: number; recentSubject: string | undefined; recentSnippet: string | undefined; lastSeenAt: Date }[] = [];
-    const staleCount = existingSubs.filter(s => !scannedEmails.has(s.senderEmail)).length;
+    const staleCount = existingSubs.filter((s: { id: string; senderEmail: string; messageCount: number }) => !scannedEmails.has(s.senderEmail)).length;
 
     for (const [senderEmail, count] of senderMessageCounts.entries()) {
       const data = senderData.get(senderEmail)!;
@@ -628,7 +628,7 @@ export async function runRollup(data: RollupJobData) {
     const subject = `Your Prunebox Subscription Digest (${subscriptions.length} subscriptions)`;
     const body = [
       `You have ${subscriptions.length} subscriptions in Prunebox:\n`,
-      ...subscriptions.map((sub, i) => {
+      ...subscriptions.map((sub: { senderName: string | null; senderEmail: string; unsubscribeUrl: string | null; unsubscribeMailto: string | null }, i: number) => {
         const unsubscribeInfo = sub.unsubscribeUrl
           ? `\n   Unsubscribe: ${sub.unsubscribeUrl}`
           : sub.unsubscribeMailto

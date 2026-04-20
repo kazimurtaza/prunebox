@@ -1,0 +1,15 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - img [ref=e6]
+      - heading "Welcome to Prunebox" [level=1] [ref=e9]
+      - paragraph [ref=e10]: Connect your Gmail to start managing subscriptions
+    - button "Continue with Google" [ref=e12] [cursor=pointer]:
+      - img
+      - text: Continue with Google
+    - generic [ref=e13]:
+      - paragraph [ref=e14]: By continuing, you agree to our Terms of Service and Privacy Policy.
+      - paragraph [ref=e15]: We never sell your data. Your email privacy is our priority.
+  - region "Notifications (F8)":
+    - list
+  - alert [ref=e16]

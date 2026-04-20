@@ -1,0 +1,113 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "Prunebox" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img [ref=e6]
+          - generic [ref=e9]: Prunebox
+        - navigation [ref=e10]:
+          - link "Pricing" [ref=e11] [cursor=pointer]:
+            - /url: /pricing
+            - button "Pricing" [ref=e12]
+          - link "Sign In" [ref=e13] [cursor=pointer]:
+            - /url: /auth/signin
+            - button "Sign In" [ref=e14]
+    - main [ref=e15]:
+      - generic [ref=e16]:
+        - heading "How Prunebox Works" [level=1] [ref=e17]
+        - paragraph [ref=e18]: Take back control of your inbox in 4 simple steps
+      - generic [ref=e19]:
+        - generic [ref=e22]:
+          - img [ref=e24]
+          - generic [ref=e27]:
+            - heading "1. Connect Your Gmail" [level=3] [ref=e28]
+            - paragraph [ref=e29]: Sign in with Google OAuth. We only request read/modify permissions to manage your email groups.
+        - generic [ref=e32]:
+          - img [ref=e34]
+          - generic [ref=e36]:
+            - heading "2. Scan Your Inbox" [level=3] [ref=e37]
+            - paragraph [ref=e38]: Our algorithm scans your emails for subscriptions using List-Unsubscribe headers and sender patterns.
+        - generic [ref=e41]:
+          - img [ref=e43]
+          - generic [ref=e46]:
+            - heading "3. Choose Your Action" [level=3] [ref=e47]
+            - paragraph [ref=e48]: "For each email group, decide: Bulk Delete all emails or Unsubscribe from mailing list."
+        - generic [ref=e51]:
+          - img [ref=e53]
+          - generic [ref=e56]:
+            - heading "4. Clean Up & Enjoy" [level=3] [ref=e57]
+            - paragraph [ref=e58]: Bulk delete old emails from unsubscribed senders. Enjoy a cleaner inbox forever.
+      - generic [ref=e59]:
+        - heading "How We Detect Email Groups" [level=2] [ref=e60]
+        - generic [ref=e63]:
+          - generic [ref=e64]:
+            - heading "High Confidence Signals" [level=3] [ref=e65]:
+              - img [ref=e66]
+              - text: High Confidence Signals
+            - list [ref=e69]:
+              - listitem [ref=e70]: • List-Unsubscribe header (RFC 2369)
+              - listitem [ref=e71]: • List-Id header
+              - listitem [ref=e72]: "• Precedence: bulk/list headers"
+              - listitem [ref=e73]: • One-Click unsubscribe (RFC 8058)
+          - generic [ref=e74]:
+            - heading "Medium Confidence Signals" [level=3] [ref=e75]:
+              - img [ref=e76]
+              - text: Medium Confidence Signals
+            - list [ref=e79]:
+              - listitem [ref=e80]: • Sender patterns (noreply@, newsletter@)
+              - listitem [ref=e81]: • ESP domains (Mailchimp, SendGrid)
+              - listitem [ref=e82]: "• Gmail category: promotions/updates"
+              - listitem [ref=e83]: • Recurring email from same sender
+      - generic [ref=e84]:
+        - heading "True Unsubscription vs Filtering" [level=2] [ref=e85]
+        - generic [ref=e86]:
+          - generic [ref=e88]:
+            - heading "✓ Prunebox (Bulk Delete + True Unsubscribe)" [level=3] [ref=e89]
+            - list [ref=e90]:
+              - listitem [ref=e91]:
+                - img [ref=e92]
+                - generic [ref=e95]: Bulk delete thousands of emails from any sender
+              - listitem [ref=e96]:
+                - img [ref=e97]
+                - generic [ref=e100]: Smart grouping by sender for easy management
+              - listitem [ref=e101]:
+                - img [ref=e102]
+                - generic [ref=e105]: True unsubscribe for mailing lists (using List-Unsubscribe)
+          - generic [ref=e107]:
+            - heading "✗ Unroll.me (Filtering Only)" [level=3] [ref=e108]
+            - list [ref=e109]:
+              - listitem [ref=e110]:
+                - img [ref=e111]
+                - generic [ref=e114]: Only moves emails to hidden folder
+              - listitem [ref=e115]:
+                - img [ref=e116]
+                - generic [ref=e119]: Subscriptions remain active
+              - listitem [ref=e120]:
+                - img [ref=e121]
+                - generic [ref=e124]: Disconnecting floods your inbox again
+              - listitem [ref=e125]:
+                - img [ref=e126]
+                - generic [ref=e129]: Sells your email data to third parties
+      - generic [ref=e132]:
+        - img [ref=e133]
+        - heading "Your Privacy, Guaranteed" [level=2] [ref=e135]
+        - paragraph [ref=e136]: We never sell, rent, or share your data. Your email content is used only to provide the email group management service. Full GDPR compliance with right to erasure.
+        - list [ref=e137]:
+          - listitem [ref=e138]: ✓ No data selling, ever
+          - listitem [ref=e139]: ✓ No ads or tracking
+          - listitem [ref=e140]: ✓ Data deletion on request
+          - listitem [ref=e141]: ✓ GDPR Article 17 compliant
+      - generic [ref=e142]:
+        - heading "Ready to Clean Your Inbox?" [level=2] [ref=e143]
+        - paragraph [ref=e144]: Start with 10 free bulk deletions. No credit card required.
+        - link "Get Started Free" [ref=e145] [cursor=pointer]:
+          - /url: /auth/signin
+          - button "Get Started Free" [ref=e146]:
+            - img
+            - text: Get Started Free
+    - contentinfo [ref=e147]:
+      - paragraph [ref=e149]: © 2026 Prunebox. Privacy-first email cleanup and grouping tool.
+  - region "Notifications (F8)":
+    - list
+  - alert [ref=e150]

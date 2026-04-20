@@ -74,7 +74,7 @@ export default async function RollupPage() {
                     <CardContent>
                         {subscriptions.length > 0 ? (
                             <div className="space-y-4">
-                                {subscriptions.map((sub) => (
+                                {subscriptions.map((sub: { id: string; senderName?: string | null; senderEmail: string }) => (
                                     <div key={sub.id} className="flex items-center justify-between p-3 border rounded-lg">
                                         <div className="flex items-center gap-3">
                                             <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">

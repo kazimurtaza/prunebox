@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
 import { encrypt, decrypt } from './crypto';
 
 const globalForPrisma = globalThis as unknown as {
@@ -10,7 +12,10 @@ const globalForPrisma = globalThis as unknown as {
  * This ensures access_token and refresh_token are always encrypted at rest
  */
 function createExtendedPrismaClient() {
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const adapter = new PrismaPg(pool);
   const basePrisma = new PrismaClient({
+    adapter: adapter as any,
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   });
 
@@ -20,7 +25,7 @@ function createExtendedPrismaClient() {
     query: {
       // Encrypt tokens before writing to database
       account: {
-        async create({ args, query }) {
+        async create({ args, query }: { args: any; query: any }) {
           if (args.data) {
             if (args.data.access_token) {
               args.data.access_token = await encrypt(args.data.access_token);
@@ -32,7 +37,7 @@ function createExtendedPrismaClient() {
           return query(args);
         },
 
-        async createMany({ args, query }) {
+        async createMany({ args, query }: { args: any; query: any }) {
           if (args.data && Array.isArray(args.data)) {
             for (const item of args.data) {
               if (item.access_token) {
@@ -46,7 +51,7 @@ function createExtendedPrismaClient() {
           return query(args);
         },
 
-        async update({ args, query }) {
+        async update({ args, query }: { args: any; query: any }) {
           if (args.data) {
             if (args.data.access_token && typeof args.data.access_token === 'string') {
               args.data.access_token = await encrypt(args.data.access_token);
@@ -58,7 +63,7 @@ function createExtendedPrismaClient() {
           return query(args);
         },
 
-        async upsert({ args, query }) {
+        async upsert({ args, query }: { args: any; query: any }) {
           if (args.create) {
             if (args.create.access_token && typeof args.create.access_token === 'string') {
               args.create.access_token = await encrypt(args.create.access_token);
@@ -79,7 +84,7 @@ function createExtendedPrismaClient() {
         },
 
         // Decrypt tokens after reading from database
-        async findMany({ args, query }) {
+        async findMany({ args, query }: { args: any; query: any }) {
           const result = await query(args);
           if (Array.isArray(result)) {
             for (const item of result) {
@@ -94,7 +99,7 @@ function createExtendedPrismaClient() {
           return result;
         },
 
-        async findFirst({ args, query }) {
+        async findFirst({ args, query }: { args: any; query: any }) {
           const result = await query(args);
           if (result) {
             if (result.access_token) {
@@ -107,7 +112,7 @@ function createExtendedPrismaClient() {
           return result;
         },
 
-        async findUnique({ args, query }) {
+        async findUnique({ args, query }: { args: any; query: any }) {
           const result = await query(args);
           if (result) {
             if (result.access_token) {
@@ -120,7 +125,7 @@ function createExtendedPrismaClient() {
           return result;
         },
 
-        async findUniqueOrThrow({ args, query }) {
+        async findUniqueOrThrow({ args, query }: { args: any; query: any }) {
           const result = await query(args);
           if (result) {
             if (result.access_token) {
@@ -134,7 +139,7 @@ function createExtendedPrismaClient() {
         },
       },
     },
-  }) as PrismaClient;
+  }) as unknown as PrismaClient;
 }
 
 export const db =

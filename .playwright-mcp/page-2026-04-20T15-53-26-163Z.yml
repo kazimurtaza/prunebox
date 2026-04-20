@@ -1,0 +1,22 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - img [ref=e6]
+      - heading "Welcome to Prunebox" [level=1] [ref=e9]
+      - paragraph [ref=e10]: Connect your Gmail to start managing subscriptions
+    - button "Continue with Google" [ref=e12] [cursor=pointer]:
+      - img
+      - text: Continue with Google
+    - generic [ref=e13]:
+      - paragraph [ref=e14]: By continuing, you agree to our Terms of Service and Privacy Policy.
+      - paragraph [ref=e15]: We never sell your data. Your email privacy is our priority.
+  - region "Notifications (F8)":
+    - list [ref=e17]:
+      - listitem [ref=e18]:
+        - generic [ref=e19]:
+          - generic [ref=e20]: Configuration Error
+          - generic [ref=e21]: There is a problem with the sign in configuration. Please contact support.
+        - button [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+  - alert [ref=e27]
+  - status [ref=e28]: Notification Configuration ErrorThere is a problem with the sign in configuration. Please contact support.

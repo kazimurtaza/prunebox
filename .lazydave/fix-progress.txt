@@ -36,3 +36,14 @@
 [2026-04-20 22:54:49] [#89] Privacy policy page already exists at /privacy - verified all GDPR requirements met. Added VR.89 regression check.
 [2026-04-20 22:53:24] [#89] fixed (a1252ac) → needs-verification
 [2026-04-20 22:59:46] [#88] fixed (6950603) → needs-verification
+[2026-04-20 23:03:59] [#87] fixed (5fa6f50) → needs-verification
+[2026-04-20 23:33:35] [#85] fixed (e3af625) → needs-verification
+[2026-04-20 23:59:00] [fix] #84: Updated spec to document manual scan approach as MVP (was fix-spec)
+[2026-04-20 23:48:50] [#84] fixed (71c7d27) → needs-verification
+[2026-04-21 14:02:00] [#83] Already resolved - BullMQ + Redis job queue system fully implemented in PRs #40, #108, #114. Queues: email-scan, unsubscribe, bulk-delete, rollup-digest, history-monitor. Workers initialized via instrumentation.ts. Regression checks exist: VR.112, VR.108.
+[2026-04-20 23:58:54] [#83] fixed (7961906) → needs-verification
+[2026-04-21 00:15:51] [#82] Fixed OAuth callback URL issue - Added validation in auth.ts to warn when NEXTAUTH_URL is not localhost in development. Also fixed local .env to use localhost values.
+[2026-04-21 00:04:45] [#82] fixed (66af772) → needs-verification
+[2026-04-21 00:17:10] [#81] fixed (5598dc4) → needs-verification
+[2026-04-21 02:48:20] [#71] fixed (8268b33) → needs-verification
+[2026-04-21 02:59:23] [#69] fixed (f1c84e6) → needs-verification
