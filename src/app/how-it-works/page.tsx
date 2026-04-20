@@ -181,7 +181,10 @@ export default function HowItWorksPage() {
               <Shield className="h-12 w-12 text-primary mx-auto mb-4" />
               <h2 className="text-xl font-bold mb-2">Your Privacy, Guaranteed</h2>
               <p className="text-muted-foreground mb-4">
-                We never sell, rent, or share your data. Your email content is used only to provide the email group management service. We comply with Google Limited Use policy - your data is used only for subscription management.
+                We never sell, rent, or share your data. Your email content is used only to provide the email group management service.
+              </p>
+              <p className="text-sm bg-primary/10 p-3 rounded-md border border-primary/20 mb-4">
+                The use of information received from Gmail APIs will adhere to Google&apos;s User Data Policy, including the Limited Use requirements.
               </p>
               <ul className="text-sm text-muted-foreground space-y-1">
                 <li>✓ No data selling, ever</li>
@@ -207,6 +210,11 @@ export default function HowItWorksPage() {
       <footer className="border-t bg-background/80 backdrop-blur-sm mt-16">
         <div className="container mx-auto px-4 py-8 text-center text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} Prunebox. Privacy-first email cleanup and grouping tool.</p>
+          <div className="flex justify-center gap-4 mt-2">
+            <Link href="/privacy" className="hover:text-foreground">Privacy Policy</Link>
+            <span>•</span>
+            <Link href="/auth/signin" className="hover:text-foreground">Sign In</Link>
+          </div>
         </div>
       </footer>
     </div>

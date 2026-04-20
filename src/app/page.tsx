@@ -109,6 +109,9 @@ export default function HomePage() {
       <footer className="border-t bg-background/80 backdrop-blur-sm mt-16">
         <div className="container mx-auto px-4 py-8 text-center text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} Prunebox. Privacy-first email cleanup and grouping tool.</p>
+          <div className="flex justify-center gap-4 mt-2">
+            <Link href="/privacy" className="hover:text-foreground">Privacy Policy</Link>
+          </div>
         </div>
       </footer>
     </div>

@@ -142,6 +142,13 @@ export default function SettingsPage() {
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
+                                    <div className="bg-primary/5 p-4 rounded-md border border-primary/20 text-sm">
+                                        <div className="font-medium mb-1">Google API Limited Use Disclosure</div>
+                                        <p className="text-muted-foreground">
+                                            The use of information received from Gmail APIs will adhere to Google&apos;s User Data Policy, including the Limited Use requirements.
+                                        </p>
+                                    </div>
+                                    <Separator />
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <div className="font-medium">Data Collection</div>

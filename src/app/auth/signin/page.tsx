@@ -2,6 +2,7 @@
 
 import { useEffect, Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
@@ -109,8 +110,12 @@ function SignInContent() {
         </div>
 
         <div className="mt-6 text-center text-sm text-muted-foreground">
-          <p>By continuing, you agree to our Terms of Service and Privacy Policy.</p>
+          <p>By continuing, you agree to our <Link href="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>.</p>
           <p className="mt-2">We never sell your data. Your email privacy is our priority.</p>
+        </div>
+
+        <div className="mt-4 p-3 bg-primary/5 rounded-md border border-primary/20 text-xs text-muted-foreground text-center">
+          The use of information received from Gmail APIs will adhere to Google&apos;s User Data Policy, including the Limited Use requirements.
         </div>
       </div>
     </div>
