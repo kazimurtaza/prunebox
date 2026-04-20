@@ -331,6 +331,83 @@
       "category": "regression",
       "verified": false,
       "notes": ""
+    },
+    {
+      "id": "VR.95",
+      "title": "Regression: ENCRYPTION_KEY validated at startup in health check (#95)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Health check at /api/health now validates ENCRYPTION_KEY exists and is >=16 chars. Returns 503 with detailed error if misconfigured. Fails fast on deployment instead of waiting for first OAuth login. getEncryptionKey() exported from crypto.ts for validation."
+    },
+    {
+      "id": "VR.95",
+      "title": "Regression: fix for #95",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.94",
+      "title": "Regression: deploy-local.sh port mapping matches Dockerfile EXPOSE (#94)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Fixed Dockerfile fallback in deploy-local.sh:30 - changed port mapping from $PORT:8080 to $PORT:3000 to match Dockerfile EXPOSE 3000. Script now correctly maps host port to container port 3000."
+    },
+    {
+      "id": "VR.94",
+      "title": "Regression: fix for #94",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.93",
+      "title": "Regression: Email body parsing for unsubscribe links when List-Unsubscribe header missing",
+      "category": "regression",
+      "verified": true,
+      "notes": "Implemented extractEmailBody() to decode base64 body text from HTML/plain parts. Added parseBodyForUnsubscribeLink() to find unsubscribe URLs using patterns (unsubscribe, opt-out, preferences, manage subscription). detectSubscription() now accepts optional message parameter and parses body for manual cases. Updated jobs.ts to pass full message. Verified at src/modules/gmail/detection.ts:219-336."
+    },
+    {
+      "id": "VR.93",
+      "title": "Regression: fix for #93",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.91",
+      "title": "Regression: Google Limited Use disclosure added (#91)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Google Limited Use disclosure text (verbatim from spec line 286) now appears on: /privacy page (dedicated section), signin page below OAuth button, Settings > Privacy tab, and how-it-works page. All page footers link to privacy policy. Exact text: 'The use of information received from Gmail APIs will adhere to Google's User Data Policy, including the Limited Use requirements.'"
+    },
+    {
+      "id": "VR.91",
+      "title": "Regression: fix for #91",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.90",
+      "title": "Regression: GDPR data export endpoint enabled (#90)",
+      "category": "regression",
+      "verified": true,
+      "notes": "GET /api/account/export endpoint returns JSON with user profile, subscriptions, preferences, rollup settings, and sync state. Export Data button in Settings > Privacy tab now enabled with download functionality. File named prunebox-data-{timestamp}.json downloaded to client."
+    },
+    {
+      "id": "VR.90",
+      "title": "Regression: fix for #90",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.89",
+      "title": "Regression: GDPR-compliant privacy policy page at /privacy (#89)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Privacy policy page at /privacy includes all required elements: exact data types collected (email headers, sender patterns), purpose (subscription management only), storage location/duration (PostgreSQL, until account deletion), third parties (Google OAuth, Vercel/PostgreSQL), exact Limited Use disclosure text, data deletion instructions, GDPR rights section, and contact information. Linked from signin page and all public page footers."
     }
   ]
 }

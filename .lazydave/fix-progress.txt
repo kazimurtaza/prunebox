@@ -27,3 +27,10 @@
 [2026-04-20 21:53:45] [#97] fixed (d638f1a) → needs-verification
 [2026-04-20 21:06:10] [#96] fixed (9a6e5ab) - implemented Configure Digest dialog with API route for rollup settings
 [2026-04-20 22:04:00] [#96] fixed (9a6e5ab) → needs-verification
+[2026-04-20 22:11:39] [#95] fixed (7773598) → needs-verification
+[2026-04-20 22:16:23] [#94] fixed deploy-local.sh port mapping bug (Dockerfile fallback now uses port 3000)
+[2026-04-20 22:15:05] [#94] fixed (4489de8) → needs-verification
+[2026-04-20 22:17:41] [#93] fixed (d3acab6) → needs-verification
+[2026-04-20 22:40:46] [#91] fixed (dd5b161) → needs-verification
+[2026-04-20 22:47:21] [#90] fixed (5bec110) → needs-verification
+[2026-04-20 22:54:49] [#89] Privacy policy page already exists at /privacy - verified all GDPR requirements met. Added VR.89 regression check.
