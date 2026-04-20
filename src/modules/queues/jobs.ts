@@ -157,7 +157,7 @@ export async function runEmailScan(data: EmailScanJobData) {
             }
 
             const headers = getMessageHeaders(message);
-            const detection = detectSubscription(headers);
+            const detection = detectSubscription(headers, message);
 
             logger.debug(`Processing message ${messageId}: isSubscription=${detection.isSubscription}, confidence=${detection.confidence}`);
 

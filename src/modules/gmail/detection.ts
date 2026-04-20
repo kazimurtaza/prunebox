@@ -12,7 +12,10 @@ export interface SubscriptionDetectionResult {
  * Detect if an email is a subscription/mailing list
  * Based on RFC 2369, RFC 8058, and common patterns
  */
-export function detectSubscription(headers: Record<string, string>): SubscriptionDetectionResult {
+export function detectSubscription(
+  headers: Record<string, string>,
+  message?: { payload?: { body?: { data?: string }; parts?: any[]; mimeType?: string } }
+): SubscriptionDetectionResult {
   const result: SubscriptionDetectionResult = {
     isSubscription: false,
     confidence: 0,
@@ -58,7 +61,18 @@ export function detectSubscription(headers: Record<string, string>): Subscriptio
   if (headers['List-Id']) {
     result.isSubscription = true;
     result.confidence = 90;
-    result.method = 'manual'; // Need to find unsubscribe link in body
+
+    if (message) {
+      const bodyText = extractEmailBody(message);
+      const unsubscribeUrl = parseBodyForUnsubscribeLink(bodyText);
+      if (unsubscribeUrl) {
+        result.unsubscribeUrl = unsubscribeUrl;
+        result.method = 'http';
+        return result;
+      }
+    }
+
+    result.method = 'manual';
     return result;
   }
 
@@ -67,6 +81,17 @@ export function detectSubscription(headers: Record<string, string>): Subscriptio
   if (precedence && ['bulk', 'list', 'junk'].includes(precedence)) {
     result.isSubscription = true;
     result.confidence = 75;
+
+    if (message) {
+      const bodyText = extractEmailBody(message);
+      const unsubscribeUrl = parseBodyForUnsubscribeLink(bodyText);
+      if (unsubscribeUrl) {
+        result.unsubscribeUrl = unsubscribeUrl;
+        result.method = 'http';
+        return result;
+      }
+    }
+
     result.method = 'manual';
     return result;
   }
@@ -76,6 +101,17 @@ export function detectSubscription(headers: Record<string, string>): Subscriptio
   if (autoSubmitted && autoSubmitted.includes('auto-generated')) {
     result.isSubscription = true;
     result.confidence = 60;
+
+    if (message) {
+      const bodyText = extractEmailBody(message);
+      const unsubscribeUrl = parseBodyForUnsubscribeLink(bodyText);
+      if (unsubscribeUrl) {
+        result.unsubscribeUrl = unsubscribeUrl;
+        result.method = 'http';
+        return result;
+      }
+    }
+
     result.method = 'manual';
     return result;
   }
@@ -125,6 +161,17 @@ export function detectSubscription(headers: Record<string, string>): Subscriptio
   if (matchedPattern) {
     result.isSubscription = true;
     result.confidence = matchedPattern === 'newsletter@' ? 70 : 50;
+
+    if (message) {
+      const bodyText = extractEmailBody(message);
+      const unsubscribeUrl = parseBodyForUnsubscribeLink(bodyText);
+      if (unsubscribeUrl) {
+        result.unsubscribeUrl = unsubscribeUrl;
+        result.method = 'http';
+        return result;
+      }
+    }
+
     result.method = 'manual';
     return result;
   }
@@ -154,6 +201,17 @@ export function detectSubscription(headers: Record<string, string>): Subscriptio
   if (espDomains.some((domain) => fromDomain.includes(domain))) {
     result.isSubscription = true;
     result.confidence = 65;
+
+    if (message) {
+      const bodyText = extractEmailBody(message);
+      const unsubscribeUrl = parseBodyForUnsubscribeLink(bodyText);
+      if (unsubscribeUrl) {
+        result.unsubscribeUrl = unsubscribeUrl;
+        result.method = 'http';
+        return result;
+      }
+    }
+
     result.method = 'manual';
     return result;
   }
@@ -186,6 +244,95 @@ export function parseSender(fromHeader: string): { email: string; name: string }
     email: email.toLowerCase(), // Normalize to lowercase
     name: formattedName,
   };
+}
+
+/**
+ * Extract and decode email body text from a Gmail message
+ * Handles both simple and multipart MIME messages
+ */
+export function extractEmailBody(message: { payload?: { body?: { data?: string }; parts?: any[]; mimeType?: string } }): string {
+  const payload = message.payload;
+  if (!payload) return '';
+
+  const decodeBase64 = (data: string): string => {
+    try {
+      return Buffer.from(data, 'base64url').toString('utf-8');
+    } catch {
+      return '';
+    }
+  };
+
+  const extractFromParts = (parts: any[]): string => {
+    for (const part of parts) {
+      if (part.mimeType === 'text/html' && part.body?.data) {
+        return decodeBase64(part.body.data);
+      }
+      if (part.mimeType === 'text/plain' && part.body?.data) {
+        return decodeBase64(part.body.data);
+      }
+      if (part.parts) {
+        const nested = extractFromParts(part.parts);
+        if (nested) return nested;
+      }
+    }
+    return '';
+  };
+
+  if (payload.parts) {
+    const bodyText = extractFromParts(payload.parts);
+    if (bodyText) return bodyText;
+  }
+
+  if (payload.body?.data) {
+    return decodeBase64(payload.body.data);
+  }
+
+  return '';
+}
+
+/**
+ * Parse email body for unsubscribe links
+ * Returns the first URL that matches common unsubscribe patterns
+ */
+export function parseBodyForUnsubscribeLink(bodyText: string): string | undefined {
+  if (!bodyText) return undefined;
+
+  const lowerBody = bodyText.toLowerCase();
+
+  const unsubscribePatterns = [
+    /https?:\/\/[^\s"'<>]+(?:unsubscribe|un-subscribe|opt-?out|opt[_-]?out|manage|preferences|subscription|settings|notifications)[^\s"'<>]*/gi,
+    /https?:\/\/[^\s"'<>]+\/[^\s"'<>]*(?:unsub|optout|opt[_-]?out|manage|pref|subscrib|notif)[^\s"'<>]*/gi,
+  ];
+
+  const spamPhrases = [
+    'buy now', 'click here', 'limited time', 'act now', 'special offer',
+    'winner', 'congratulations', 'free money', 'cash prize', 'urgent',
+    'expiration', 'deadline', 'trial', 'offer expires'
+  ];
+
+  for (const pattern of unsubscribePatterns) {
+    const matches = bodyText.match(pattern);
+    if (matches) {
+      for (const url of matches) {
+        const cleanUrl = url.split(/["'<>]/)[0].split(/[?&]utm_/)[0];
+
+        if (spamPhrases.some(phrase => lowerBody.substring(Math.max(0, lowerBody.indexOf(url) - 100), lowerBody.indexOf(url) + 100).includes(phrase))) {
+          continue;
+        }
+
+        if (cleanUrl.length > 20 && cleanUrl.length < 500) {
+          try {
+            new URL(cleanUrl);
+            return cleanUrl;
+          } catch {
+            continue;
+          }
+        }
+      }
+    }
+  }
+
+  return undefined;
 }
 
 /**
