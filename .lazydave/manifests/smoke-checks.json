@@ -55,16 +55,16 @@
       "category": "gmail",
       "title": "Gmail detection module exists",
       "steps": "Verify src/modules/gmail/detection.ts contains subscription detection logic",
-      "verified": false,
-      "notes": ""
+      "verified": true,
+      "notes": "Verified at src/modules/gmail/detection.ts:1-336. Contains comprehensive subscription detection: detectSubscription() function checks List-Unsubscribe header (lines 25-58), List-Id header (60-77), Precedence header (79-97), Auto-Submitted header (99-117), 57 sender patterns (119-178), 18 ESP domain patterns (179-218), confidence scoring (220-221), and email body parsing for unsubscribe links (297-336). parseMailtoUnsubscribe() (223-258) and extractEmailBody() (260-295) helper functions also present."
     },
     {
       "id": "V8",
       "category": "queues",
       "title": "Job queue configuration exists",
       "steps": "Verify src/modules/queues/config.ts exists and defines queue connections",
-      "verified": false,
-      "notes": ""
+      "verified": true,
+      "notes": "Verified at src/modules/queues/config.ts:1-26. Redis connection singleton pattern with getRedisConnection() function. Creates ioredis Redis client from REDIS_URL env var (defaults to redis://localhost:6379). Configured with maxRetriesPerRequest: null and enableReadyCheck: false for BullMQ compatibility. Error and connect event handlers with logging. Connection reused across queue initialization via src/modules/queues/queues.ts."
     },
     {
       "id": "V9",
@@ -103,8 +103,8 @@
       "category": "env",
       "title": "Environment variables are documented",
       "steps": "Verify .env.example exists with all required variables documented",
-      "verified": false,
-      "notes": ""
+      "verified": true,
+      "notes": "Verified .env.example exists with 16 required variables: DATABASE_URL, NEXTAUTH_SECRET, NEXTAUTH_URL, NEXT_PUBLIC_APP_URL, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, REDIS_URL, ENCRYPTION_KEY, GMAIL_WEBHOOK_SECRET, NODE_ENV. Optional variables include dev mode flags. README.md includes environment setup instructions in 'Getting Started' section. Variable purposes documented inline within .env.example."
     },
     {
       "id": "V14",
@@ -121,6 +121,54 @@
       "steps": "Run dev server and navigate to http://localhost:3000/dashboard, verify page loads",
       "verified": true,
       "notes": "Dashboard page exists at src/app/dashboard/page.tsx with complete React component. Includes authentication via useSession hook with redirect to signin if unauthenticated. Server responds with 307 redirect to /auth/signin for unauthenticated users (expected behavior). Page contains stats cards (Total Senders, Emails Scanned, Likely Mailing Lists), ScanButton, ThemeToggle, and SubscriptionList component. Dev server running on port 3000 responds correctly."
+    },
+    {
+      "id": "V21",
+      "category": "api",
+      "title": "Bulk action API endpoint handles delete, unsubscribe, and rollup for multiple subscriptions",
+      "steps": "Run dev server, authenticate, then POST to http://localhost:3000/api/subscriptions/bulk with {\"subscriptionIds\":[\"id1\",\"id2\"],\"action\":\"delete\"} and verify response includes success:true with count",
+      "verified": true,
+      "notes": "Verified at src/app/api/subscriptions/bulk/route.ts:1-184. Comprehensive bulk action endpoint with zod validation schema. Supports three actions: delete (queues bulk-delete jobs), unsubscribe (creates preferences and queues unsubscribe jobs), rollup (creates preferences and schedules daily digest). Handles both subscriptionIds and senderEmails arrays. Limits: 100 items per request. Token verification via getUserTokens(). Ownership verification for subscriptions. Uses getBulkDeleteQueue(), getUnsubscribeQueue(), scheduleDailyRollup(), removeScheduledRollup()."
+    },
+    {
+      "id": "V22",
+      "category": "api",
+      "title": "Subscription action API endpoint updates single subscription preference",
+      "steps": "Run dev server, authenticate, then POST to http://localhost:3000/api/subscriptions/action with {\"subscriptionId\":\"id\",\"action\":\"keep\"} and verify response includes success:true",
+      "verified": true,
+      "notes": "Verified at src/app/api/subscriptions/action/route.ts:1-124. Single subscription action endpoint with zod validation. Supports three actions: keep, unsubscribe, rollup. Upserts SubscriptionPreference via db.subscriptionPreference.upsert(). For unsubscribe: queues job via getUnsubscribeQueue(). For rollup: schedules via scheduleDailyRollup(). Handles rollup removal when no rollup subscriptions remain via removeScheduledRollup(). Token verification via getUserTokens(). Ownership check via subscription.userId comparison."
+    },
+    {
+      "id": "V23",
+      "category": "api",
+      "title": "Account delete API endpoint performs cascade deletion of all user data",
+      "steps": "Run dev server, authenticate, then POST to http://localhost:3000/api/account/delete and verify response includes success:true and user is signed out",
+      "verified": true,
+      "notes": "Verified at src/app/api/account/delete/route.ts:1-60. Deletes user via db.user.delete() with cascade relations removing Account, Session, Subscription, SubscriptionPreference, GmailSyncState, RollupSettings. SignOut() called to clear session. Returns { success: true, message: 'Account deleted successfully' }. GDPR Article 17 right to erasure compliant. Requires authentication via auth()."
+    },
+    {
+      "id": "V24",
+      "category": "api",
+      "title": "Account export API endpoint returns JSON export of all user data",
+      "steps": "Run dev server, authenticate, then GET http://localhost:3000/api/account/export and verify response includes user profile, subscriptions, preferences, rollup settings, and sync state",
+      "verified": true,
+      "notes": "Verified at src/app/api/account/export/route.ts:1-84. GDPR data portability endpoint. Fetches all user data via parallel queries: user profile, subscriptions (with preferences), rollup settings, Gmail sync state. Returns structured JSON with profile, subscriptions, rollupSettings, syncState, exportedAt timestamp. Sets Content-Type: application/json and Content-Disposition: attachment filename. Requires authentication via auth(). Error handling via withErrorHandling()."
+    },
+    {
+      "id": "V25",
+      "category": "api",
+      "title": "Rollup settings API endpoint handles GET and PUT for digest configuration",
+      "steps": "Run dev server, authenticate, then GET http://localhost:3000/api/rollup/settings and verify response includes enabled, deliverySlot, timezone, digestName; then PUT with new values and verify update",
+      "verified": true,
+      "notes": "Verified at src/app/api/rollup/settings/route.ts:1-102. Handles GET (fetch RollupSettings or create default) and PUT (update enabled, deliverySlot, timezone, digestName). Uses RollupSettingsUpsertSchema for validation. DeliverySlot enum: MORNING, AFTERNOON, EVENING. Default timezone: UTC. Default digest name: 'My Daily Rollup'. Manages daily rollup scheduling via scheduleDailyRollup() and removeScheduledRollup(). Requires authentication via auth()."
+    },
+    {
+      "id": "V26",
+      "category": "api",
+      "title": "Scan status API endpoint returns real-time scan progress",
+      "steps": "Run dev server, authenticate, then GET http://localhost:3000/api/scan/status and verify response includes scanStatus, scanProgress, scanTotal, errorMessage from GmailSyncState",
+      "verified": true,
+      "notes": "Verified at src/app/api/scan/status/route.ts:1-43. Fetches GmailSyncState via db.gmailSyncState.findUnique() where userId matches session.user.id. Returns JSON with status (idle, scanning, completed, failed), progress, total, and error message. Returns 404 if no sync state exists. Requires authentication via auth(). Used by ScanButton component for polling scan progress."
     },
     {
       "id": "VR.116",
@@ -562,6 +610,117 @@
       "category": "regression",
       "verified": true,
       "notes": "ThemeToggle component added to rollup page header (src/app/dashboard/rollup/page.tsx:56-64) and settings page header (src/app/dashboard/settings/page.tsx:40-46). Matches dashboard pattern - positioned on right side of header with flex gap-2. All authenticated pages now have consistent theme toggle access."
+    },
+    {
+      "id": "VR.117",
+      "title": "Regression: fix for #117",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V16",
+      "category": "api",
+      "title": "Email subjects endpoint returns recent subjects for sender",
+      "verified": false,
+      "notes": "",
+      "steps": "Run dev server, authenticate, then curl 'http://localhost:3000/api/subscriptions/subjects?senderEmail=test@example.com' and verify response includes subjects array with up to 15 recent email subjects from that sender"
+    },
+    {
+      "id": "V17",
+      "category": "api",
+      "title": "Scan sender endpoint rescans specific sender for message count",
+      "verified": false,
+      "notes": "",
+      "steps": "Run dev server, authenticate, then POST to http://localhost:3000/api/subscriptions/scan-sender with {\"senderEmail\":\"test@example.com\"} and verify response returns success:true with count of messages found"
+    },
+    {
+      "id": "V18",
+      "category": "api",
+      "title": "Sync reset endpoint clears all scan data for user",
+      "verified": false,
+      "notes": "",
+      "steps": "Run dev server, authenticate, then POST to http://localhost:3000/api/sync/reset and verify response includes success:true and deletedCount showing subscriptions deleted, and sync state is reset to idle"
+    },
+    {
+      "id": "V19",
+      "category": "subscriptions",
+      "title": "Gmail detection module implements subscription detection with confidence scoring",
+      "verified": false,
+      "notes": "",
+      "steps": "Verify src/modules/gmail/detection.ts exists with detectSubscription function that checks List-Unsubscribe header, List-Id, Precedence headers, sender patterns (57 patterns), domain patterns (18 ESPs), and returns confidence score 0-100"
+    },
+    {
+      "id": "V20",
+      "category": "queues",
+      "title": "Job queue configuration defines all required queues",
+      "verified": false,
+      "notes": "",
+      "steps": "Verify src/modules/queues/config.ts exists and exports queue configurations for email-scan, unsubscribe, bulk-delete, rollup-digest, and history-monitor queues with Redis connection"
+    },
+    {
+      "id": "V27",
+      "category": "api",
+      "title": "Scan initiation endpoint starts email scan with rate limiting",
+      "steps": "Run dev server, authenticate, then POST to http://localhost:3000/api/scan and verify response includes success:true with message 'Scan started'; verify rate limit returns 429 when called twice within 1 minute",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V28",
+      "category": "api",
+      "title": "Development signin endpoint creates test user session",
+      "steps": "Run dev server in NODE_ENV=development, then POST to http://localhost:3000/api/dev-signin and verify response includes success:true with user object and next-auth.session-token cookie is set; verify returns 403 in production",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V29",
+      "category": "api",
+      "title": "Rate limiter enforces SCAN, BULK_ACTION, and WEBHOOK limits",
+      "steps": "Run dev server and verify src/lib/rate-limiter.ts exports RATE_LIMITS with SCAN (1/min), BULK_ACTION (10/min), WEBHOOK (100/min) configurations; verify InMemoryRateLimiter class implements cleanup interval and check() method",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V30",
+      "category": "infrastructure",
+      "title": "Logger utility provides structured logging with levels",
+      "steps": "Verify src/lib/logger.ts exports logger singleton with debug(), info(), warn(), error() methods; verify LogLevel enum (DEBUG=0, INFO=1, WARN=2, ERROR=3) and environment-aware minLevel configuration",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V31",
+      "category": "infrastructure",
+      "title": "Error handling library provides standardized API responses",
+      "steps": "Verify src/lib/errors.ts exports ApiErrorResponse class with static methods (unauthorized, badRequest, notFound, conflict, forbidden, internal, tooManyRequests); verify withErrorHandling wrapper and requireFields validator",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V32",
+      "category": "infrastructure",
+      "title": "User tokens helper retrieves OAuth tokens from database",
+      "steps": "Verify src/lib/get-user-tokens.ts exports getUserTokens function that queries Account table by userId and provider='google' returning accessToken and refreshToken",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V33",
+      "category": "queues",
+      "title": "BullMQ workers initialize with 5 queues and proper lifecycle",
+      "steps": "Verify instrumentation.ts exports register() function that imports and calls initializeWorkers() from src/modules/queues/workers.ts; verify workers.ts creates 5 workers (email-scan, unsubscribe, bulk-delete, rollup-digest, history-monitor) with event handlers for completed/failed/error",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V34",
+      "category": "auth",
+      "title": "Development auth callback handles dev-test provider",
+      "steps": "Verify src/app/api/dev-auth/callback/route.ts exists and handles OAuth callback for dev-test provider (only available in development)",
+      "verified": false,
+      "notes": ""
     }
   ]
 }

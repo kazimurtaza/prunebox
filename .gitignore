@@ -54,6 +54,7 @@ logs/
 /check_*.ts
 /cleanup_*.ts
 /logs*.txt
+.playwright-mcp/
 
 # Git worktrees
 .worktrees/

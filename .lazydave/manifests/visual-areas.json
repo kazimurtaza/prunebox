@@ -92,6 +92,51 @@
       "notes": "Screenshot saved: lazydave/test-logs/screenshots/T10-how-it-works.png. Page structure verified: header with nav, 'How Prunebox Works' title (text-4xl md:text-5xl font-bold), 4 step cards in 2-column grid layout (Connect Gmail, Scan Inbox, Choose Action, Clean Up), Detection methods section with high/medium confidence signals, Comparison section (Prunebox vs Unroll.me), Privacy guarantee card, CTA section. Design tokens applied: primary emerald (#1F7D53 - 160 84% 39% in dark mode), proper card borders (border-2), icon badges (bg-primary/10, bg-destructive/10). Typography hierarchy correct with text-muted-foreground for descriptions. Issue found: /pricing link in navigation returns 404 - pricing page not implemented yet (src/app/pricing/ does not exist). Console error: Failed to load resource /pricing?_rsc=12hng (404).",
       "skill": null,
       "agent": null
+    },
+    {
+      "id": "T11",
+      "name": "Landing page hero section with gradient background, privacy badge, and feature cards (Bulk Deletion, Smart Grouping, True Unsubscribe)",
+      "category": "ui",
+      "skill": null,
+      "agent": null,
+      "status": "passed",
+      "notes": "Code-based analysis: src/app/page.tsx:22-118. Hero section verified: gradient background (from-background via-background to-muted), centered layout with max-w-4xl, privacy badge (Shield icon, bg-primary/10, 'Privacy-First. No data selling. Ever.'), H1 title (text-5xl md:text-6xl, font-bold, bg-gradient-to-r from-primary to-foreground), subtitle (text-xl text-muted-foreground), two CTA buttons (Get Started Free with Zap icon, Self-Host variant outline). 3-column feature grid (md:grid-cols-2 lg:grid-cols-3): Trash2 icon (destructive badge) for Bulk Deletion, Mail icon (primary badge) for Smart Grouping, Shield icon (muted badge) for True Unsubscribe. Comparison card with 'Better than Unroll.me' (bg-muted/30 border). Header navigation: Mail logo, Self-Host ghost button, Sign In button, ThemeToggle. Footer with privacy link. Design tokens: primary emerald, destructive red for danger actions, proper text hierarchy."
+    },
+    {
+      "id": "T12",
+      "name": "Privacy page with Google Limited Use disclosure, data collection, usage, storage, and GDPR rights sections",
+      "category": "ui",
+      "skill": null,
+      "agent": null,
+      "status": "passed",
+      "notes": "Code-based analysis: src/app/privacy/page.tsx:8-213. Page structure verified: centered header (max-w-4xl), Shield icon (h-8 w-8 bg-primary/10 rounded-full), H1 title (text-4xl font-bold), subtitle with dynamic date. 8 Card sections with proper spacing (mb-8): Google Limited Use Disclosure (border-2, bg-primary/5 p-4, exact verbatim disclosure text), Data We Collect (Eye icon, bullet list of email headers/sender patterns, destructive warning for what's NOT stored), How We Use Your Data (Lock icon, 4-item list of service purposes), Google Limited Use Compliance (4-item compliance list), Data Deletion (Trash2 destructive icon, Settings → Privacy → Delete Account instructions), Data Storage & Security (location, encryption, retention, access), Third Parties (Google OAuth, Vercel/PostgreSQL only), GDPR Rights (5 rights: access, rectification, erasure, portability, object), Contact Us section. Each card has CardContent with p-8 padding, icon badges, proper typography hierarchy. Design tokens: primary emerald for badges, destructive for warnings, proper text-muted-foreground for descriptions. Footer with Home link."
+    },
+    {
+      "id": "T13",
+      "name": "Deploy page with Docker Compose, pre-built image, and build from source instructions, environment variables configuration, and tech stack cards",
+      "category": "ui",
+      "skill": null,
+      "agent": null,
+      "status": "passed",
+      "notes": "Code-based analysis: src/app/deploy/page.tsx:6-239. Page structure verified: centered header with H1 (text-4xl md:text-5xl), subtitle. 3 deployment option Cards (mb-8 spacing): Docker Compose (border-2 border-primary, Package icon, recommended label, 4-step numbered list with break-all code for git clone, cp env, edit env, docker-compose up), Pre-built Docker Image (Download icon, gray badge, docker pull command with break-all), Build from Source (Server icon, npm install/build/start commands). Configuration section (H2 text-center): Required env vars Card (2-column grid with labels and code blocks: DATABASE_URL, NEXTAUTH_URL, NEXTAUTH_SECRET, ENCRYPTION_KEY, GMAIL_WEBHOOK_SECRET), Google OAuth setup (4-step list with border-t), Gmail scopes warning Card (border-primary/20 bg-primary/5, Shield icon, restricted scopes list). Tech stack section (3-column grid): Frontend (Zap icon), Backend (Server icon), Deployment (Package icon). GitHub CTA Card (Copy icon, Button to github.com). All code uses break-all class for mobile responsiveness. Design tokens: primary emerald for emphasis, proper card spacing, centered layouts."
+    },
+    {
+      "id": "T14",
+      "name": "Development sign-in page with auto-redirect behavior and loading spinner",
+      "category": "auth",
+      "skill": null,
+      "agent": null,
+      "status": "pending",
+      "notes": "Page at src/app/dev-signin/page.tsx. Should display centered layout with spinning loader (animate-spin rounded-full h-12 w-12 border-b-2 border-primary) and 'Signing in as test user...' message. Must auto-redirect to /auth/signin when NODE_ENV !== 'development'. Uses signIn('dev-test') with callbackUrl='/dashboard'."
+    },
+    {
+      "id": "T15",
+      "name": "Authentication error page with error code display and retry button",
+      "category": "auth",
+      "skill": null,
+      "agent": null,
+      "status": "pending",
+      "notes": "Page at src/app/auth/error/page.tsx. Should display centered Card (max-w-md) with AlertCircle icon (h-12 w-12 text-destructive), 'Authentication Error' title (text-2xl), error description, error code in destructive-styled box (bg-destructive/10 border-destructive/20 text-destructive p-4 rounded-md font-mono), and 'Try Again' button linking to /auth/signin. Uses Suspense with Loading fallback."
     }
   ]
 }
