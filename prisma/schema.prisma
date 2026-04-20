@@ -8,19 +8,21 @@ datasource db {
 }
 
 model User {
-  id             String                   @id @default(cuid())
-  email          String                   @unique
-  emailVerified  DateTime?
-  name           String?
-  image          String?
-  createdAt      DateTime                 @default(now())
-  updatedAt      DateTime                 @updatedAt
-  accounts       Account[]
-  gmailSyncState GmailSyncState?
-  rollupSettings RollupSettings?
-  sessions       Session[]
-  subscriptions  Subscription[]
-  preferences    SubscriptionPreference[]
+  id                    String                   @id @default(cuid())
+  email                 String                   @unique
+  emailVerified         DateTime?
+  name                  String?
+  image                 String?
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
+  accounts              Account[]
+  gmailSyncState        GmailSyncState?
+  rollupSettings        RollupSettings?
+  sessions              Session[]
+  subscriptions         Subscription[]
+  preferences           SubscriptionPreference[]
+  unsubscriptionAttempts UnsubscriptionAttempt[]
+  bulkDeletionJobs      BulkDeletionJob[]
 
   @@index([email])
 }
@@ -143,6 +145,7 @@ model UnsubscriptionAttempt {
   errorMessage   String?
   attemptedAt    DateTime  @default(now())
   completedAt    DateTime?
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, subscriptionId])
   @@index([status])
@@ -158,6 +161,7 @@ model BulkDeletionJob {
   errorMessage    String?
   createdAt       DateTime  @default(now())
   completedAt     DateTime?
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, status])
 }
