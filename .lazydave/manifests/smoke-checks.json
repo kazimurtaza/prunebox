@@ -163,6 +163,20 @@
       "category": "regression",
       "verified": false,
       "notes": ""
+    },
+    {
+      "id": "VR.112",
+      "title": "Regression: fix for #112",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.123",
+      "title": "Regression: BulkDeletionJob records created in runBulkDelete (#109)",
+      "category": "regression",
+      "verified": true,
+      "notes": "runBulkDelete creates BulkDeletionJob record at start (lines 446-454), updates totalMessages after search (lines 507-510), marks success with deletedCount (lines 559-566), and marks failed with errorMessage (lines 572-579). Follows same pattern as runUnsubscribe."
     }
   ]
 }
