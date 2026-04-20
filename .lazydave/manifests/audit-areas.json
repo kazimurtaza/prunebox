@@ -1,0 +1,136 @@
+{
+  "version": "1.0",
+  "project": "prunebox",
+  "areas": [
+    {
+      "id": "A1",
+      "category": "detection",
+      "title": "Section 4: Detecting subscription emails programmatically",
+      "spec_sections": [
+        "4"
+      ],
+      "status": "pending",
+      "notes": "",
+      "improvements": [],
+      "regressions": [],
+      "issues_found": []
+    },
+    {
+      "id": "A2",
+      "category": "unsubscribe",
+      "title": "Section 5: Automated unsubscription via List-Unsubscribe header",
+      "spec_sections": [
+        "5"
+      ],
+      "status": "pending",
+      "notes": "",
+      "improvements": [],
+      "regressions": [],
+      "issues_found": []
+    },
+    {
+      "id": "A3",
+      "category": "oauth",
+      "title": "Section 3: Gmail API technical architecture",
+      "spec_sections": [
+        "3"
+      ],
+      "status": "pending",
+      "notes": "",
+      "improvements": [],
+      "regressions": [],
+      "issues_found": []
+    },
+    {
+      "id": "A4",
+      "category": "database",
+      "title": "Section 6: Database schema for subscription tracking",
+      "spec_sections": [
+        "6"
+      ],
+      "status": "pending",
+      "notes": "",
+      "improvements": [],
+      "regressions": [],
+      "issues_found": []
+    },
+    {
+      "id": "A5",
+      "category": "architecture",
+      "title": "Section 7: Node.js technical implementation architecture",
+      "spec_sections": [
+        "7"
+      ],
+      "status": "pending",
+      "notes": "",
+      "improvements": [],
+      "regressions": [],
+      "issues_found": []
+    },
+    {
+      "id": "A6",
+      "category": "security",
+      "title": "Section 8: Google verification process and CASA compliance",
+      "spec_sections": [
+        "8"
+      ],
+      "status": "pending",
+      "notes": "",
+      "improvements": [],
+      "regressions": [],
+      "issues_found": []
+    },
+    {
+      "id": "A7",
+      "category": "legal",
+      "title": "Section 9: Legal compliance requirements (GDPR, privacy policy)",
+      "spec_sections": [
+        "9"
+      ],
+      "status": "pending",
+      "notes": "",
+      "improvements": [],
+      "regressions": [],
+      "issues_found": []
+    },
+    {
+      "id": "A8",
+      "category": "product",
+      "title": "Section 10: Product architecture and feature requirements",
+      "spec_sections": [
+        "10"
+      ],
+      "status": "pending",
+      "notes": "",
+      "improvements": [],
+      "regressions": [],
+      "issues_found": []
+    },
+    {
+      "id": "A9",
+      "category": "competitive",
+      "title": "Section 2: Competitive landscape and feature gaps",
+      "spec_sections": [
+        "2"
+      ],
+      "status": "pending",
+      "notes": "",
+      "improvements": [],
+      "regressions": [],
+      "issues_found": []
+    },
+    {
+      "id": "A10",
+      "category": "unrollme",
+      "title": "Section 1: Unroll.me functionality and limitations",
+      "spec_sections": [
+        "1"
+      ],
+      "status": "pending",
+      "notes": "",
+      "improvements": [],
+      "regressions": [],
+      "issues_found": []
+    }
+  ]
+}

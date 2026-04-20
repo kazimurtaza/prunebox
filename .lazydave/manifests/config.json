@@ -1,0 +1,55 @@
+{
+  "version": "2.0",
+  "project": "prunebox",
+  "models": {
+    "smoke": "glm-4.7",
+    "visual": "glm-4.7",
+    "audit": "glm-4.7",
+    "triage": "glm-4.5",
+    "refine": "glm-5.1",
+    "fix": "glm-4.7",
+    "verify": "glm-4.5"
+  },
+  "iterations": {
+    "smoke": 40,
+    "visual": 30,
+    "audit": 20,
+    "triage": 1,
+    "refine": 5,
+    "fix": 5,
+    "verify": 1
+  },
+  "batch_sizes": {
+    "smoke": 10,
+    "visual": 5,
+    "audit": 5
+  },
+  "timeouts": {
+    "claude": 1200,
+    "rate_limit_backoff": 60
+  },
+  "costs": {
+    "budget_max": 25.0
+  },
+  "tiers": {
+    "default": "P3",
+    "triage_tier": "P3"
+  },
+  "flags": {
+    "verbose": true,
+    "yes": false,
+    "loop": false,
+    "zero": false
+  },
+  "paths": {
+    "manifests": "manifests",
+    "progress": "progress",
+    "test_logs": "test-logs",
+    "spec": "docs/prunebox_specsheet.md",
+    "project_claude_md": "CLAUDE.md"
+  },
+  "docker": {
+    "container": "prunebox-dev",
+    "port": 3000
+  }
+}

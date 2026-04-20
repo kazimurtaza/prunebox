@@ -12,7 +12,7 @@ const ENCRYPTED_POSITION = TAG_POSITION + TAG_LENGTH;
 
 let cachedEncryptionKey: string | undefined;
 
-function getEncryptionKey(): string {
+export function getEncryptionKey(): string {
   if (cachedEncryptionKey) return cachedEncryptionKey;
 
   const key = process.env.ENCRYPTION_KEY;

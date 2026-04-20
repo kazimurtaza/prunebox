@@ -324,6 +324,13 @@
       "category": "regression",
       "verified": true,
       "notes": "ConfigureRollupDialog component (src/components/dashboard/configure-rollup-dialog.tsx) provides form with enable toggle, digest name, delivery time, and timezone selection. API route at /api/rollup/settings handles GET/PUT with proper validation. Switch UI component created for toggle. Rollup page (src/app/dashboard/rollup/page.tsx:48-51) now uses dialog instead of static button."
+    },
+    {
+      "id": "VR.96",
+      "title": "Regression: fix for #96",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
     }
   ]
 }

@@ -16,3 +16,14 @@
 [2026-04-20 20:36:28] [#108] fixed (9fb645a) → needs-verification
 [2026-04-20 20:53:00] [#107] fixed (988377c) → needs-verification
 [2026-04-20 20:56:00] [#110] Code already correct - batchDeleteMessages uses gmail.users.messages.batchDelete API with 1000-message chunks (verified at src/modules/gmail/client.ts:290-310). Added VR.88 regression check.
+[2026-04-20 20:55:00] [#110] fixed (fb54b6e) → needs-verification
+[2026-04-20 20:59:16] [#105] fixed (af45a00) → needs-verification
+[2026-04-20 21:03:05] [#104] fixed (446146e) → needs-verification
+[2026-04-20 21:19:12] [#103] fixed (a2ee60a) → needs-verification
+[2026-04-20 21:21:39] [#101] fixed (f6b0087) → needs-verification
+[2026-04-20 21:31:44] [#100] fixed (1061f39) → needs-verification
+[2026-04-20 21:41:41] [#98] fixed (f1f9ece) → needs-verification
+[2026-04-20 21:54:45] [#97] fixed (d638f1a) → needs-verification
+[2026-04-20 21:53:45] [#97] fixed (d638f1a) → needs-verification
+[2026-04-20 21:06:10] [#96] fixed (9a6e5ab) - implemented Configure Digest dialog with API route for rollup settings
+[2026-04-20 22:04:00] [#96] fixed (9a6e5ab) → needs-verification

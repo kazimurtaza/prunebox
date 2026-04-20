@@ -1,0 +1,66 @@
+{
+  "project_type": "web-app",
+  "components": [
+    {"path": "src/app", "type": "directory", "description": "Next.js App Router - pages, layouts, and API routes"},
+    {"path": "src/app/api/auth", "type": "module", "description": "NextAuth.js v5 authentication with Google OAuth"},
+    {"path": "src/app/api/scan", "type": "module", "description": "Gmail inbox scanning API endpoints"},
+    {"path": "src/app/api/subscriptions", "type": "module", "description": "Subscription CRUD and bulk operations API"},
+    {"path": "src/app/api/webhook/gmail", "type": "module", "description": "Gmail push notification webhook handler"},
+    {"path": "src/app/dashboard", "type": "directory", "description": "Main dashboard UI pages (subscriptions, rollup, settings)"},
+    {"path": "src/modules/auth", "type": "module", "description": "Authentication configuration and utilities"},
+    {"path": "src/modules/gmail", "type": "module", "description": "Gmail API client, detection logic, unsubscribe handling"},
+    {"path": "src/modules/queues", "type": "module", "description": "BullMQ job queue for background tasks"},
+    {"path": "src/components", "type": "directory", "description": "React components including shadcn/ui and dashboard components"},
+    {"path": "prisma/schema.prisma", "type": "config", "description": "Database schema with User, Subscription, GmailSyncState models"},
+    {"path": "Dockerfile", "type": "config", "description": "Docker container configuration"},
+    {"path": "docker-compose.yml", "type": "config", "description": "Multi-container setup with app, PostgreSQL, and Redis"}
+  ],
+  "build_system": {
+    "tool": "npm",
+    "command": "npm run build",
+    "has_tests": false,
+    "has_lint": true
+  },
+  "has_ui": true,
+  "smoke_checks": [
+    {"id": "V1", "category": "build", "title": "Application builds successfully", "steps": "Run npm run build and verify production build completes without errors"},
+    {"id": "V2", "category": "lint", "title": "Code passes ESLint checks", "steps": "Run npm run lint and verify no critical errors"},
+    {"id": "V3", "category": "database", "title": "Database schema is valid", "steps": "Run npx prisma validate to check schema.prisma syntax"},
+    {"id": "V4", "category": "database", "title": "Database migrations can be applied", "steps": "Run npx prisma migrate deploy to verify migrations apply cleanly"},
+    {"id": "V5", "category": "api", "title": "Health check endpoint responds", "steps": "Run dev server and curl http://localhost:3000/api/health, expect 200 OK"},
+    {"id": "V6", "category": "auth", "title": "Authentication routes exist", "steps": "Verify src/app/api/auth/[...nextauth]/route.ts exists and exports auth configuration"},
+    {"id": "V7", "category": "gmail", "title": "Gmail detection module exists", "steps": "Verify src/modules/gmail/detection.ts contains subscription detection logic"},
+    {"id": "V8", "category": "queues", "title": "Job queue configuration exists", "steps": "Verify src/modules/queues/config.ts exists and defines queue connections"},
+    {"id": "V9", "category": "api", "title": "Subscription API endpoints exist", "steps": "Verify src/app/api/subscriptions/route.ts exists with CRUD operations"},
+    {"id": "V10", "category": "webhook", "title": "Gmail webhook endpoint exists", "steps": "Verify src/app/api/webhook/gmail/route.ts exists for push notifications"},
+    {"id": "V11", "category": "docker", "title": "Docker build succeeds", "steps": "Run docker build -t prunebox . and verify image builds without errors"},
+    {"id": "V12", "category": "docker", "title": "Docker compose configuration is valid", "steps": "Run docker-compose config to verify compose file syntax"},
+    {"id": "V13", "category": "env", "title": "Environment variables are documented", "steps": "Verify .env.example exists with all required variables documented"},
+    {"id": "V14", "category": "subscriptions", "title": "Unsubscribe module exists", "steps": "Verify src/modules/gmail/unsubscribe.ts contains unsubscribe logic"},
+    {"id": "V15", "category": "dashboard", "title": "Dashboard page renders", "steps": "Run dev server and navigate to http://localhost:3000/dashboard, verify page loads"}
+  ],
+  "visual_areas": [
+    {"id": "T1", "category": "auth", "title": "Sign-in page with Google OAuth button"},
+    {"id": "T2", "category": "dashboard", "title": "Dashboard layout with navigation header"},
+    {"id": "T3", "category": "subscriptions", "title": "Subscription list table with sender names, email counts, and action buttons"},
+    {"id": "T4", "category": "subscriptions", "title": "Scan button component for initiating Gmail scans"},
+    {"id": "T5", "category": "rollup", "title": "Rollup digest settings page with delivery time and frequency options"},
+    {"id": "T6", "category": "settings", "title": "User settings page with account preferences"},
+    {"id": "T7", "category": "ui", "title": "Dark mode theme toggle functionality"},
+    {"id": "T8", "category": "subscriptions", "title": "Subscription action dialog (keep, unsubscribe, rollup options)"},
+    {"id": "T9", "category": "notifications", "title": "Toast notifications for scan progress and action results"},
+    {"id": "T10", "category": "how-it-works", "title": "How It Works page explaining subscription detection"}
+  ],
+  "audit_areas": [
+    {"id": "A1", "category": "detection", "title": "Section 4: Detecting subscription emails programmatically", "spec_sections": ["4"]},
+    {"id": "A2", "category": "unsubscribe", "title": "Section 5: Automated unsubscription via List-Unsubscribe header", "spec_sections": ["5"]},
+    {"id": "A3", "category": "oauth", "title": "Section 3: Gmail API technical architecture", "spec_sections": ["3"]},
+    {"id": "A4", "category": "database", "title": "Section 6: Database schema for subscription tracking", "spec_sections": ["6"]},
+    {"id": "A5", "category": "architecture", "title": "Section 7: Node.js technical implementation architecture", "spec_sections": ["7"]},
+    {"id": "A6", "category": "security", "title": "Section 8: Google verification process and CASA compliance", "spec_sections": ["8"]},
+    {"id": "A7", "category": "legal", "title": "Section 9: Legal compliance requirements (GDPR, privacy policy)", "spec_sections": ["9"]},
+    {"id": "A8", "category": "product", "title": "Section 10: Product architecture and feature requirements", "spec_sections": ["10"]},
+    {"id": "A9", "category": "competitive", "title": "Section 2: Competitive landscape and feature gaps", "spec_sections": ["2"]},
+    {"id": "A10", "category": "unrollme", "title": "Section 1: Unroll.me functionality and limitations", "spec_sections": ["1"]}
+  ]
+}

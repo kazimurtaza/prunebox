@@ -1,0 +1,2 @@
+[2026-04-20 20:51:33] [#108] Added VR.108 regression check to .lazydave/manifests/smoke-checks.json
+[2026-04-20 21:01:40] [#105] Added VR.105 smoke check for Google verification documentation (already fixed in commits 892ef61, 1fc4b3a)

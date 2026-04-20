@@ -1,0 +1,96 @@
+{
+  "version": "1.0",
+  "project": "prunebox",
+  "areas": [
+    {
+      "id": "T1",
+      "category": "auth",
+      "title": "Sign-in page with Google OAuth button",
+      "status": "pending",
+      "notes": "",
+      "skill": null,
+      "agent": null
+    },
+    {
+      "id": "T2",
+      "category": "dashboard",
+      "title": "Dashboard layout with navigation header",
+      "status": "pending",
+      "notes": "",
+      "skill": null,
+      "agent": null
+    },
+    {
+      "id": "T3",
+      "category": "subscriptions",
+      "title": "Subscription list table with sender names, email counts, and action buttons",
+      "status": "pending",
+      "notes": "",
+      "skill": null,
+      "agent": null
+    },
+    {
+      "id": "T4",
+      "category": "subscriptions",
+      "title": "Scan button component for initiating Gmail scans",
+      "status": "pending",
+      "notes": "",
+      "skill": null,
+      "agent": null
+    },
+    {
+      "id": "T5",
+      "category": "rollup",
+      "title": "Rollup digest settings page with delivery time and frequency options",
+      "status": "pending",
+      "notes": "",
+      "skill": null,
+      "agent": null
+    },
+    {
+      "id": "T6",
+      "category": "settings",
+      "title": "User settings page with account preferences",
+      "status": "pending",
+      "notes": "",
+      "skill": null,
+      "agent": null
+    },
+    {
+      "id": "T7",
+      "category": "ui",
+      "title": "Dark mode theme toggle functionality",
+      "status": "pending",
+      "notes": "",
+      "skill": null,
+      "agent": null
+    },
+    {
+      "id": "T8",
+      "category": "subscriptions",
+      "title": "Subscription action dialog (keep, unsubscribe, rollup options)",
+      "status": "pending",
+      "notes": "",
+      "skill": null,
+      "agent": null
+    },
+    {
+      "id": "T9",
+      "category": "notifications",
+      "title": "Toast notifications for scan progress and action results",
+      "status": "pending",
+      "notes": "",
+      "skill": null,
+      "agent": null
+    },
+    {
+      "id": "T10",
+      "category": "how-it-works",
+      "title": "How It Works page explaining subscription detection",
+      "status": "pending",
+      "notes": "",
+      "skill": null,
+      "agent": null
+    }
+  ]
+}
