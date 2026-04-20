@@ -130,6 +130,13 @@
       "notes": ""
     },
     {
+      "id": "VR.112",
+      "title": "Regression: BullMQ + Redis job queue system implemented",
+      "category": "regression",
+      "verified": true,
+      "notes": "BullMQ (v5.74.1) and ioredis (v5.10.1) packages installed. Queues configured: email-scan, unsubscribe, bulk-delete, rollup-digest, history-monitor. Workers initialized via instrumentation.ts with proper lifecycle. Scheduled jobs: daily rollup at 8 AM, history monitor every 10 min. All API routes use queues instead of direct calls."
+    },
+    {
       "id": "VR.115",
       "title": "Regression: Docker Compose includes PostgreSQL service (#115)",
       "category": "regression",
@@ -149,6 +156,13 @@
       "category": "regression",
       "verified": true,
       "notes": "Implemented history API polling via listHistory() and getCurrentHistoryId() functions in src/modules/gmail/client.ts. Added runHistoryMonitor() job, history-monitor queue/worker, and automatic initialization for all Google accounts on worker startup. Polling interval: 10 minutes per user."
+    },
+    {
+      "id": "VR.114",
+      "title": "Regression: fix for #114",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
     }
   ]
 }

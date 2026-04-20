@@ -1,1 +1,2 @@
 [2026-04-20 11:53:40] [verify] Issue #112: BullMQ + Redis job queue system already fully implemented and verified
+[2026-04-20 10:15:00] [verify] Added VR.112 regression check to smoke-checks.json for BullMQ + Redis job queue system
