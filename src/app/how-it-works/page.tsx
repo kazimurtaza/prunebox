@@ -112,7 +112,6 @@ export default function HowItWorksPage() {
                   <ul className="space-y-2 text-sm text-muted-foreground">
                     <li>• Sender patterns (noreply@, newsletter@)</li>
                     <li>• ESP domains (Mailchimp, SendGrid)</li>
-                    <li>• Gmail category: promotions/updates</li>
                     <li>• Recurring email from same sender</li>
                   </ul>
                 </div>
