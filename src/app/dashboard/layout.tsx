@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { signOut } from '@/modules/auth/auth';
 import Link from 'next/link';
 import { Providers } from '@/components/providers/session-provider';
+import { DashboardNav } from '@/components/dashboard/dashboard-nav';
 
 export default async function DashboardLayout({
   children,
@@ -29,14 +30,7 @@ export default async function DashboardLayout({
               </svg>
               <span className="font-bold text-lg">Prunebox</span>
             </Link>
-            <nav className="hidden md:flex items-center gap-4">
-              <Link href="/dashboard" className="text-sm font-medium text-primary">
-                Email Groups
-              </Link>
-              <Link href="/dashboard/settings" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-                Settings
-              </Link>
-            </nav>
+            <DashboardNav />
           </div>
 
           <div className="flex items-center gap-3">
