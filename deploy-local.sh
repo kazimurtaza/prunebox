@@ -27,7 +27,7 @@ elif [[ -f "docker/docker-compose.yml" ]]; then
 elif [[ -f "Dockerfile" ]]; then
   # Fallback: build and run directly
   docker build -t dev-server .
-  docker run -d --name dev-server -p "$PORT:8080" dev-server
+  docker run -d --name dev-server -p "$PORT:3000" dev-server
 else
   echo "Error: No docker-compose.yml or Dockerfile found"
   exit 1
