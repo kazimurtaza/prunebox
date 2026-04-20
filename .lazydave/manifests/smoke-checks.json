@@ -177,6 +177,20 @@
       "category": "regression",
       "verified": true,
       "notes": "runBulkDelete creates BulkDeletionJob record at start (lines 446-454), updates totalMessages after search (lines 507-510), marks success with deletedCount (lines 559-566), and marks failed with errorMessage (lines 572-579). Follows same pattern as runUnsubscribe."
+    },
+    {
+      "id": "VR.109",
+      "title": "Regression: fix for #109",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.108",
+      "title": "Regression: BullMQ + Redis job queue system fully implemented (#108)",
+      "category": "regression",
+      "verified": true,
+      "notes": "BullMQ (v5.74.1) and ioredis (v5.10.1) installed. Redis connection via REDIS_URL env var. All 5 queues configured: email-scan, unsubscribe, bulk-delete, rollup-digest, history-monitor. Workers with retry logic (3 attempts, exponential backoff 5s). instrumentation.ts manages worker lifecycle. All API routes use queues: scan (getEmailScanQueue), bulk (getBulkDeleteQueue/getUnsubscribeQueue), action (getUnsubscribeQueue). Scheduled jobs: daily rollup at 8 AM, history monitor every 10 min."
     }
   ]
 }
