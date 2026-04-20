@@ -527,6 +527,13 @@
       "category": "regression",
       "verified": false,
       "notes": ""
+    },
+    {
+      "id": "VR.55",
+      "title": "Regression: Test framework and test coverage added (#55)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Vitest test framework installed with @vitest/ui. Added test, test:watch, and test:ui scripts to package.json. Created comprehensive test suites: src/modules/gmail/__tests__/detection.test.ts (45 tests covering subscription detection, sender parsing, email body extraction, unsubscribe link parsing) and src/lib/__tests__/crypto.test.ts (14 tests covering encryption/decryption roundtrips, error handling, ciphertext properties). All 59 tests pass. TypeScript compilation passes with no errors."
     }
   ]
 }
