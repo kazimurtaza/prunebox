@@ -348,3 +348,85 @@ export async function sendEmail(
 
   return response.data;
 }
+
+/**
+ * Fetch Gmail history list to detect new messages
+ * @param startHistoryId - The history ID to start from (exclusive)
+ * @returns Array of message IDs that were added
+ */
+export async function listHistory(
+  accessToken: string,
+  refreshToken: string | undefined,
+  startHistoryId: string,
+  userId?: string
+): Promise<string[]> {
+  const gmail = await createGmailClient(accessToken, refreshToken, userId);
+  const messageIdSet = new Set<string>();
+
+  let pageToken: string | undefined;
+  let retryCount = 0;
+  const maxRetries = 3;
+
+  do {
+    try {
+      const response = await gmail.users.history.list({
+        userId: 'me',
+        startHistoryId,
+        historyTypes: ['messageAdded'],
+        pageToken,
+      });
+
+      if (response.data.history) {
+        for (const historyRecord of response.data.history) {
+          if (historyRecord.messagesAdded) {
+            for (const msgAdded of historyRecord.messagesAdded) {
+              if (msgAdded.message?.id) {
+                messageIdSet.add(msgAdded.message.id);
+              }
+            }
+          }
+        }
+      }
+
+      pageToken = response.data.nextPageToken || undefined;
+      retryCount = 0;
+    } catch (error) {
+      const err = error as { code?: number };
+      if (err?.code === 429 && retryCount < maxRetries) {
+        const delayMs = Math.pow(2, retryCount) * 1000 + Math.random() * 1000;
+        logger.warn(`History API rate limit hit, retrying in ${delayMs}ms (attempt ${retryCount + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+        retryCount++;
+        continue;
+      }
+      if (err?.code === 404) {
+        logger.info(`History ID ${startHistoryId} is too old, performing full sync`);
+        return [];
+      }
+      throw error;
+    }
+  } while (pageToken);
+
+  return Array.from(messageIdSet);
+}
+
+/**
+ * Get the current history ID for a user's Gmail account
+ */
+export async function getCurrentHistoryId(
+  accessToken: string,
+  refreshToken: string | undefined,
+  userId?: string
+): Promise<string> {
+  const gmail = await createGmailClient(accessToken, refreshToken, userId);
+
+  const profile = await gmail.users.getProfile({
+    userId: 'me',
+  });
+
+  if (!profile.data.historyId) {
+    throw new Error('No history ID in Gmail profile');
+  }
+
+  return profile.data.historyId;
+}

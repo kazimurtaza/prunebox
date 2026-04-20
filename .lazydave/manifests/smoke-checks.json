@@ -1,0 +1,154 @@
+{
+  "version": "1.0",
+  "project": "prunebox",
+  "checks": [
+    {
+      "id": "V1",
+      "category": "build",
+      "title": "Application builds successfully",
+      "steps": "Run npm run build and verify production build completes without errors",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V2",
+      "category": "lint",
+      "title": "Code passes ESLint checks",
+      "steps": "Run npm run lint and verify no critical errors",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V3",
+      "category": "database",
+      "title": "Database schema is valid",
+      "steps": "Run npx prisma validate to check schema.prisma syntax",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V4",
+      "category": "database",
+      "title": "Database migrations can be applied",
+      "steps": "Run npx prisma migrate deploy to verify migrations apply cleanly",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V5",
+      "category": "api",
+      "title": "Health check endpoint responds",
+      "steps": "Run dev server and curl http://localhost:3000/api/health, expect 200 OK",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V6",
+      "category": "auth",
+      "title": "Authentication routes exist",
+      "steps": "Verify src/app/api/auth/[...nextauth]/route.ts exists and exports auth configuration",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V7",
+      "category": "gmail",
+      "title": "Gmail detection module exists",
+      "steps": "Verify src/modules/gmail/detection.ts contains subscription detection logic",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V8",
+      "category": "queues",
+      "title": "Job queue configuration exists",
+      "steps": "Verify src/modules/queues/config.ts exists and defines queue connections",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V9",
+      "category": "api",
+      "title": "Subscription API endpoints exist",
+      "steps": "Verify src/app/api/subscriptions/route.ts exists with CRUD operations",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V10",
+      "category": "webhook",
+      "title": "Gmail webhook endpoint exists",
+      "steps": "Verify src/app/api/webhook/gmail/route.ts exists for push notifications",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V11",
+      "category": "docker",
+      "title": "Docker build succeeds",
+      "steps": "Run docker build -t prunebox . and verify image builds without errors",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V12",
+      "category": "docker",
+      "title": "Docker compose configuration is valid",
+      "steps": "Run docker-compose config to verify compose file syntax",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V13",
+      "category": "env",
+      "title": "Environment variables are documented",
+      "steps": "Verify .env.example exists with all required variables documented",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V14",
+      "category": "subscriptions",
+      "title": "Unsubscribe module exists",
+      "steps": "Verify src/modules/gmail/unsubscribe.ts contains unsubscribe logic",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V15",
+      "category": "dashboard",
+      "title": "Dashboard page renders",
+      "steps": "Run dev server and navigate to http://localhost:3000/dashboard, verify page loads",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.116",
+      "title": "Regression: fix for #116",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.115",
+      "title": "Regression: Docker Compose includes PostgreSQL service (#115)",
+      "category": "regression",
+      "verified": true,
+      "notes": "All docker-compose files now include postgres service with healthcheck. DATABASE_URL uses container hostname (postgres:5432). Verified at fix time - docker-compose.yml:22-36, docker-compose.dev.yml:37-52, docker-compose.production.yml:37-52"
+    },
+    {
+      "id": "VR.115",
+      "title": "Regression: fix for #115",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.114",
+      "title": "Regression: Gmail history API polling for email monitoring (#114)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Implemented history API polling via listHistory() and getCurrentHistoryId() functions in src/modules/gmail/client.ts. Added runHistoryMonitor() job, history-monitor queue/worker, and automatic initialization for all Google accounts on worker startup. Polling interval: 10 minutes per user."
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { listMessages, getMessage, getMessageHeaders, batchDeleteMessages, sendEmail, createGmailClient, InvalidTokenError } from '../gmail/client';
+import { listMessages, getMessage, getMessageHeaders, batchDeleteMessages, sendEmail, createGmailClient, InvalidTokenError, listHistory, getCurrentHistoryId } from '../gmail/client';
 import { detectSubscription, parseSender } from '../gmail/detection';
 import { db } from '@/lib/db';
 import { logger } from '@/lib/logger';
@@ -29,6 +29,10 @@ export interface BulkDeleteJobData {
   senderEmail: string;
   accessToken: string;
   refreshToken?: string;
+}
+
+export interface HistoryMonitorJobData {
+  userId: string;
 }
 
 /**
@@ -654,6 +658,117 @@ export async function runRollup(data: RollupJobData) {
     return { success: true, subscriptionCount: subscriptions.length };
   } catch (error) {
     logger.error(`Rollup digest failed for user ${userId}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * History Monitor Job
+ * Polls Gmail history API to detect new messages and trigger email scans
+ */
+export async function runHistoryMonitor(data: HistoryMonitorJobData) {
+  const { userId } = data;
+
+  logger.info(`Starting history monitor for user ${userId}`);
+
+  try {
+    const account = await db.account.findFirst({
+      where: {
+        userId,
+        provider: 'google',
+      },
+    });
+
+    if (!account || !account.access_token) {
+      logger.warn(`No valid Google account found for user ${userId}`);
+      return { success: false, reason: 'no_account' };
+    }
+
+    const accessToken = account.access_token;
+    const refreshToken = account.refresh_token ?? undefined;
+
+    const syncState = await db.gmailSyncState.findUnique({
+      where: { userId },
+    });
+
+    if (!syncState) {
+      logger.info(`No sync state found for user ${userId}, fetching current history ID`);
+      const currentHistoryId = await getCurrentHistoryId(accessToken, refreshToken, userId);
+
+      await db.gmailSyncState.create({
+        data: {
+          userId,
+          historyId: BigInt(currentHistoryId),
+        },
+      });
+
+      logger.info(`Initialized history ID for user ${userId}: ${currentHistoryId}`);
+      return { success: true, newMessages: 0, initialized: true };
+    }
+
+    const startHistoryId = syncState.historyId?.toString();
+
+    if (!startHistoryId) {
+      logger.info(`No history ID stored for user ${userId}, fetching current history ID`);
+      const currentHistoryId = await getCurrentHistoryId(accessToken, refreshToken, userId);
+
+      await db.gmailSyncState.update({
+        where: { userId },
+        data: { historyId: BigInt(currentHistoryId) },
+      });
+
+      return { success: true, newMessages: 0, initialized: true };
+    }
+
+    logger.info(`Fetching history for user ${userId} from historyId: ${startHistoryId}`);
+    const newMessageIds = await listHistory(accessToken, refreshToken, startHistoryId, userId);
+
+    if (newMessageIds.length === 0) {
+      logger.info(`No new messages for user ${userId}`);
+      return { success: true, newMessages: 0 };
+    }
+
+    logger.info(`Found ${newMessageIds.length} new messages for user ${userId}`);
+
+    const currentHistoryId = await getCurrentHistoryId(accessToken, refreshToken, userId);
+
+    await db.gmailSyncState.update({
+      where: { userId },
+      data: { historyId: BigInt(currentHistoryId) },
+    });
+
+    logger.info(`Updated history ID for user ${userId} from ${startHistoryId} to ${currentHistoryId}`);
+
+    if (newMessageIds.length > 0) {
+      const { getEmailScanQueue } = await import('./queues');
+      await getEmailScanQueue().add(
+        'email-scan',
+        {
+          userId,
+          accessToken,
+          refreshToken,
+        },
+        {
+          jobId: `scan-${userId}-${Date.now()}`,
+        }
+      );
+      logger.info(`Queued email scan for user ${userId} after detecting ${newMessageIds.length} new messages`);
+    }
+
+    return { success: true, newMessages: newMessageIds.length };
+  } catch (error) {
+    logger.error(`History monitor failed for user ${userId}:`, error);
+
+    if (error instanceof InvalidTokenError) {
+      await db.gmailSyncState.update({
+        where: { userId },
+        data: {
+          scanStatus: 'error',
+          errorMessage: 'Your Google account access has expired. Please reconnect your account.',
+        },
+      });
+    }
+
     throw error;
   }
 }

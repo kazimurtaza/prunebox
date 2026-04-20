@@ -24,6 +24,7 @@ let emailScanQueueInstance: Queue | null = null;
 let unsubscribeQueueInstance: Queue | null = null;
 let bulkDeleteQueueInstance: Queue | null = null;
 let rollupQueueInstance: Queue | null = null;
+let historyMonitorQueueInstance: Queue | null = null;
 
 export function getEmailScanQueue(): Queue {
   if (!emailScanQueueInstance) {
@@ -65,6 +66,16 @@ export function getRollupQueue(): Queue {
   return rollupQueueInstance;
 }
 
+export function getHistoryMonitorQueue(): Queue {
+  if (!historyMonitorQueueInstance) {
+    historyMonitorQueueInstance = new Queue('history-monitor', {
+      connection: getRedisConnection(),
+      defaultJobOptions,
+    });
+  }
+  return historyMonitorQueueInstance;
+}
+
 export async function scheduleDailyRollup(userId: string, accessToken: string, refreshToken?: string) {
   const jobId = `daily-digest-${userId}`;
   await getRollupQueue().add(
@@ -89,4 +100,63 @@ export async function removeScheduledRollup(userId: string) {
   if (job) {
     await job.remove();
   }
+}
+
+/**
+ * Schedule history monitoring for a user
+ * Runs every 10 minutes to check for new emails
+ */
+export async function scheduleHistoryMonitoring(userId: string) {
+  const jobId = `history-monitor-${userId}`;
+  await getHistoryMonitorQueue().add(
+    'history-monitor',
+    { userId },
+    {
+      jobId,
+      repeat: {
+        every: 600000,
+      },
+    }
+  );
+}
+
+/**
+ * Remove scheduled history monitoring for a user
+ */
+export async function removeHistoryMonitoring(userId: string) {
+  const jobId = `history-monitor-${userId}`;
+  const job = await getHistoryMonitorQueue().getJob(jobId);
+  if (job) {
+    await job.remove();
+  }
+}
+
+/**
+ * Initialize history monitoring for all users with Google accounts
+ * This should be called on startup
+ */
+export async function initializeHistoryMonitoringForAllUsers() {
+  const { db } = await import('@/lib/db');
+  const { logger } = await import('@/lib/logger');
+
+  const users = await db.user.findMany({
+    where: {
+      accounts: {
+        some: {
+          provider: 'google',
+        },
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  logger.info(`Initializing history monitoring for ${users.length} users`);
+
+  for (const user of users) {
+    await scheduleHistoryMonitoring(user.id);
+  }
+
+  logger.info(`History monitoring scheduled for ${users.length} users`);
 }

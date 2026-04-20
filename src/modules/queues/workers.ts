@@ -1,11 +1,11 @@
 import { Worker } from 'bullmq';
 import { getRedisConnection } from './config';
-import { runEmailScan, runUnsubscribe, runBulkDelete, runRollup } from './jobs';
+import { runEmailScan, runUnsubscribe, runBulkDelete, runRollup, runHistoryMonitor } from './jobs';
 import { logger } from '@/lib/logger';
 
 let workers: Worker[] | null = null;
 
-export function initializeWorkers() {
+export async function initializeWorkers() {
   if (workers) {
     logger.info('Workers already initialized');
     return workers;
@@ -57,7 +57,18 @@ export function initializeWorkers() {
     }
   );
 
-  workers = [emailScanWorker, unsubscribeWorker, bulkDeleteWorker, rollupWorker];
+  const historyMonitorWorker = new Worker(
+    'history-monitor',
+    async (job) => {
+      return await runHistoryMonitor(job.data);
+    },
+    {
+      connection: redisConnection,
+      concurrency: 10,
+    }
+  );
+
+  workers = [emailScanWorker, unsubscribeWorker, bulkDeleteWorker, rollupWorker, historyMonitorWorker];
 
   workers.forEach((worker) => {
     worker.on('completed', (job) => {
@@ -74,6 +85,12 @@ export function initializeWorkers() {
   });
 
   logger.info('BullMQ workers initialized');
+
+  const { initializeHistoryMonitoringForAllUsers } = await import('./queues');
+  await initializeHistoryMonitoringForAllUsers().catch((err) => {
+    logger.error('Failed to initialize history monitoring:', err);
+  });
+
   return workers;
 }
 

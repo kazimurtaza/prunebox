@@ -2,7 +2,7 @@ export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     const { initializeWorkers, closeWorkers } = await import('@/modules/queues/workers');
 
-    initializeWorkers();
+    await initializeWorkers();
 
     process.on('beforeExit', async () => {
       await closeWorkers();
