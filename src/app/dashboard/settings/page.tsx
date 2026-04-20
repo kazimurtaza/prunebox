@@ -20,6 +20,7 @@ import {
 import { User, Shield, Bell, Trash2, Loader2, Download } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 type Tab = 'account' | 'notifications' | 'privacy';
 
@@ -38,11 +39,14 @@ export default function SettingsPage() {
 
     return (
         <div className="max-w-4xl mx-auto space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold">Settings</h1>
-                <p className="text-muted-foreground">
-                    Manage your account preferences and privacy settings
-                </p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold">Settings</h1>
+                    <p className="text-muted-foreground">
+                        Manage your account preferences and privacy settings
+                    </p>
+                </div>
+                <ThemeToggle />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Mail, Clock, Calendar } from 'lucide-react';
 import { ConfigureRollupDialog } from '@/components/dashboard/configure-rollup-dialog';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const DELIVERY_SLOT_LABELS: Record<string, { label: string; time: string }> = {
   MORNING: { label: 'Morning', time: '08:00' },
@@ -53,14 +54,17 @@ export default async function RollupPage() {
                         Daily digest of your selected email groups
                     </p>
                 </div>
-                <ConfigureRollupDialog
-                    initialSettings={settings ? {
-                        enabled: settings.enabled,
-                        deliverySlot: settings.deliverySlot,
-                        timezone: settings.timezone,
-                        digestName: settings.digestName,
-                    } : undefined}
-                />
+                <div className="flex items-center gap-2">
+                    <ConfigureRollupDialog
+                        initialSettings={settings ? {
+                            enabled: settings.enabled,
+                            deliverySlot: settings.deliverySlot,
+                            timezone: settings.timezone,
+                            digestName: settings.digestName,
+                        } : undefined}
+                    />
+                    <ThemeToggle />
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

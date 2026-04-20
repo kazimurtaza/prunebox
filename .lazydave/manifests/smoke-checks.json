@@ -534,6 +534,27 @@
       "category": "regression",
       "verified": true,
       "notes": "Vitest test framework installed with @vitest/ui. Added test, test:watch, and test:ui scripts to package.json. Created comprehensive test suites: src/modules/gmail/__tests__/detection.test.ts (45 tests covering subscription detection, sender parsing, email body extraction, unsubscribe link parsing) and src/lib/__tests__/crypto.test.ts (14 tests covering encryption/decryption roundtrips, error handling, ciphertext properties). All 59 tests pass. TypeScript compilation passes with no errors."
+    },
+    {
+      "id": "VR.55",
+      "title": "Regression: fix for #55",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.118",
+      "title": "Regression: UnsubscriptionAttempt and BulkDeletionJob cascade on User deletion (#118)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Added onDelete: Cascade to UnsubscriptionAttempt and BulkDeletionJob models. Added reverse relations (unsubscriptionAttempts, bulkDeletionJobs) to User model. GDPR Article 17 right to erasure now complete - all user data deleted on account deletion. Verified at prisma/schema.prisma:147,162 and User model lines 15-16."
+    },
+    {
+      "id": "VR.118",
+      "title": "Regression: fix for #118",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
     }
   ]
 }
