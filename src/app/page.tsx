@@ -2,6 +2,7 @@ import { Shield, Mail, Trash2, Zap } from "lucide-react";
 import Link from "next/link";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { ReactNode } from "react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface LinkButtonProps extends Omit<ButtonProps, 'onClick'> {
   href: string;
@@ -32,6 +33,7 @@ export default function HomePage() {
             <LinkButton href="/auth/signin">
               Sign In
             </LinkButton>
+            <ThemeToggle />
           </nav>
         </div>
       </header>

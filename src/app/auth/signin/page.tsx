@@ -6,6 +6,7 @@ import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { Mail } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 function SignInContent() {
   const searchParams = useSearchParams();
@@ -57,6 +58,9 @@ function SignInContent() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted p-4">
       <div className="max-w-md w-full bg-card rounded-xl shadow-lg p-8">
+        <div className="flex justify-end mb-4">
+          <ThemeToggle />
+        </div>
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center h-16 w-16 bg-primary/10 rounded-full mb-4">
             <Mail className="h-8 w-8 text-primary" />
