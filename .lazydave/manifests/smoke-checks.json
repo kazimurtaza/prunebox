@@ -555,6 +555,13 @@
       "category": "regression",
       "verified": false,
       "notes": ""
+    },
+    {
+      "id": "VR.117",
+      "title": "Regression: ThemeToggle added to rollup and settings pages (#117)",
+      "category": "regression",
+      "verified": true,
+      "notes": "ThemeToggle component added to rollup page header (src/app/dashboard/rollup/page.tsx:56-64) and settings page header (src/app/dashboard/settings/page.tsx:40-46). Matches dashboard pattern - positioned on right side of header with flex gap-2. All authenticated pages now have consistent theme toggle access."
     }
   ]
 }
