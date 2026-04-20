@@ -210,9 +210,14 @@ CREATE TABLE subscriptions (
   sender_name VARCHAR(255),
   list_unsubscribe_header TEXT,        -- Store for unsubscribe processing
   unsubscribe_method VARCHAR(50),      -- 'mailto', 'http', 'manual'
+  unsubscribe_url TEXT,                -- Parsed HTTP unsubscribe URL
+  unsubscribe_mailto TEXT,             -- Parsed mailto unsubscribe address
   message_count INTEGER DEFAULT 1,
   first_seen_at TIMESTAMP WITH TIME ZONE,
   last_seen_at TIMESTAMP WITH TIME ZONE,
+  confidence_score INTEGER DEFAULT 50, -- Detection confidence (0-100)
+  recent_subject VARCHAR(255),         -- Latest email subject for preview
+  recent_snippet TEXT,                 -- Latest email snippet for preview
   UNIQUE(user_id, sender_email)
 );
 
@@ -222,14 +227,61 @@ CREATE TABLE subscription_preferences (
   subscription_id UUID NOT NULL,
   action VARCHAR(20) DEFAULT 'keep',   -- 'keep', 'unsubscribe', 'rollup'
   rollup_frequency VARCHAR(20),        -- 'daily', 'weekly'
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE,
   UNIQUE(user_id, subscription_id)
 );
 
 CREATE TABLE gmail_sync_state (
-  user_id UUID PRIMARY KEY,
+  id UUID PRIMARY KEY,
+  user_id UUID NOT NULL UNIQUE REFERENCES users(id),
   history_id BIGINT,                   -- For incremental sync
   watch_expiration TIMESTAMP WITH TIME ZONE,
-  last_sync_at TIMESTAMP WITH TIME ZONE
+  last_sync_at TIMESTAMP WITH TIME ZONE,
+  scan_status VARCHAR(20) DEFAULT 'idle', -- 'idle', 'scanning', 'completed', 'failed'
+  scan_progress INTEGER,               -- Current progress count for UX
+  scan_total INTEGER,                  -- Total messages to scan
+  error_message TEXT                   -- Error details if scan fails
+);
+
+-- Unsubscription attempt tracking for audit trail
+CREATE TABLE unsubscription_attempts (
+  id UUID PRIMARY KEY,
+  user_id UUID NOT NULL,
+  subscription_id UUID NOT NULL,
+  method VARCHAR(50),                  -- 'one-click', 'mailto', 'manual'
+  status VARCHAR(20),                  -- 'pending', 'completed', 'failed'
+  error_message TEXT,
+  attempted_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  completed_at TIMESTAMP WITH TIME ZONE
+);
+
+-- Bulk deletion job tracking for async operations
+CREATE TYPE deletion_status AS ENUM ('pending', 'processing', 'completed', 'failed');
+
+CREATE TABLE bulk_deletion_jobs (
+  id UUID PRIMARY KEY,
+  user_id UUID NOT NULL,
+  sender_email VARCHAR(320) NOT NULL,
+  status deletion_status DEFAULT 'pending',
+  total_messages INTEGER NOT NULL,
+  deleted_messages INTEGER DEFAULT 0,
+  error_message TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  completed_at TIMESTAMP WITH TIME ZONE
+);
+
+-- User customization for digest delivery
+CREATE TYPE delivery_slot AS ENUM ('MORNING', 'AFTERNOON', 'EVENING');
+
+CREATE TABLE rollup_settings (
+  id UUID PRIMARY KEY,
+  user_id UUID NOT NULL UNIQUE REFERENCES users(id),
+  enabled BOOLEAN DEFAULT false,
+  delivery_slot delivery_slot DEFAULT 'MORNING',
+  timezone VARCHAR(50) DEFAULT 'UTC',
+  digest_name VARCHAR(100) DEFAULT 'My Daily Rollup',
+  last_sent_at TIMESTAMP WITH TIME ZONE
 );
 ```
 
