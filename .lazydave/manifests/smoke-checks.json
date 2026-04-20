@@ -443,6 +443,62 @@
       "category": "regression",
       "verified": true,
       "notes": "Verified at fix time - docs/prunebox_specsheet.md Section 18 now includes: Subscription model fields (confidenceScore, recentSubject, recentSnippet, unsubscribeUrl, unsubscribeMailto), GmailSyncState fields (scanStatus, scanProgress, scanTotal, errorMessage), UnsubscriptionAttempt table, BulkDeletionJob table, RollupSettings table with DeliverySlot enum."
+    },
+    {
+      "id": "VR.85",
+      "title": "Regression: fix for #85",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.84",
+      "title": "Regression: Spec documents manual scan approach for email monitoring (#84)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Updated spec Section 17 to reflect manual scans as the MVP approach. Previous spec incorrectly prescribed polling/history.list API. Current implementation uses user-triggered manual scans via scan button, which is the documented and desired behavior."
+    },
+    {
+      "id": "VR.84",
+      "title": "Regression: fix for #84",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.83",
+      "title": "Regression: BullMQ + Redis job queue system matches spec (#83)",
+      "category": "regression",
+      "verified": true,
+      "notes": "BullMQ (v5.74.1) and ioredis (v5.10.1) installed. All 5 queues configured: email-scan, unsubscribe, bulk-delete, rollup-digest, history-monitor. Workers with retry logic (3 attempts, exponential backoff). instrumentation.ts manages lifecycle. All API routes use queues, not direct async calls. Jobs persist in Redis (survive restarts). Verified at fix time - src/modules/queues/queues.ts, workers.ts, config.ts, instrumentation.ts"
+    },
+    {
+      "id": "VR.83",
+      "title": "Regression: fix for #83",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.82",
+      "title": "Regression: NEXTAUTH_URL validation added to prevent production domain in dev (#82)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Added console warnings in src/modules/auth/auth.ts when NEXTAUTH_URL or NEXT_PUBLIC_APP_URL are not set to localhost in development mode. Helps developers identify OAuth callback failures caused by using production domain during local development. Validation runs on server startup."
+    },
+    {
+      "id": "VR.82",
+      "title": "Regression: fix for #82",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.81",
+      "title": "Regression: Lazydave config port 3000 for prunebox (not 8080)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Verified .lazydave/manifests/config.json has port: 3000 (correct for prunebox). Previous value 8080 pointed to Inkboard. Next.js default port is 3000, matching docker-compose.yml mapping '3000:3000'. Dev docker-compose maps 3001:3000 for dev API."
     }
   ]
 }
