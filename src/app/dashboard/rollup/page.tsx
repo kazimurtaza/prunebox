@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Mail, Settings2, Clock, Calendar } from 'lucide-react';
+import { Mail, Clock, Calendar } from 'lucide-react';
+import { ConfigureRollupDialog } from '@/components/dashboard/configure-rollup-dialog';
 
 async function getRollupData(userId: string) {
     const settings = await db.rollupSettings.findUnique({
@@ -43,10 +44,14 @@ export default async function RollupPage() {
                         Daily digest of your selected email groups
                     </p>
                 </div>
-                <Button variant="outline">
-                    <Settings2 className="mr-2 h-4 w-4" />
-                    Configure Digest
-                </Button>
+                <ConfigureRollupDialog
+                    initialSettings={settings ? {
+                        enabled: settings.enabled,
+                        deliveryTime: settings.deliveryTime,
+                        timezone: settings.timezone,
+                        digestName: settings.digestName,
+                    } : undefined}
+                />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

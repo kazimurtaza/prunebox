@@ -212,6 +212,118 @@
       "category": "regression",
       "verified": true,
       "notes": "Verified at fix time - batchDeleteMessages function (src/modules/gmail/client.ts:290-310) correctly uses gmail.users.messages.batchDelete API with 1000-message chunks. No sequential trash() calls. Efficient quota usage (50 units per 1000 messages vs 10 units per individual trash)."
+    },
+    {
+      "id": "VR.110",
+      "title": "Regression: fix for #110",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.105",
+      "title": "Regression: Google verification timeline and CASA costs documented (#105)",
+      "category": "regression",
+      "verified": true,
+      "notes": "README.md section 'Google Verification Timeline and Costs' (lines 145-168) documents verification timeline (4-8 weeks minimum, 3-6 months with issues), CASA audit costs (Tier 2: $500-1,000/year, Tier 3: $4,500+/year), annual recertification, and unverified limitations (100 test users, warning screen, 7-day token expiry). DEPLOYMENT.md (line 42) has verification notice."
+    },
+    {
+      "id": "VR.105",
+      "title": "Regression: fix for #105",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.104",
+      "title": "Regression: Dashboard navigation includes Rollup link and mobile menu (#104)",
+      "category": "regression",
+      "verified": true,
+      "notes": "DashboardNav component (src/components/dashboard/dashboard-nav.tsx) includes all three navigation links (Email Groups, Rollup, Settings). Mobile hamburger menu with slide-in drawer provides navigation on screens <768px. Active link highlighting using usePathname hook."
+    },
+    {
+      "id": "VR.104",
+      "title": "Regression: fix for #104",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.103",
+      "title": "Regression: False GDPR compliance claims removed from how-it-works page (#103)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Removed false GDPR claims: 'Full GDPR compliance with right to erasure', 'GDPR Article 17 compliant', and 'Data deletion on request'. Replaced with accurate Google Limited Use policy language. Verified at src/app/how-it-works/page.tsx:184 - now states 'We comply with Google Limited Use policy - your data is used only for subscription management'."
+    },
+    {
+      "id": "VR.103",
+      "title": "Regression: fix for #103",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.101",
+      "title": "Regression: Theme toggle available on landing and sign-in pages (#101)",
+      "category": "regression",
+      "verified": true,
+      "notes": "ThemeToggle component added to landing page navigation (src/app/page.tsx:36) and sign-in page card (src/app/auth/signin/page.tsx:60-62). Non-authenticated users can now switch between light and dark themes before signing in."
+    },
+    {
+      "id": "VR.101",
+      "title": "Regression: fix for #101",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.100",
+      "title": "Regression: Deploy page responsive on mobile viewports (#100)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Added break-all class to code elements in src/app/deploy/page.tsx. Long URLs (git clone, docker pull, config values) now wrap on mobile. Document width matches viewport width at 320px/375px/390px. No horizontal scrolling."
+    },
+    {
+      "id": "VR.100",
+      "title": "Regression: fix for #100",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.98",
+      "title": "Regression: Rollup action button added to subscription list (#98)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Rollup button added to desktop view (lines 728-737) and mobile dropdown menu (lines 705-710) in subscription-list.tsx. updateAction function now accepts all three action types: keep, unsubscribe, rollup (line 240). Users can now add subscriptions to daily digest from main dashboard."
+    },
+    {
+      "id": "VR.98",
+      "title": "Regression: fix for #98",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.97",
+      "title": "Regression: Delete Account button enabled with GDPR compliance (#97)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Delete Account button in Settings (src/app/dashboard/settings/page.tsx:164-207) is enabled with confirmation dialog. Backend endpoint /api/account/delete (src/app/api/account/delete/route.ts) deletes user with cascade - removes User, Account, Session, Subscription, SubscriptionPreference, GmailSyncState, and RollupSettings records. OAuth tokens deleted via Account cascade. User signed out and redirected after deletion."
+    },
+    {
+      "id": "VR.97",
+      "title": "Regression: fix for #97",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.96",
+      "title": "Regression: Configure Digest dialog implemented on rollup page (#96)",
+      "category": "regression",
+      "verified": true,
+      "notes": "ConfigureRollupDialog component (src/components/dashboard/configure-rollup-dialog.tsx) provides form with enable toggle, digest name, delivery time, and timezone selection. API route at /api/rollup/settings handles GET/PUT with proper validation. Switch UI component created for toggle. Rollup page (src/app/dashboard/rollup/page.tsx:48-51) now uses dialog instead of static button."
     }
   ]
 }
