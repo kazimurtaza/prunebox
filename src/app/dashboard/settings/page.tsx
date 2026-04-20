@@ -6,14 +6,28 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { User, Shield, Bell, Trash2 } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { User, Shield, Bell, Trash2, Loader2 } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 type Tab = 'account' | 'notifications' | 'privacy';
 
 export default function SettingsPage() {
     const { data: session } = useSession();
+    const router = useRouter();
     const [activeTab, setActiveTab] = useState<Tab>('account');
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const tabs = [
         { id: 'account' as Tab, label: 'Account', icon: User },
@@ -147,10 +161,55 @@ export default function SettingsPage() {
                                                 Permanently delete your account and all associated data.
                                             </div>
                                         </div>
-                                        <Button variant="destructive" size="sm" disabled>
-                                            <Trash2 className="mr-2 h-4 w-4" />
-                                            Delete Everything (Coming soon)
-                                        </Button>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button variant="destructive" size="sm">
+                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                    Delete Everything
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        This action cannot be undone. This will permanently delete your account and remove all your data from our servers.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                    <AlertDialogAction
+                                                        onClick={async (e) => {
+                                                            e.preventDefault();
+                                                            setIsDeleting(true);
+                                                            try {
+                                                                const res = await fetch('/api/account/delete', {
+                                                                    method: 'POST',
+                                                                });
+                                                                if (res.ok) {
+                                                                    await signOut({ callbackUrl: '/' });
+                                                                } else {
+                                                                    setIsDeleting(false);
+                                                                    alert('Failed to delete account. Please try again.');
+                                                                }
+                                                            } catch {
+                                                                setIsDeleting(false);
+                                                                alert('An error occurred. Please try again.');
+                                                            }
+                                                        }}
+                                                        disabled={isDeleting}
+                                                    >
+                                                        {isDeleting ? (
+                                                            <>
+                                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                Deleting...
+                                                            </>
+                                                        ) : (
+                                                            'Delete Everything'
+                                                        )}
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
                                     </div>
                                 </CardContent>
                             </Card>
