@@ -429,6 +429,20 @@
       "category": "regression",
       "verified": true,
       "notes": "RollupSettings schema now uses DeliverySlot enum (MORNING/AFTERNOON/EVENING) instead of free-form time string. ConfigureRollupDialog shows radio buttons for three slots. UI displays selected slot with time (Morning 08:00, Afternoon 14:00, Evening 20:00). Verified at fix time - prisma/schema.prisma:119-132, src/components/dashboard/configure-rollup-dialog.tsx:108-122"
+    },
+    {
+      "id": "VR.87",
+      "title": "Regression: fix for #87",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.85",
+      "title": "Regression: Spec Section 18 documents all Prisma schema fields and tables",
+      "category": "regression",
+      "verified": true,
+      "notes": "Verified at fix time - docs/prunebox_specsheet.md Section 18 now includes: Subscription model fields (confidenceScore, recentSubject, recentSnippet, unsubscribeUrl, unsubscribeMailto), GmailSyncState fields (scanStatus, scanProgress, scanTotal, errorMessage), UnsubscriptionAttempt table, BulkDeletionJob table, RollupSettings table with DeliverySlot enum."
     }
   ]
 }
