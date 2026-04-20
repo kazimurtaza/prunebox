@@ -17,7 +17,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { User, Shield, Bell, Trash2, Loader2 } from 'lucide-react';
+import { User, Shield, Bell, Trash2, Loader2, Download } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
@@ -28,6 +28,7 @@ export default function SettingsPage() {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<Tab>('account');
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
 
     const tabs = [
         { id: 'account' as Tab, label: 'Account', icon: User },
@@ -156,8 +157,46 @@ export default function SettingsPage() {
                                                 We only scan headers to identify email groups. No email content is stored.
                                             </div>
                                         </div>
-                                        <Button variant="outline" size="sm" disabled>
-                                            Export Data (Coming soon)
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={async () => {
+                                                setIsExporting(true);
+                                                try {
+                                                    const res = await fetch('/api/account/export');
+                                                    if (res.ok) {
+                                                        const data = await res.json();
+                                                        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                                                        const url = URL.createObjectURL(blob);
+                                                        const a = document.createElement('a');
+                                                        a.href = url;
+                                                        a.download = `prunebox-data-${Date.now()}.json`;
+                                                        document.body.appendChild(a);
+                                                        a.click();
+                                                        document.body.removeChild(a);
+                                                        URL.revokeObjectURL(url);
+                                                    } else {
+                                                        alert('Failed to export data. Please try again.');
+                                                    }
+                                                } catch {
+                                                    alert('An error occurred. Please try again.');
+                                                } finally {
+                                                    setIsExporting(false);
+                                                }
+                                            }}
+                                            disabled={isExporting}
+                                        >
+                                            {isExporting ? (
+                                                <>
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    Exporting...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Download className="mr-2 h-4 w-4" />
+                                                    Export Data
+                                                </>
+                                            )}
                                         </Button>
                                     </div>
                                     <Separator />
