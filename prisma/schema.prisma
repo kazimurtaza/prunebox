@@ -7,6 +7,7 @@ datasource db {
   provider = "postgresql"
 }
 
+
 model User {
   id                    String                   @id @default(cuid())
   email                 String                   @unique
@@ -146,6 +147,7 @@ model UnsubscriptionAttempt {
   attemptedAt    DateTime  @default(now())
   completedAt    DateTime?
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
 
   @@index([userId, subscriptionId])
   @@index([status])
