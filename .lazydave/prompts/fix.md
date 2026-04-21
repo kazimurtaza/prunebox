@@ -1,59 +1,40 @@
-# Prompt version: v1
+# Prompt version: v2
 
 # Issue Fix
 
-You are fixing an approved issue for **{{PROJECT_NAME}}**. When planning, consult `.lazydave/hotspots.md` if it exists.
+Fixing approved issue for **{{PROJECT_NAME}}**. Check `.lazydave/hotspots.md` for context.
 
-## Fix Types
+## Detect Fix Type
 
-- **fix-code**: The code is wrong. Edit source files to match the specification.
-- **fix-spec**: The spec is wrong. Edit `{{SPEC_FILE}}` to match code.
+Issue labels tell you what to fix:
+- `fix-code` → The code is wrong. Edit source files.
+- `fix-spec` → The spec is wrong. Edit `{{SPEC_FILE}}`.
+- No label? Fix the code.
 
-Detect the fix type from the issue labels (`fix-code` or `fix-spec`).
+## Required Actions (in order)
 
-## Requirements
-
-1. **Think first, then act:**
-   - Read the issue and fully understand the problem
-   - Find the relevant code (Read, Glob, Grep)
-   - Plan your approach BEFORE making any changes
-   - Consider edge cases and implications
-
-2. Make the minimal fix needed — don't refactor surrounding code
-
-3. **Run `npm run typecheck`** before finishing — it MUST pass
-
-4. Commit the fix with message format: `fix(scope): description (#N)`
-
-**Note:** This two-phase approach (think → execute) works best when you thoroughly analyze before editing. If the issue is complex or ambiguous, spend more time in the planning phase.
-
-## Commit Format
-
-```
-fix(widget-name): brief description (#ISSUE_NUM)
-```
-
-## Verification
-
-After your fix:
-1. Run `npm run typecheck` — must pass with zero errors
-2. If typecheck fails, fix the errors before finishing
-3. The verify stage will run additional checks after this
-
-## Regression Coverage
-
-After committing your fix, add a smoke check to prevent regression:
-
-1. Read the manifest file: `.lazydave/manifests/smoke-checks.json` (in project root)
-2. Find the `.checks` array and append a new regression check object:
+1. **Understand:** Read issue. Find relevant code with Glob/Grep/Read.
+2. **Edit:** Use Edit tool to apply minimal fix.
+3. **Verify:** `npm run typecheck` — fix any errors.
+4. **Commit:** `fix(scope): description (#ISSUE_NUM)`
+5. **Regression:** Append to `.lazydave/manifests/smoke-checks.json`:
    ```json
-   {"id": "VR.{ISSUE_NUM}", "title": "Regression: {brief description}", "category": "regression", "verified": true, "notes": "Verified at fix time - {evidence}"}
+   {"id": "VR.{N}", "title": "Regression: {what}", "category": "regression", "verified": true, "notes": "Works because: {evidence}"}
    ```
-3. Use the Edit tool to insert this before the closing `]` of the checks array
-4. Set `verified` to `true` — you just confirmed it works. Future pipeline runs will re-verify it.
-5. Keep the title under 80 chars. Include the issue number so regressions trace back to the original bug.
 
-Example: For issue #286, append `{"id": "VR.286", "title": "Regression: Portfolio API timeout fixed", "category": "regression", "verified": true, "notes": "Portfolio endpoint now responds within 30s consistently"}`
+## Most Important Rule
+
+**Edit a file.** Recent failures touched 0 files. Understanding isn't enough — you must change code.
+
+## Example Fix Flow
+
+Issue #123: "Login button does nothing"
+1. Read issue → Button click handler missing
+2. Find code → `src/components/Login.tsx:45`
+3. Edit → Add `onClick={handleLogin}` to button
+4. Typecheck → passes
+5. Commit → `fix(login): add missing onClick handler (#123)`
+6. Regression → `{"id": "VR.123", "title": "Regression: Login button functional", ...}`
 
 ## Constraints
 
