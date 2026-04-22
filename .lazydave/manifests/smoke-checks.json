@@ -1183,6 +1183,34 @@
       "category": "regression",
       "verified": true,
       "notes": "Works because: Added DEV_MODE_ENABLED environment variable check in both dev-signin/page.tsx and auth.config.ts. This allows the dev-test credentials provider to be registered and the dev-signin page to work in Docker when DEV_MODE_ENABLED=true, independently of NODE_ENV=production. Docker build completed successfully with /dev-signin route included in standalone output."
+    },
+    {
+      "id": "VR.121",
+      "title": "Regression: fix for #121",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.120",
+      "title": "Regression: Docker build generates Prisma client before TypeScript compilation (#120)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Works because: Added 'RUN npx prisma generate' step in Dockerfile after copying source files and before 'npm run build'. This ensures Prisma Client types are generated from schema.prisma before Next.js TypeScript compilation occurs, preventing the 'Module @prisma/client has no exported member PrismaClient' error that was blocking Docker builds."
+    },
+    {
+      "id": "VR.120",
+      "title": "Regression: fix for #120",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.119",
+      "title": "Regression: Database migrations exist and can be applied (#119)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Works because: Created prisma.config.js with datasource.url configuration for Prisma 7 compatibility. Generated initial migration (20250422000000_init/migration.sql) from schema using `prisma migrate diff --from-empty --to-schema`. Un-ignored prisma/migrations/ in .gitignore. `prisma migrate deploy` now successfully applies migrations instead of falling back to db push."
     }
   ]
 }
