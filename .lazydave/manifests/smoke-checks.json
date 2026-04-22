@@ -1120,6 +1120,62 @@
       "category": "regression",
       "verified": false,
       "notes": ""
+    },
+    {
+      "id": "VR.125",
+      "title": "Regression: Terms of Service page accessible at /terms with all required sections (#125)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Works because: Created src/app/terms/page.tsx with all required sections (acceptance of terms, service description, user responsibilities, payment terms, cancellation policy, liability limitations, governing law). Page is statically generated at 3.71 kB. Signin page (/auth/signin:113) and home page footer (/page.tsx:113) now link to /terms alongside /privacy."
+    },
+    {
+      "id": "VR.125",
+      "title": "Regression: fix for #125",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.124",
+      "title": "Regression: Rollup digest scheduling respects deliverySlot and timezone (#124)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Works because: scheduleDailyRollup now fetches RollupSettings to get user's deliverySlot (MORNING/AFTERNOON/EVENING) and timezone preference, then calculates the correct UTC hour using getUtcHourFromLocal helper. Previously hardcoded '0 8 * * *' is now dynamically computed: MORNING=08:00, AFTERNOON=14:00, EVENING=20:00 local time converted to UTC based on user's timezone."
+    },
+    {
+      "id": "VR.124",
+      "title": "Regression: fix for #124",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.123",
+      "title": "Regression: ThemeToggle renders on sign-in page with mounted state guard (#123)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Works because: Added useState/useEffect mounted state guard to theme-toggle.tsx. This prevents SSR/hydration mismatch that prevented ThemeToggle from rendering. Component now returns null during SSR, preventing the 'useTheme() returned theme: undefined during SSR' issue. Build passed, theme toggle button now appears in sign-in page DOM."
+    },
+    {
+      "id": "VR.123",
+      "title": "Regression: fix for #123",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.122",
+      "title": "Regression: Privacy page includes 72-hour breach notification policy (#122)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Works because: Added 'Data Breach Notification' card to src/app/privacy/page.tsx after GDPR Rights section. Card specifies 72-hour notification window to supervisory authorities (GDPR Article 33) and user notification for high-risk breaches. Section includes breach description and mitigation steps requirements. TypeScript compilation passed."
+    },
+    {
+      "id": "VR.122",
+      "title": "Regression: fix for #122",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
     }
   ]
 }

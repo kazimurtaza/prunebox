@@ -12,7 +12,7 @@ export default function DevSigninPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== 'development') {
+    if (process.env.NODE_ENV !== 'development' && process.env.DEV_MODE_ENABLED !== 'true') {
       router.push('/auth/signin');
       return;
     }

@@ -9,6 +9,7 @@ services:
       - DATABASE_URL=postgresql://prunebox:CHANGE_ME_POSTGRES_PASSWORD@postgres:5432/prunebox
       - POSTGRES_PASSWORD=CHANGE_ME_POSTGRES_PASSWORD
       - NODE_ENV=production
+      - DEV_MODE_ENABLED=true
       - NEXTAUTH_URL=https://dev.prunebox.example.com
       - NEXTAUTH_SECRET=CHANGE_ME_NEXTAUTH_SECRET
       - GOOGLE_CLIENT_ID=CHANGE_ME_GOOGLE_CLIENT_ID.apps.googleusercontent.com

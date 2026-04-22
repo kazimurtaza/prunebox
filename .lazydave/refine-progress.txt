@@ -12,3 +12,5 @@
 [2026-04-22 21:54:44] [refined] #127 — analysis posted: root cause is branch divergence. Routes (account/delete, account/export, rollup/settings, dev-signin) exist only on develop, never merged to master. Docker image (prunebox:latest) built from master doesn't include them. Blocked by #128 (Prisma adapter incompatibility).
 [2026-04-22 21:41:08] [#127] refined — analysis posted
 [2026-04-22 21:55:03] [#120] refined — analysis posted
+[2026-04-22 22:05:00] [refined] #119 — analysis posted: two root causes found. (1) prisma/schema.prisma datasource block missing url = env("DATABASE_URL"). (2) No prisma/migrations/ directory — project has only used db:push. Fix: add url to datasource, run prisma migrate dev --name init to create initial migration.
+[2026-04-22 21:58:20] [#119] refined — analysis posted

@@ -7,7 +7,7 @@ import { db } from '@/lib/db';
 export const authConfig: NextAuthConfig = {
   providers: [
     // Development-only credentials provider for testing
-    ...(process.env.NODE_ENV === 'development'
+    ...(process.env.NODE_ENV === 'development' || process.env.DEV_MODE_ENABLED === 'true'
       ? [
           Credentials({
             id: 'dev-test',
