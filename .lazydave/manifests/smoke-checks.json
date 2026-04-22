@@ -1176,6 +1176,13 @@
       "category": "regression",
       "verified": false,
       "notes": ""
+    },
+    {
+      "id": "VR.121",
+      "title": "Regression: Dev-signin page works in Docker with DEV_MODE_ENABLED (#121)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Works because: Added DEV_MODE_ENABLED environment variable check in both dev-signin/page.tsx and auth.config.ts. This allows the dev-test credentials provider to be registered and the dev-signin page to work in Docker when DEV_MODE_ENABLED=true, independently of NODE_ENV=production. Docker build completed successfully with /dev-signin route included in standalone output."
     }
   ]
 }
