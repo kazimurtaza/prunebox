@@ -78,6 +78,24 @@ export function getHistoryMonitorQueue(): Queue {
 
 export async function scheduleDailyRollup(userId: string, accessToken: string, refreshToken?: string) {
   const jobId = `daily-digest-${userId}`;
+
+  const { db } = await import('@/lib/db');
+
+  const settings = await db.rollupSettings.findUnique({
+    where: { userId },
+  });
+
+  const slotHours = {
+    MORNING: 8,
+    AFTERNOON: 14,
+    EVENING: 20,
+  };
+
+  const localHour = settings?.deliverySlot ? slotHours[settings.deliverySlot] : 8;
+  const userTimezone = settings?.timezone || 'UTC';
+
+  const utcHour = getUtcHourFromLocal(localHour, userTimezone);
+
   await getRollupQueue().add(
     'daily-digest',
     {
@@ -88,10 +106,25 @@ export async function scheduleDailyRollup(userId: string, accessToken: string, r
     {
       jobId,
       repeat: {
-        pattern: '0 8 * * *',
+        pattern: `0 ${utcHour} * * *`,
       },
     }
   );
+}
+
+function getUtcHourFromLocal(localHour: number, timezone: string): number {
+  const now = new Date();
+  const localDate = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+  const utcDate = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' }));
+
+  const offsetMs = localDate.getTime() - utcDate.getTime();
+  const offsetHours = Math.round(offsetMs / (1000 * 60 * 60));
+
+  let utcHour = localHour - offsetHours;
+  if (utcHour < 0) utcHour += 24;
+  if (utcHour >= 24) utcHour -= 24;
+
+  return utcHour;
 }
 
 export async function removeScheduledRollup(userId: string) {
