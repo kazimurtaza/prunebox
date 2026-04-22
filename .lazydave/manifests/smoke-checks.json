@@ -7,151 +7,151 @@
       "category": "build",
       "title": "Application builds successfully",
       "steps": "Run npm run build and verify production build completes without errors",
-      "verified": true,
-      "notes": "Build completed successfully after fixing PrismaPg adapter type cast (src/lib/db.ts:18) and removing unused bcryptjs import (src/modules/auth/auth.config.ts:6). Production build generated 29 static pages, 22 API routes. Exit code 0. Warnings present (unused vars, any types) but non-blocking."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V2",
       "category": "lint",
       "title": "Code passes ESLint checks",
       "steps": "Run npm run lint and verify no critical errors",
-      "verified": true,
-      "notes": "ESLint completed with warnings only (no errors). 14 warnings across 8 files: unused variables in route files (error, auth, signIn, request, DELIVERY_SLOT_TIMES, router, err, selectedSlot), deprecated 'next lint' command (v15.5.11), any types in database modules (db.ts:18,28,40,54,66,87,102,115,128) and detection module (detection.ts:17,253,265). All warnings are non-blocking - application builds and runs successfully. Exit code 0 indicates code quality acceptable for deployment."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V3",
       "category": "database",
       "title": "Database schema is valid",
       "steps": "Run npx prisma validate to check schema.prisma syntax",
-      "verified": true,
-      "notes": "Prisma schema validation successful. Temporary fix by moving prisma.config.ts (which was conflicting with Prisma CLI) to prisma.config.ts.bak. Schema at prisma/schema.prisma is valid with all models, enums, and relations properly defined."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.117",
       "title": "Regression: ThemeToggle added to rollup and settings pages (#117)",
       "category": "regression",
-      "verified": true,
-      "notes": "ThemeToggle component added to rollup page header (src/app/dashboard/rollup/page.tsx:56-64) and settings page header (src/app/dashboard/settings/page.tsx:40-46). Matches dashboard pattern - positioned on right side of header with flex gap-2. All authenticated pages now have consistent theme toggle access."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V3",
       "category": "database",
       "title": "Database schema is valid",
       "steps": "Run npx prisma validate to check schema.prisma syntax",
-      "verified": true,
-      "notes": "Prisma schema validation successful. Temporary fix by moving prisma.config.ts (which was conflicting with Prisma CLI) to prisma.config.ts.bak. Schema at prisma/schema.prisma is valid with all models, enums, and relations properly defined."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V4",
       "category": "database",
       "title": "Database migrations can be applied",
       "steps": "Run npx prisma migrate deploy to verify migrations apply cleanly",
-      "verified": true,
-      "notes": "Prisma schema validates successfully (npx prisma validate). No migrations directory exists yet - valid for new database state using 'prisma db push'. datasource.url configured via env(DATABASE_URL) in prisma/schema.prisma:7. .env.example documents DATABASE_URL. When migrations are created via 'npx prisma migrate dev', they will apply cleanly."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V5",
       "category": "api",
       "title": "Health check endpoint responds",
       "steps": "Run dev server and curl http://localhost:3000/api/health, expect 200 OK",
-      "verified": true,
-      "notes": "Health check endpoint verified on 2026-04-21. Dev server running on port 3000, endpoint accessible at http://localhost:3000/api/health. Returns 200 with {\"status\":\"healthy\",\"database\":\"connected\"}. validates database connectivity and ENCRYPTION_KEY configuration."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V6",
       "category": "auth",
       "title": "Authentication routes exist",
       "steps": "Verify src/app/api/auth/[...nextauth]/route.ts exists and exports auth configuration",
-      "verified": true,
-      "notes": "Auth route exists at src/app/api/auth/[...nextauth]/route.ts exporting GET/POST handlers from auth module. src/modules/auth/auth.ts exports NextAuth config with PrismaAdapter, trustHost, authConfig, NEXTAUTH_SECRET. Includes development validation for NEXTAUTH_URL/NEXT_PUBLIC_APP_URL to prevent production domain usage. Type extensions for Session and User defined. Verification complete - all auth routes (API routes, auth pages, dev auth endpoints) properly implemented."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V7",
       "category": "gmail",
       "title": "Gmail detection module exists",
       "steps": "Verify src/modules/gmail/detection.ts contains subscription detection logic",
-      "verified": true,
-      "notes": "Verified at src/modules/gmail/detection.ts:1-356. Contains comprehensive subscription detection: detectSubscription() function checks List-Unsubscribe header (lines 25-58), List-Id header (60-77), Precedence header (79-97), Auto-Submitted header (99-117), 57 sender patterns (119-178), 18 ESP domain patterns (179-218), confidence scoring (220-221), and email body parsing for unsubscribe links (297-336). parseMailtoUnsubscribe() (223-258) and extractEmailBody() (260-295) helper functions also present. All 45 tests pass (confirmed 2026-04-21). Module is properly integrated in jobs.ts, unsubscribe.ts, and scan-sender API route."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V8",
       "category": "queues",
       "title": "Job queue configuration exists",
       "steps": "Verify src/modules/queues/config.ts exists and defines queue connections",
-      "verified": true,
-      "notes": "Verified at src/modules/queues/config.ts:1-26. Redis connection singleton pattern with getRedisConnection() function. Creates ioredis Redis client from REDIS_URL env var (defaults to redis://localhost:6379). Configured with maxRetriesPerRequest: null and enableReadyCheck: false for BullMQ compatibility. Error and connect event handlers with logging. Connection reused across queue initialization via src/modules/queues/queues.ts."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V9",
       "category": "api",
       "title": "Subscription API endpoints exist",
       "steps": "Verify src/app/api/subscriptions/route.ts exists with CRUD operations",
-      "verified": true,
-      "notes": "Subscriptions API endpoint exists at src/app/api/subscriptions/route.ts with GET operation implemented. Supports pagination (cursor-based, limit param), authentication via auth(), filtering by userId, returns SubscriptionResponse[] with action field from preferences. Includes error handling via withErrorHandling wrapper. Note: Full CRUD operations handled via separate endpoints: /api/subscriptions/action (single subscription actions) and /api/subscriptions/bulk (bulk operations)."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V10",
       "category": "webhook",
       "title": "Gmail webhook endpoint exists",
       "steps": "Verify src/app/api/webhook/gmail/route.ts exists for push notifications",
-      "notes": "Verified endpoint exists at src/app/api/webhook/gmail/route.ts with POST handler. Implements HMAC SHA256 signature verification via x-goog-signature header. Successfully tested with curl - returns 401 Unauthorized for invalid signature (expected behavior). Endpoint decodes base64 message.data to extract emailAddress and historyId. Includes proper error handling and requires GMAIL_WEBHOOK_SECRET env var. Functional implementation for Gmail push notifications.",
-      "verified": true
+      "notes": "",
+      "verified": false
     },
     {
       "id": "V11",
       "category": "docker",
       "title": "Docker build succeeds",
       "steps": "Run docker build -t prunebox . and verify image builds without errors",
-      "verified": true,
-      "notes": "Docker build completed successfully. Image prunebox:latest created (ID: 29dfc084896b, size: 3.71GB, compressed: 732MB). Build used production Dockerfile with multi-stage build. No build errors reported."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V12",
       "category": "docker",
       "title": "Docker compose configuration is valid",
       "steps": "Run docker-compose config to verify compose file syntax",
-      "verified": true,
-      "notes": "Verified all Docker Compose files: docker-compose.yml, docker-compose.dev.yml, docker-compose.production.yml. All pass `docker compose config` validation with proper services: postgres (16-alpine), redis (7-alpine), prunebox (app). Healthchecks configured for all services. Port mappings: 3000:3000 (main), 3001:3000 (dev), 6379:6379 (redis). Volumes: prunebox_postgres, prunebox_redis. Networks: default network prunebox_default. Configuration validated on 2026-04-21."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V13",
       "category": "env",
       "title": "Environment variables are documented",
       "steps": "Verify .env.example exists with all required variables documented",
-      "verified": true,
-      "notes": "✓ Verification complete. .env.example contains 16 required variables with comprehensive documentation. README.md Configuration section provides setup instructions. DEPLOYMENT.md documents production secrets. All variables used in codebase (ENCRYPTION_KEY, DATABASE_URL, NEXTAUTH_URL, NEXTAUTH_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, REDIS_URL, GMAIL_WEBHOOK_SECRET, GOOGLE_OAUTH_SCOPES, ROLLUP_FROM_EMAIL, MAX_EMAIL_SCAN_LIMIT, MAX_FULL_SCAN_LIMIT) are properly documented."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V14",
       "category": "subscriptions",
       "title": "Unsubscribe module exists",
       "steps": "Verify src/modules/gmail/unsubscribe.ts contains unsubscribe logic",
-      "verified": true,
-      "notes": "Verified: Unsubscribe module exists at src/modules/gmail/unsubscribe.ts with comprehensive unsubscribe logic including one-click (RFC 8058), mailto, HTTP, and manual methods. Module properly exports all functions and interfaces."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V15",
       "category": "dashboard",
       "title": "Dashboard page renders",
       "steps": "Run dev server and navigate to http://localhost:3000/dashboard, verify page loads",
-      "verified": true,
-      "notes": "Verified via curl (2026-04-21 23:54 UTC): Dashboard page returns 307 Temporary Redirect to /auth/signin when unauthenticated (correct security behavior). Page exists at src/app/dashboard/page.tsx with complete React component structure. Includes authentication via useSession hook with redirect logic. Contains stats cards, ScanButton, ThemeToggle, and SubscriptionList components. Dev server running on port 3000 responds correctly. Authenticated access confirmed via sign-in page returning HTTP 200."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V21",
       "category": "api",
       "title": "Bulk action API endpoint handles delete, unsubscribe, and rollup for multiple subscriptions",
       "steps": "Run dev server, authenticate, then POST to http://localhost:3000/api/subscriptions/bulk with {\"subscriptionIds\":[\"id1\",\"id2\"],\"action\":\"delete\"} and verify response includes success:true with count",
-      "verified": true,
-      "notes": "Verified at src/app/api/subscriptions/bulk/route.ts:1-184. Comprehensive bulk action endpoint with zod validation schema. Supports three actions: delete (queues bulk-delete jobs), unsubscribe (creates preferences and queues unsubscribe jobs), rollup (creates preferences and schedules daily digest). Handles both subscriptionIds and senderEmails arrays. Limits: 100 items per request. Token verification via getUserTokens(). Ownership verification for subscriptions. Uses getBulkDeleteQueue(), getUnsubscribeQueue(), scheduleDailyRollup(), removeScheduledRollup()."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V22",
       "category": "api",
       "title": "Subscription action API endpoint updates single subscription preference",
       "steps": "Run dev server, authenticate, then POST to http://localhost:3000/api/subscriptions/action with {\"subscriptionId\":\"id\",\"action\":\"keep\"} and verify response includes success:true",
-      "verified": true,
-      "notes": "Verified endpoint exists at /api/subscriptions/action (correct path not /api/subscriptions/update-preference). Tested via curl: endpoint returns 401 Unauthorized when unauthenticated (expected security behavior). Verified implementation at src/app/api/subscriptions/action/route.ts:1-124. Single subscription action endpoint with zod validation. Supports three actions: keep, unsubscribe, rollup. Upserts SubscriptionPreference via db.subscriptionPreference.upsert(). For unsubscribe: queues job via getUnsubscribeQueue(). For rollup: schedules via scheduleDailyRollup(). Handles rollup removal when no rollup subscriptions remain via removeScheduledRollup(). Token verification via getUserTokens(). Ownership check via subscription.userId comparison."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V23",
@@ -159,518 +159,518 @@
       "title": "Account delete API endpoint performs cascade deletion of all user data",
       "steps": "Run dev server, authenticate, then POST to http://localhost:3000/api/account/delete and verify response includes success:true and user is signed out",
       "verified": false,
-      "notes": "Current implementation at src/app/api/account/delete/route.ts:1-22 only performs basic user deletion without cascade deletion of related data (Account, Session, Subscription, etc.) and lacks SignOut() call for session clearing. Returns { success: true } instead of { success: true, message: 'Account deleted successfully' }. Implementation needs to be updated to match verified version with proper cascade deletion and sign-out functionality."
+      "notes": ""
     },
     {
       "id": "V24",
       "category": "api",
       "title": "Account export API endpoint returns JSON export of all user data",
       "steps": "Run dev server, authenticate, then GET http://localhost:3000/api/account/export and verify response includes user profile, subscriptions, preferences, rollup settings, and sync state",
-      "verified": true,
-      "notes": "Verified at src/app/api/account/export/route.ts:1-84. GDPR data portability endpoint. Fetches all user data via parallel queries: user profile, subscriptions (with preferences), rollup settings, Gmail sync state. Returns structured JSON with profile, subscriptions, rollupSettings, syncState, exportedAt timestamp. Sets Content-Type: application/json and Content-Disposition: attachment filename. Requires authentication via auth(). Error handling via withErrorHandling()."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V25",
       "category": "api",
       "title": "Rollup settings API endpoint handles GET and PUT for digest configuration",
       "steps": "Run dev server, authenticate, then GET http://localhost:3000/api/rollup/settings and verify response includes enabled, deliverySlot, timezone, digestName; then PUT with new values and verify update",
-      "verified": true,
-      "notes": "Verified via code analysis. Endpoint exists at src/app/api/rollup/settings/route.ts and properly handles both GET (fetches rollup settings including digestName) and PUT (updates digest configuration with validation). Authentication required - endpoint returns 401 when unauthenticated. DeliverySlot enum validates MORNING/AFTERNOON/EVENING options. Supports custom digest names with timezone configuration."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V26",
       "category": "api",
       "title": "Scan status API endpoint returns real-time scan progress",
       "steps": "Run dev server, authenticate, then GET http://localhost:3000/api/scan/status and verify response includes scanStatus, scanProgress, scanTotal, errorMessage from GmailSyncState",
-      "verified": true,
-      "notes": "Verified at src/app/api/scan/status/route.ts:1-43. Fetches GmailSyncState via db.gmailSyncState.findUnique() where userId matches session.user.id. Returns JSON with status (idle, scanning, completed, failed), progress, total, and error message. Returns 404 if no sync state exists. Requires authentication via auth(). Used by ScanButton component for polling scan progress."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.116",
       "title": "Regression: fix for #116",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: 'Gmail category' text not present in how-it-works page. grep search returned no matches. Fix (remove Gmail category from detection signals documentation) remains in place at src/app/how-it-works/page.tsx."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.112",
       "title": "Regression: BullMQ + Redis job queue system implemented",
       "category": "regression",
-      "verified": true,
-      "notes": "BullMQ (v5.74.1) and ioredis (v5.10.1) packages installed. Queues configured: email-scan, unsubscribe, bulk-delete, rollup-digest, history-monitor. Workers initialized via instrumentation.ts with proper lifecycle. Scheduled jobs: daily rollup at 8 AM, history monitor every 10 min. All API routes use queues instead of direct calls."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.115",
       "title": "Regression: Docker Compose includes PostgreSQL service (#115)",
       "category": "regression",
-      "verified": true,
-      "notes": "All docker-compose files now include postgres service with healthcheck. DATABASE_URL uses container hostname (postgres:5432). Verified at fix time - docker-compose.yml:22-36, docker-compose.dev.yml:37-52, docker-compose.production.yml:37-52"
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.115",
       "title": "Regression: fix for #115",
       "category": "regression",
-      "verified": true,
-      "notes": "PostgreSQL service added to all docker-compose files with healthcheck. docker-compose.yml:37-52, docker-compose.dev.yml:38-52, docker-compose.production.yml:38-52 all include postgres:16-alpine service with proper healthcheck (pg_isready), environment variables, volumes, and depends_on configuration from prunebox service."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.114",
       "title": "Regression: Gmail history API polling for email monitoring (#114)",
       "category": "regression",
-      "verified": true,
-      "notes": "Implemented history API polling via listHistory() and getCurrentHistoryId() functions in src/modules/gmail/client.ts. Added runHistoryMonitor() job, history-monitor queue/worker, and automatic initialization for all Google accounts on worker startup. Polling interval: 10 minutes per user."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.114",
       "title": "Regression: fix for #114",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: Gmail history API polling implemented. listHistory() and getCurrentHistoryId() functions exist in src/modules/gmail/client.ts. runHistoryMonitor() job processes history events. history-monitor queue and worker configured. Workers.ts initializes historyMonitorWorker with concurrency 10. Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.112",
       "title": "Regression: fix for #112",
       "category": "regression",
-      "verified": true,
-      "notes": "BullMQ + Redis job queue system verified. BullMQ (v5.74.1) and ioredis (v5.10.1) packages installed in package.json. All 5 queues configured: email-scan, unsubscribe, bulk-delete, rollup-digest, history-monitor in src/modules/queues/queues.ts. Workers initialized in src/modules/queues/workers.ts with proper retry logic (3 attempts, exponential backoff 5s). API routes use queue system: scan (getEmailScanQueue), bulk actions (getBulkDeleteQueue/getUnsubscribeQueue), action endpoint (getUnsubscribeQueue). instrumentation.ts manages worker lifecycle with proper shutdown handlers. Docker configuration includes redis service in docker-compose.yml. REDIS_URL configured as redis://localhost:6379."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.123",
       "title": "Regression: BulkDeletionJob records created in runBulkDelete (#109)",
       "category": "regression",
-      "verified": true,
-      "notes": "runBulkDelete creates BulkDeletionJob record at start (lines 446-454), updates totalMessages after search (lines 507-510), marks success with deletedCount (lines 559-566), and marks failed with errorMessage (lines 572-579). Follows same pattern as runUnsubscribe."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.109",
       "title": "Regression: fix for #109",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: BulkDeletionJob records created in runBulkDelete(). Prisma schema has BulkDeletionJob model. Jobs.ts creates BulkDeletionJob records at start (lines 446-454), updates totalMessages (lines 507-510), marks success (lines 559-566), marks failed (lines 572-579). Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.108",
       "title": "Regression: BullMQ + Redis job queue system fully implemented (#108)",
       "category": "regression",
-      "verified": true,
-      "notes": "BullMQ (v5.74.1) and ioredis (v5.10.1) installed. Redis connection via REDIS_URL env var. All 5 queues configured: email-scan, unsubscribe, bulk-delete, rollup-digest, history-monitor. Workers with retry logic (3 attempts, exponential backoff 5s). instrumentation.ts manages worker lifecycle. All API routes use queues: scan (getEmailScanQueue), bulk (getBulkDeleteQueue/getUnsubscribeQueue), action (getUnsubscribeQueue). Scheduled jobs: daily rollup at 8 AM, history monitor every 10 min."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.108",
       "title": "Regression: fix for #108",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified BullMQ + Redis job queue system fully implemented: BullMQ (v5.74.1) and ioredis (v5.10.1) installed. All 5 queues (email-scan, unsubscribe, bulk-delete, rollup-digest, history-monitor) with lazy loading in queues.ts. Workers in workers.ts with retry logic (3 attempts, exponential backoff 5s). instrumentation.ts manages lifecycle on startup/shutdown. API routes use queues: scan (getEmailScanQueue), bulk (getBulkDeleteQueue/getUnsubscribeQueue), action (getUnsubscribeQueue). Scheduled jobs: daily rollup at 8 AM, history monitor every 10 min via scheduleHistoryMonitoring(). Redis running on port 6379."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.107",
       "title": "Regression: fix for #107",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: Shell library file paths are correct. All required files exist at lazydave/lib/core.sh, lazydave/lib/init.sh, lazydave/lib/runner.sh. Source imports are properly implemented: core.sh is imported in init.sh (line 12) and runner.sh (line 12), config.sh is imported in init.sh (line 13), manifest.sh is imported in init.sh (line 14), claude.sh is imported in runner.sh (line 12). All paths resolve correctly from LAZYDAVE_DIR."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.88",
       "title": "Regression: batchDeleteMessages uses batchDelete API (#110)",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified at fix time - batchDeleteMessages function (src/modules/gmail/client.ts:290-310) correctly uses gmail.users.messages.batchDelete API with 1000-message chunks. No sequential trash() calls. Efficient quota usage (50 units per 1000 messages vs 10 units per individual trash)."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.110",
       "title": "Regression: fix for #110",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified batchDeleteMessages uses gmail.users.messages.batchDelete API with 1000-message chunks (src/modules/gmail/client.ts:319-322). Efficient quota usage (50 units per 1000 messages vs 10 units per individual trash). No sequential trash() calls."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.105",
       "title": "Regression: Google verification timeline and CASA costs documented (#105)",
       "category": "regression",
-      "verified": true,
-      "notes": "README.md section 'Google Verification Timeline and Costs' (lines 145-168) documents verification timeline (4-8 weeks minimum, 3-6 months with issues), CASA audit costs (Tier 2: $500-1,000/year, Tier 3: $4,500+/year), annual recertification, and unverified limitations (100 test users, warning screen, 7-day token expiry). DEPLOYMENT.md (line 42) has verification notice."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.105",
       "title": "Regression: fix for #105",
       "category": "regression",
-      "verified": true,
-      "notes": "README.md section 'Google Verification Timeline and Costs' (lines 145-168) documents verification timeline (4-8 weeks minimum, 3-6 months with issues), CASA audit costs (Tier 2: $500-1,000/year, Tier 3: $4,500+/year), annual recertification, and unverified limitations (100 test users, warning screen, 7-day token expiry). DEPLOYMENT.md (line 42) has verification notice."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.104",
       "title": "Regression: Dashboard navigation includes Rollup link and mobile menu (#104)",
       "category": "regression",
-      "verified": true,
-      "notes": "DashboardNav component (src/components/dashboard/dashboard-nav.tsx) includes all three navigation links (Email Groups, Rollup, Settings). Mobile hamburger menu with slide-in drawer provides navigation on screens <768px. Active link highlighting using usePathname hook."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.104",
       "title": "Regression: fix for #104",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: Dashboard navigation includes Rollup link. src/components/dashboard/dashboard-nav.tsx line 12 has {href: '/dashboard/rollup', label: 'Rollup'}. Mobile hamburger menu provides navigation on screens <768px. Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.103",
       "title": "Regression: False GDPR compliance claims removed from how-it-works page (#103)",
       "category": "regression",
-      "verified": true,
-      "notes": "Removed false GDPR claims: 'Full GDPR compliance with right to erasure', 'GDPR Article 17 compliant', and 'Data deletion on request'. Replaced with accurate Google Limited Use policy language. Verified at src/app/how-it-works/page.tsx:184 - now states 'We comply with Google Limited Use policy - your data is used only for subscription management'."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.103",
       "title": "Regression: fix for #103",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: False GDPR compliance claims removed. grep for 'GDPR compliance' and 'right to erasure' in how-it-works page returned no matches. Page now states 'We comply with Google Limited Use policy' instead. Fix remains in place at src/app/how-it-works/page.tsx:184."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.101",
       "title": "Regression: Theme toggle available on landing and sign-in pages (#101)",
       "category": "regression",
-      "verified": true,
-      "notes": "ThemeToggle component added to landing page navigation (src/app/page.tsx:36) and sign-in page card (src/app/auth/signin/page.tsx:60-62). Non-authenticated users can now switch between light and dark themes before signing in."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.101",
       "title": "Regression: fix for #101",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: ThemeToggle added to landing page (src/app/page.tsx:36) and sign-in page (src/app/auth/signin/page.tsx:63). Both pages import ThemeToggle component and render it in navigation/header. Non-authenticated users can now switch themes. Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.100",
       "title": "Regression: Deploy page responsive on mobile viewports (#100)",
       "category": "regression",
-      "verified": true,
-      "notes": "Added break-all class to code elements in src/app/deploy/page.tsx. Long URLs (git clone, docker pull, config values) now wrap on mobile. Document width matches viewport width at 320px/375px/390px. No horizontal scrolling."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.100",
       "title": "Regression: fix for #100",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: Deploy page responsive. grep shows break-all class applied to code elements for long URL wrapping. Mobile responsiveness confirmed via CSS classes. Fix remains in place at src/app/deploy/page.tsx."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.98",
       "title": "Regression: Rollup action button added to subscription list (#98)",
       "category": "regression",
-      "verified": true,
-      "notes": "Rollup button added to desktop view (lines 728-737) and mobile dropdown menu (lines 705-710) in subscription-list.tsx. updateAction function now accepts all three action types: keep, unsubscribe, rollup (line 240). Users can now add subscriptions to daily digest from main dashboard."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.98",
       "title": "Regression: fix for #98",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified rollup action button implementation: Desktop view has rollup button (lines 735-744) in subscription-list.tsx, mobile dropdown includes rollup option (lines 705-711). updateAction function accepts 'rollup' action (line 240). API endpoint /api/subscriptions/action handles rollup by upserting SubscriptionPreference and calling scheduleDailyRollup(). UI correctly shows rollup state with secondary button variant. Issue #98 resolved - users can now add subscriptions to daily digest from dashboard."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.97",
       "title": "Regression: Delete Account button enabled with GDPR compliance (#97)",
       "category": "regression",
-      "verified": true,
-      "notes": "Delete Account button in Settings (src/app/dashboard/settings/page.tsx:164-207) is enabled with confirmation dialog. Backend endpoint /api/account/delete (src/app/api/account/delete/route.ts) deletes user with cascade - removes User, Account, Session, Subscription, SubscriptionPreference, GmailSyncState, and RollupSettings records. OAuth tokens deleted via Account cascade. User signed out and redirected after deletion."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.97",
       "title": "Regression: fix for #97",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: Delete Account button enabled. src/app/api/account/delete/route.ts performs cascade deletion of all user data. Settings page has Delete Account button with confirmation dialog. GDPR Article 17 right to erasure compliant. Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.96",
       "title": "Regression: Configure Digest dialog implemented on rollup page (#96)",
       "category": "regression",
-      "verified": true,
-      "notes": "ConfigureRollupDialog component (src/components/dashboard/configure-rollup-dialog.tsx) provides form with enable toggle, digest name, delivery time, and timezone selection. API route at /api/rollup/settings handles GET/PUT with proper validation. Switch UI component created for toggle. Rollup page (src/app/dashboard/rollup/page.tsx:48-51) now uses dialog instead of static button."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.96",
       "title": "Regression: fix for #96",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified ConfigureRollupDialog implementation: Component exists at src/components/dashboard/configure-rollup-dialog.tsx with form containing enable toggle, digest name input, delivery time radio group (MORNING/AFTERNOON/EVENING), and timezone select. API route /api/rollup/settings handles GET (fetches/creates default settings) and PUT (updates with validation). Rollup page at src/app/dashboard/rollup/page.tsx:58 uses ConfigureRollupDialog component. All form fields properly validated with error handling. DeliverySlot enum matches spec (MORNING=08:00, AFTERNOON=14:00, EVENING=20:00). Issue #96 resolved."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.95",
       "title": "Regression: ENCRYPTION_KEY validated at startup in health check (#95)",
       "category": "regression",
-      "verified": true,
-      "notes": "Health check at /api/health now validates ENCRYPTION_KEY exists and is >=16 chars. Returns 503 with detailed error if misconfigured. Fails fast on deployment instead of waiting for first OAuth login. getEncryptionKey() exported from crypto.ts for validation."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.95",
       "title": "Regression: fix for #95",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: ENCRYPTION_KEY validated at startup. src/app/api/health/route.ts validates ENCRYPTION_KEY exists and is >=16 chars. Returns 503 with detailed error if misconfigured. getEncryptionKey() exported from crypto.ts. Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.94",
       "title": "Regression: deploy-local.sh port mapping matches Dockerfile EXPOSE (#94)",
       "category": "regression",
-      "verified": true,
-      "notes": "Fixed Dockerfile fallback in deploy-local.sh:30 - changed port mapping from $PORT:8080 to $PORT:3000 to match Dockerfile EXPOSE 3000. Script now correctly maps host port to container port 3000."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.94",
       "title": "Regression: fix for #94",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified deploy-local.sh port mapping: config.json sets port:3000, deploy-local.sh maps $PORT:3000, Dockerfile EXPOSE 3000. All match correctly - no port mismatch issue."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.93",
       "title": "Regression: Email body parsing for unsubscribe links when List-Unsubscribe header missing",
       "category": "regression",
-      "verified": true,
-      "notes": "Implemented extractEmailBody() to decode base64 body text from HTML/plain parts. Added parseBodyForUnsubscribeLink() to find unsubscribe URLs using patterns (unsubscribe, opt-out, preferences, manage subscription). detectSubscription() now accepts optional message parameter and parses body for manual cases. Updated jobs.ts to pass full message. Verified at src/modules/gmail/detection.ts:219-336."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.93",
       "title": "Regression: fix for #93",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: Email body parsing for unsubscribe links implemented. src/modules/gmail/detection.ts has extractEmailBody() function (lines 260-295) to decode base64 body text. parseBodyForUnsubscribeLink() finds unsubscribe URLs using patterns. detectSubscription() accepts optional message parameter. Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.91",
       "title": "Regression: Google Limited Use disclosure added (#91)",
       "category": "regression",
-      "verified": true,
-      "notes": "Google Limited Use disclosure text (verbatim from spec line 286) now appears on: /privacy page (dedicated section), signin page below OAuth button, Settings > Privacy tab, and how-it-works page. All page footers link to privacy policy. Exact text: 'The use of information received from Gmail APIs will adhere to Google's User Data Policy, including the Limited Use requirements.'"
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.91",
       "title": "Regression: fix for #91",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: Google Limited Use disclosure added. Exact disclosure text appears on privacy page, signin page, Settings > Privacy tab, and how-it-works page. Text: 'The use of information received from Gmail APIs will adhere to Google's User Data Policy, including the Limited Use requirements.' Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.90",
       "title": "Regression: GDPR data export endpoint enabled (#90)",
       "category": "regression",
-      "verified": true,
-      "notes": "GET /api/account/export endpoint returns JSON with user profile, subscriptions, preferences, rollup settings, and sync state. Export Data button in Settings > Privacy tab now enabled with download functionality. File named prunebox-data-{timestamp}.json downloaded to client."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.90",
       "title": "Regression: fix for #90",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: GDPR data export endpoint enabled. GET /api/account/export returns JSON with user profile, subscriptions, preferences, rollup settings, sync state. Export Data button in Settings > Privacy tab enabled with download functionality. Content-Type: application/json, Content-Disposition: attachment header set. Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.89",
       "title": "Regression: GDPR-compliant privacy policy page at /privacy (#89)",
       "category": "regression",
-      "verified": true,
-      "notes": "Privacy policy page at /privacy includes all required elements: exact data types collected (email headers, sender patterns), purpose (subscription management only), storage location/duration (PostgreSQL, until account deletion), third parties (Google OAuth, Vercel/PostgreSQL), exact Limited Use disclosure text, data deletion instructions, GDPR rights section, and contact information. Linked from signin page and all public page footers."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.89",
       "title": "Regression: fix for #89",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: GDPR-compliant privacy policy page at /privacy. src/app/privacy/page.tsx includes all required elements: data types collected, purpose, storage location/duration, third parties, Limited Use disclosure, data deletion instructions, GDPR rights, contact information. Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.88",
       "title": "Regression: fix for #88",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: batchDeleteMessages uses batchDelete API. src/modules/gmail/client.ts:290-310 uses gmail.users.messages.batchDelete with 1000-message chunks. Efficient quota usage (50 units per 1000 messages vs 10 per individual trash). No sequential trash() calls. Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.87",
       "title": "Regression: Rollup supports three delivery time slots (morning/afternoon/evening)",
       "category": "regression",
-      "verified": true,
-      "notes": "RollupSettings schema now uses DeliverySlot enum (MORNING/AFTERNOON/EVENING) instead of free-form time string. ConfigureRollupDialog shows radio buttons for three slots. UI displays selected slot with time (Morning 08:00, Afternoon 14:00, Evening 20:00). Verified at fix time - prisma/schema.prisma:119-132, src/components/dashboard/configure-rollup-dialog.tsx:108-122"
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.87",
       "title": "Regression: fix for #87",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: Rollup supports three delivery time slots. prisma/schema.prisma has DeliverySlot enum (MORNING/AFTERNOON/EVENING). ConfigureRollupDialog shows radio buttons for three slots. UI displays selected slot with time (Morning 08:00, Afternoon 14:00, Evening 20:00). Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.85",
       "title": "Regression: Spec Section 18 documents all Prisma schema fields and tables",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified at fix time - docs/prunebox_specsheet.md Section 18 now includes: Subscription model fields (confidenceScore, recentSubject, recentSnippet, unsubscribeUrl, unsubscribeMailto), GmailSyncState fields (scanStatus, scanProgress, scanTotal, errorMessage), UnsubscriptionAttempt table, BulkDeletionJob table, RollupSettings table with DeliverySlot enum."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.85",
       "title": "Regression: fix for #85",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: Spec Section 18 documents all Prisma schema fields and tables. docs/prunebox_specsheet.md Section 18 includes: Subscription model fields (confidenceScore, recentSubject, recentSnippet, unsubscribeUrl, unsubscribeMailto), GmailSyncState fields (scanStatus, scanProgress, scanTotal, errorMessage), UnsubscriptionAttempt table, BulkDeletionJob table, RollupSettings table with DeliverySlot enum. Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.84",
       "title": "Regression: Spec documents manual scan approach for email monitoring (#84)",
       "category": "regression",
-      "verified": true,
-      "notes": "Updated spec Section 17 to reflect manual scans as the MVP approach. Previous spec incorrectly prescribed polling/history.list API. Current implementation uses user-triggered manual scans via scan button, which is the documented and desired behavior."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.84",
       "title": "Regression: fix for #84",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: Spec documents manual scan approach. docs/prunebox_specsheet.md Section 17 reflects manual scans as MVP approach. User-triggered manual scans via scan button. No incorrect polling/history.list API prescriptions. Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.83",
       "title": "Regression: BullMQ + Redis job queue system matches spec (#83)",
       "category": "regression",
-      "verified": true,
-      "notes": "BullMQ (v5.74.1) and ioredis (v5.10.1) installed. All 5 queues configured: email-scan, unsubscribe, bulk-delete, rollup-digest, history-monitor. Workers with retry logic (3 attempts, exponential backoff). instrumentation.ts manages lifecycle. All API routes use queues, not direct async calls. Jobs persist in Redis (survive restarts). Verified at fix time - src/modules/queues/queues.ts, workers.ts, config.ts, instrumentation.ts"
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.83",
       "title": "Regression: fix for #83",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: BullMQ + Redis job queue system matches spec. All 5 queues configured: email-scan, unsubscribe, bulk-delete, rollup-digest, history-monitor. Workers with retry logic (3 attempts, exponential backoff 5s). instrumentation.ts manages lifecycle. API routes use queues, not direct async calls. Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.82",
       "title": "Regression: NEXTAUTH_URL validation added to prevent production domain in dev (#82)",
       "category": "regression",
-      "verified": true,
-      "notes": "Added console warnings in src/modules/auth/auth.ts when NEXTAUTH_URL or NEXT_PUBLIC_APP_URL are not set to localhost in development mode. Helps developers identify OAuth callback failures caused by using production domain during local development. Validation runs on server startup."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.82",
       "title": "Regression: fix for #82",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: NEXTAUTH_URL validation added. src/modules/auth/auth.ts has console warnings when NEXTAUTH_URL or NEXT_PUBLIC_APP_URL are not set to localhost in development. Helps developers identify OAuth callback failures caused by using production domain during local development. Validation runs on server startup. Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.81",
       "title": "Regression: Lazydave config port 3000 for prunebox (not 8080)",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified .lazydave/manifests/config.json has port: 3000 (correct for prunebox). Previous value 8080 pointed to Inkboard. Next.js default port is 3000, matching docker-compose.yml mapping '3000:3000'. Dev docker-compose maps 3001:3000 for dev API."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.81",
       "title": "Regression: fix for #81",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: Lazydave config port 3000 for prunebox. .lazydave/manifests/config.json has port: 3000 (correct for prunebox). Next.js default port is 3000, matching docker-compose.yml mapping '3000:3000'. Dev docker-compose maps 3001:3000 for dev API. Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.71",
       "title": "Regression: Prisma upgraded to v7.7.0 with correct dependencies",
       "category": "regression",
-      "verified": true,
-      "notes": "Prisma v7.7.0 upgrade completed. @prisma/client moved to dependencies (runtime requirement). @prisma/adapter-pg moved to dependencies (used in src/lib/db.ts). pg moved to dependencies (used in src/lib/db.ts). prisma CLI remains in devDependencies. Schema validates and generates successfully with v7.7.0."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.71",
       "title": "Regression: fix for #71",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: Prisma upgraded to v7.7.0. @prisma/client moved to dependencies (runtime requirement). @prisma/adapter-pg moved to dependencies (used in src/lib/db.ts). pg moved to dependencies. prisma CLI remains in devDependencies. Schema validates and generates successfully with v7.7.0. Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.69",
       "title": "Regression: fix for #69",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: Fix for #69 remains in place. Git history shows commit for VR.69. No regression detected in current codebase."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.55",
       "title": "Regression: Test framework and test coverage added (#55)",
       "category": "regression",
-      "verified": true,
-      "notes": "Vitest test framework installed with @vitest/ui. Added test, test:watch, and test:ui scripts to package.json. Created comprehensive test suites: src/modules/gmail/__tests__/detection.test.ts (45 tests covering subscription detection, sender parsing, email body extraction, unsubscribe link parsing) and src/lib/__tests__/crypto.test.ts (14 tests covering encryption/decryption roundtrips, error handling, ciphertext properties). All 59 tests pass. TypeScript compilation passes with no errors."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.55",
       "title": "Regression: fix for #55",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: Test framework and test coverage added. Vitest installed with @vitest/ui. test, test:watch, and test:ui scripts in package.json. Test suites: src/modules/gmail/__tests__/detection.test.ts (45 tests), src/lib/__tests__/crypto.test.ts (14 tests). All 59 tests pass. TypeScript compilation passes. Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.118",
       "title": "Regression: UnsubscriptionAttempt and BulkDeletionJob cascade on User deletion (#118)",
       "category": "regression",
-      "verified": true,
-      "notes": "Added onDelete: Cascade to UnsubscriptionAttempt and BulkDeletionJob models. Added reverse relations (unsubscriptionAttempts, bulkDeletionJobs) to User model. GDPR Article 17 right to erasure now complete - all user data deleted on account deletion. Verified at prisma/schema.prisma:147,162 and User model lines 15-16."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.118",
       "title": "Regression: fix for #118",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: UnsubscriptionAttempt and BulkDeletionJob cascade on User deletion. prisma/schema.prisma has onDelete: Cascade on both models (lines 147, 162). Reverse relations (unsubscriptionAttempts, bulkDeletionJobs) added to User model (lines 15-16). GDPR Article 17 right to erasure now complete. Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.117",
       "title": "Regression: ThemeToggle added to rollup and settings pages (#117)",
       "category": "regression",
-      "verified": true,
-      "notes": "ThemeToggle component added to rollup page header (src/app/dashboard/rollup/page.tsx:56-64) and settings page header (src/app/dashboard/settings/page.tsx:40-46). Matches dashboard pattern - positioned on right side of header with flex gap-2. All authenticated pages now have consistent theme toggle access."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.117",
       "title": "Regression: fix for #117",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: ThemeToggle added to rollup and settings pages. src/app/dashboard/rollup/page.tsx:66 has ThemeToggle component. src/app/dashboard/settings/page.tsx:49 has ThemeToggle component. Both pages position ThemeToggle on right side of header with flex gap-2, matching dashboard pattern. Fix remains in place."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V16",
       "category": "api",
       "title": "Email subjects endpoint returns recent subjects for sender",
-      "verified": true,
-      "notes": "Verified at src/app/api/subscriptions/subjects/route.ts. Endpoint implements GET handler with authentication (auth()), senderEmail query param validation, Gmail search query using listMessages() with 15 message limit, iterates through messages to extract Subject headers via getMessage() with 'metadata' format for efficiency. Returns { subjects: string[] }. Error handling via withErrorHandling wrapper. Requires valid Gmail tokens via getUserTokens().",
+      "verified": false,
+      "notes": "",
       "steps": "Run dev server, authenticate, then curl 'http://localhost:3000/api/subscriptions/subjects?senderEmail=test@example.com' and verify response includes subjects array with up to 15 recent email subjects from that sender"
     },
     {
       "id": "V17",
       "category": "api",
       "title": "Scan sender endpoint rescans specific sender for message count",
-      "verified": true,
-      "notes": "Verified at src/app/api/subscriptions/scan-sender/route.ts. POST handler with zod validation (ScanSenderSchema) for senderEmail and optional senderName. Queries Gmail via listMessages() with 1000 message limit. If 0 messages, deletes subscription and returns {success:true, count:0, removed:true}. Otherwise upserts subscription with updated messageCount, recentSubject, recentSnippet using latest message data and detectSubscription() for confidence scoring. Returns {success:true, count:number}.",
+      "verified": false,
+      "notes": "",
       "steps": "Run dev server, authenticate, then POST to http://localhost:3000/api/subscriptions/scan-sender with {\"senderEmail\":\"test@example.com\"} and verify response returns success:true with count of messages found"
     },
     {
       "id": "V18",
       "category": "api",
       "title": "Sync reset endpoint clears all scan data for user",
-      "verified": true,
-      "notes": "Verified at src/app/api/sync/reset/route.ts. POST handler requires authentication via auth(). Deletes all subscriptions for user via db.subscription.deleteMany(). Deletes existing GmailSyncState and recreates with scanStatus:'idle', scanProgress:0. Returns {success:true, deletedCount:number, message:'All scan data has been cleared...'}. Logger records deleted count. Error handling with try/catch returning 500 on failure.",
+      "verified": false,
+      "notes": "",
       "steps": "Run dev server, authenticate, then POST to http://localhost:3000/api/sync/reset and verify response includes success:true and deletedCount showing subscriptions deleted, and sync state is reset to idle"
     },
     {
       "id": "V19",
       "category": "subscriptions",
       "title": "Gmail detection module implements subscription detection with confidence scoring",
-      "verified": true,
-      "notes": "Verified at src/modules/gmail/detection.ts. detectSubscription() function (line 15) checks List-Unsubscribe header (confidence 95-100), List-Id header (confidence 90), Precedence header (line 79), Auto-Submitted header (line 99). Sender patterns array (line 119+) with 57 patterns including no-reply, noreply, bounce, unsubscribe, notification, alert, digest, newsletter. Domain patterns (line 179+) with 18 ESPs. Returns confidence score 0-100, method field (one_click/mailto/http/manual/none), unsubscribeUrl/unsubscribeMailto.",
+      "verified": false,
+      "notes": "",
       "steps": "Verify src/modules/gmail/detection.ts exists with detectSubscription function that checks List-Unsubscribe header, List-Id, Precedence headers, sender patterns (57 patterns), domain patterns (18 ESPs), and returns confidence score 0-100"
     },
     {
       "id": "V20",
       "category": "queues",
       "title": "Job queue configuration defines all required queues",
-      "verified": true,
-      "notes": "Verified at src/modules/queues/queues.ts. Exports 5 queue getter functions: getEmailScanQueue(), getUnsubscribeQueue(), getBulkDeleteQueue(), getRollupQueue(), getHistoryMonitorQueue(). All use lazy-loading pattern to prevent Redis connections during Next.js build. Uses getRedisConnection() from config.ts. Default job options: 3 attempts, exponential backoff 5s, removeOnComplete (age 24h, count 1000), removeOnFail (age 7d, count 5000). Also exports scheduleDailyRollup(), removeScheduledRollup(), scheduleHistoryMonitoring(), removeHistoryMonitoring().",
+      "verified": false,
+      "notes": "",
       "steps": "Verify src/modules/queues/config.ts exists and exports queue configurations for email-scan, unsubscribe, bulk-delete, rollup-digest, and history-monitor queues with Redis connection"
     },
     {
@@ -678,92 +678,448 @@
       "category": "api",
       "title": "Scan initiation endpoint starts email scan with rate limiting",
       "steps": "Run dev server, authenticate, then POST to http://localhost:3000/api/scan and verify response includes success:true with message 'Scan started'; verify rate limit returns 429 when called twice within 1 minute",
-      "verified": true,
-      "notes": "Verified at src/app/api/scan/route.ts. POST handler with authentication, rate limiting via withRateLimit() using RATE_LIMITS.SCAN (1 request per minute). Checks if scan already in progress via GmailSyncState.scanStatus. Detects first scan (no syncState or lastSyncAt). Queues job to getEmailScanQueue() with userId, tokens, forceFullScan flag. Returns {success:true, message:'Scan started'}. Conflict response if scanning, unauthorized if no Gmail tokens."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V28",
       "category": "api",
       "title": "Development signin endpoint creates test user session",
       "steps": "Run dev server in NODE_ENV=development, then POST to http://localhost:3000/api/dev-signin and verify response includes success:true with user object and next-auth.session-token cookie is set; verify returns 403 in production",
-      "verified": true,
-      "notes": "Verified at src/app/api/dev-signin/route.ts. POST handler checks NODE_ENV!=='development' and returns 403 with 'Not allowed in production' (lines 10-12). In dev, upserts test user (test@example.com, 'Test User') via db.user.upsert(). Returns {success:true, user:testUser} with next-auth.session-token cookie set (httpOnly, secure:false, sameSite:lax, 30-day expiry). Error handling returns 500 on failure."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V29",
       "category": "api",
       "title": "Rate limiter enforces SCAN, BULK_ACTION, and WEBHOOK limits",
       "steps": "Run dev server and verify src/lib/rate-limiter.ts exports RATE_LIMITS with SCAN (1/min), BULK_ACTION (10/min), WEBHOOK (100/min) configurations; verify InMemoryRateLimiter class implements cleanup interval and check() method",
-      "verified": true,
-      "notes": "Verified at src/lib/rate-limiter.ts. Exports RATE_LIMITS constant with SCAN (maxRequests:1, windowMs:60000), BULK_ACTION (10/60000), WEBHOOK (100/60000). InMemoryRateLimiter class implements cleanup interval (line 37: setInterval every 5 minutes), check() method (line 42) with timestamp tracking and window filtering. Exports withRateLimit() middleware returning 429 if exceeded, checkRateLimit() for raw checks. Process cleanup on beforeExit. createRateLimitResponse() adds X-RateLimit-* headers."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V30",
       "category": "infrastructure",
       "title": "Logger utility provides structured logging with levels",
       "steps": "Verify src/lib/logger.ts exports logger singleton with debug(), info(), warn(), error() methods; verify LogLevel enum (DEBUG=0, INFO=1, WARN=2, ERROR=3) and environment-aware minLevel configuration",
-      "verified": true,
-      "notes": "Verified at src/lib/logger.ts. LogLevel enum (DEBUG=0, INFO=1, WARN=2, ERROR=3). Logger class with environment-aware minLevel: production defaults to INFO, development defaults to DEBUG. LOG_LEVEL env var supported. Methods: debug(), info(), warn(), error() with optional context. Singleton exported as 'logger'. Convenience exports: debug(), info(), warn(), logError(). Structured format: [timestamp] [LEVEL] message {context}."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V31",
       "category": "infrastructure",
       "title": "Error handling library provides standardized API responses",
       "steps": "Verify src/lib/errors.ts exports ApiErrorResponse class with static methods (unauthorized, badRequest, notFound, conflict, forbidden, internal, tooManyRequests); verify withErrorHandling wrapper and requireFields validator",
-      "verified": true,
-      "notes": "Verified at src/lib/errors.ts. ApiErrorResponse class with static methods: unauthorized(), badRequest(), missingFields(), notFound(), conflict(), forbidden(), internal(), tooManyRequests(), invalidToken(). HttpStatus enum (OK=200 through SERVICE_UNAVAILABLE=503). withErrorHandling() wrapper for try/catch with Prisma error handling (P2002 unique, P2025 not found). requireFields() validator checks body for missing fields. apiError() creates standardized JSON responses with {error:{code,message,status}}."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V32",
       "category": "infrastructure",
       "title": "User tokens helper retrieves OAuth tokens from database",
       "steps": "Verify src/lib/get-user-tokens.ts exports getUserTokens function that queries Account table by userId and provider='google' returning accessToken and refreshToken",
-      "verified": true,
-      "notes": "Verified at src/lib/get-user-tokens.ts. getUserTokens() async function queries db.account.findFirst() where {userId, provider:'google'}. Returns {accessToken: string|null, refreshToken: string|null} or null if account not found. Uses Prisma Account table fields access_token and refresh_token. Minimal implementation with no error handling - relies on Prisma for database errors."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V33",
       "category": "queues",
       "title": "BullMQ workers initialize with 5 queues and proper lifecycle",
       "steps": "Verify instrumentation.ts exports register() function that imports and calls initializeWorkers() from src/modules/queues/workers.ts; verify workers.ts creates 5 workers (email-scan, unsubscribe, bulk-delete, rollup-digest, history-monitor) with event handlers for completed/failed/error",
-      "verified": true,
-      "notes": "Verified at src/modules/queues/workers.ts. initializeWorkers() creates 5 workers: email-scan (concurrency 5), unsubscribe (concurrency 10), bulk-delete (concurrency 10), rollup-digest (concurrency 5), history-monitor (concurrency 10). All use getRedisConnection(). Event handlers: completed (logs job id), failed (logs job id and error), error (logs worker error). closeWorkers() closes all workers. Calls initializeHistoryMonitoringForAllUsers() on startup. instrumentation.ts imports and calls initializeWorkers() in register()."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V34",
       "category": "auth",
       "title": "Development auth callback handles dev-test provider",
       "steps": "Verify src/app/api/dev-auth/callback/route.ts exists and handles OAuth callback for dev-test provider (only available in development)",
-      "verified": true,
-      "notes": "Verified at src/app/api/dev-auth/callback/route.ts. POST handler checks NODE_ENV!=='development' and returns 403 (lines 10-12). Upserts test user (test@example.com, 'Test User'), upserts credentials account, upserts session with 30-day expiry. Sets two NextAuth session cookies: next-auth.session-token and __Secure-next-auth.session-token. Returns {success:true, redirect:'/dashboard'}. Error handling returns 500 on failure."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.V15",
       "title": "Regression: Dashboard page renders correctly with authentication flow",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified dashboard page returns 307 Temporary Redirect to /auth/signin when unauthenticated (correct security behavior). Sign-in page renders with proper loading spinner and authentication flow. Dev server running on port 3000 responds correctly. Authentication confirmed - sign-in page returns HTTP 200."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.123",
       "title": "Regression: Account delete endpoint performs proper cascade deletion including SignOut call (#23)",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: Account delete endpoint at src/app/api/account/delete/route.ts now performs explicit cascade deletion of all related data (Account, Session, Subscription, SubscriptionPreference, UnsubscriptionAttempt, BulkDeletionJob, GmailSyncState, RollupSettings) before deleting the User record. Added proper SignOut({ redirect: false }) call for session clearing. Returns success message with proper JSON structure. Implements GDPR Article 17 right to erasure completely."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "VR.118",
       "title": "Regression: UnsubscriptionAttempt has proper cascade relation for complete GDPR compliance (#118)",
       "category": "regression",
-      "verified": true,
-      "notes": "Verified: Prisma schema at prisma/schema.prisma:149 added cascade relation for UnsubscriptionAttempt.subscription (line 151). When a Subscription is deleted, all related UnsubscriptionAttempt records will be automatically cascade deleted. Ensures complete data removal per GDPR Article 17 requirements - no orphaned unsubscription attempts left behind when parent subscription is deleted."
+      "verified": false,
+      "notes": ""
     },
     {
       "id": "V21",
       "category": "regression",
       "title": "Regression: Bulk action API endpoint handles delete, unsubscribe, and rollup for multiple subscriptions",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V35",
+      "category": "testing",
+      "title": "Test suite runs successfully with passing tests",
+      "steps": "Run npm test and verify all tests pass without errors; check vitest test files in src/lib/__tests__ and src/modules/gmail/__tests__ execute correctly",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V36",
+      "category": "database",
+      "title": "Prisma Client generates successfully after schema validation",
+      "steps": "Run npx prisma generate and verify Prisma Client is generated without errors; check node_modules/.prisma/client contains generated files",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V37",
+      "category": "infrastructure",
+      "title": "Crypto module provides AES-256-GCM encryption and decryption functions",
+      "steps": "Verify src/lib/crypto.ts exports encrypt(), decrypt(), and getEncryptionKey() functions; run node -e \"console.log(require('./src/lib/crypto.ts'))\" to confirm module loads without errors",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V38",
+      "category": "auth",
+      "title": "OAuth token refresh mechanism updates expired access tokens",
+      "steps": "Verify src/modules/gmail/client.ts contains token refresh logic in oauth2Client.on('tokens') callback; check that refresh tokens are persisted to database via Account model",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V39",
+      "category": "rollup",
+      "title": "Rollup digest job generates and sends daily digest email",
+      "steps": "Verify src/modules/queues/jobs.ts exports runRollupDigest() function that compiles subscriptions, generates digest content, and calls sendEmail(); check function handles delivery slot timing and timezone conversion",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V40",
+      "category": "infrastructure",
+      "title": "Error handling wrapper provides standardized API error responses",
+      "steps": "Verify src/lib/errors.ts exports withErrorHandling() higher-order function and ApiErrorResponse class; check that error responses include proper HTTP status codes and error messages",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V41",
+      "category": "infrastructure",
+      "title": "Logger utility provides structured logging with environment-aware levels",
+      "steps": "Verify src/lib/logger.ts exports logger singleton with debug(), info(), warn(), error() methods; check LogLevel enum and minLevel configuration based on NODE_ENV",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V42",
+      "category": "infrastructure",
+      "title": "Client-side logger provides browser logging capabilities",
+      "steps": "Verify src/lib/client-logger.ts exports clientLogger with methods matching server logger; check it handles browser console logging with proper formatting",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V43",
+      "category": "auth",
+      "title": "Auth callback route handles OAuth redirect for dev-test provider",
+      "steps": "Run dev server and navigate to http://localhost:3000/api/dev-auth/callback; verify route processes OAuth callback and creates session for dev-test provider",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V44",
+      "category": "webhook",
+      "title": "Gmail webhook endpoint implements HMAC SHA256 signature verification with timing-safe comparison",
+      "steps": "Verify src/app/api/webhook/gmail/route.ts contains verifyWebhookSignature() function that uses crypto.createHmac('sha256') with crypto.timingSafeEqual() for constant-time comparison; verify endpoint returns 401 when signature validation fails",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V45",
+      "category": "queues",
+      "title": "History monitoring initializes for all users with Google accounts on application startup",
+      "steps": "Verify src/modules/queues/queues.ts exports initializeHistoryMonitoringForAllUsers() function; check that workers.ts or instrumentation.ts calls this function during worker initialization to schedule history monitoring for existing users",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V46",
+      "category": "infrastructure",
+      "title": "BullMQ queues configure exponential backoff retry strategy with proper job retention policies",
+      "steps": "Verify src/modules/queues/queues.ts defines defaultJobOptions with attempts: 3, backoff type: 'exponential', removeOnComplete: { age: 24*3600, count: 1000 }, removeOnFail: { age: 7*24*3600, count: 5000 }; verify all 5 queues (email-scan, unsubscribe, bulk-delete, rollup-digest, history-monitor) use these options",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V47",
+      "category": "infrastructure",
+      "title": "Redis connection configures maxRetriesPerRequest and enableReadyCheck for BullMQ compatibility",
+      "steps": "Verify src/modules/queues/config.ts exports getRedisConnection() that creates Redis connection with maxRetriesPerRequest: null and enableReadyCheck: false for optimal BullMQ queue behavior",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V48",
+      "category": "gmail",
+      "title": "Gmail sendEmail function sends email via Gmail API",
+      "steps": "Verify src/modules/gmail/client.ts exports sendEmail() function that calls gmail.users.messages.send() with RFC 822 formatted email; check function handles to, subject, and body parameters",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V49",
+      "category": "gmail",
+      "title": "Gmail listHistory function retrieves history records for incremental sync",
+      "steps": "Verify src/modules/gmail/client.ts exports listHistory() function that calls gmail.users.history.list() with historyId parameter; check function handles startHistoryId and pagination",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V50",
+      "category": "gmail",
+      "title": "Gmail getMessage function retrieves individual message by ID",
+      "steps": "Verify src/modules/gmail/client.ts exports getMessage() function that calls gmail.users.messages.get() with format='full' or format='metadata'; check function returns message with headers, payload, and body",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V51",
+      "category": "gmail",
+      "title": "Gmail getCurrentHistoryId function retrieves current history ID for user",
+      "steps": "Verify src/modules/gmail/client.ts exports getCurrentHistoryId() function that calls gmail.users.messages.list() with maxResults=1 to get current historyId; check function returns historyId as string",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V52",
+      "category": "queues",
+      "title": "History monitor job polls Gmail history API and triggers email scans for new messages",
+      "steps": "Verify src/modules/queues/jobs.ts exports runHistoryMonitor() function that calls listHistory() and runEmailScan() when new messages detected; check function updates historyId in GmailSyncState",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V53",
+      "category": "queues",
+      "title": "BullMQ queues provide lazy-loaded singleton pattern with Redis connection",
+      "steps": "Verify src/modules/queues/queues.ts exports getUnsubscribeQueue(), getBulkDeleteQueue(), getRollupQueue(), and getHistoryMonitorQueue() functions that create queues on first call; check queues share same Redis connection",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V54",
+      "category": "api",
+      "title": "Gmail client retry logic with exponential backoff for rate limit handling",
+      "steps": "Verify src/modules/gmail/client.ts implements retry logic with exponential backoff in listMessages() and other API functions; check for retry count, delay calculation, and error logging",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V55",
+      "category": "queues",
+      "title": "Email scan job processes messages and creates subscription records with confidence scoring",
+      "steps": "Verify src/modules/queues/jobs.ts exports runEmailScan() function that calls listMessages(), detectSubscription(), and creates Subscription records; check function handles incremental scanning, first-scan full scan logic, and updates GmailSyncState with progress",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V56",
+      "category": "queues",
+      "title": "Unsubscribe job processes unsubscription attempts with multiple fallback methods",
+      "steps": "Verify src/modules/queues/jobs.ts exports runUnsubscribe() function that calls attemptUnsubscribe() with one-click, mailto, and HTTP fallback methods; check function updates Subscription record, creates UnsubscriptionAttempt audit trail, and handles errors gracefully",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V57",
+      "category": "queues",
+      "title": "Bulk delete job processes mass message deletion with progress tracking",
+      "steps": "Verify src/modules/queues/jobs.ts exports runBulkDelete() function that queries messages by sender, calls batchDeleteMessages() in chunks, and updates BulkDeletionJob with deletedMessages count; check function handles rate limiting and partial failures",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V58",
+      "category": "pages",
+      "title": "Landing page renders with theme toggle and navigation",
+      "steps": "Run dev server and navigate to http://localhost:3000/, verify page loads with hero section, privacy-first badge, theme toggle button, self-host link, and sign-in button",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V59",
+      "category": "pages",
+      "title": "How-it-works page renders with four-step process explanation",
+      "steps": "Run dev server and navigate to http://localhost:3000/how-it-works, verify page loads with four steps (Connect Gmail, Scan Inbox, Choose Action, Clean Up), icons, and descriptions",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V60",
+      "category": "pages",
+      "title": "Deploy page renders with Docker Compose self-host instructions",
+      "steps": "Run dev server and navigate to http://localhost:3000/deploy, verify page loads with Docker Compose setup instructions, environment variable requirements, and configuration steps",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V61",
+      "category": "pages",
+      "title": "Rollup dashboard page renders with digest configuration",
+      "steps": "Run dev server, authenticate, then navigate to http://localhost:3000/dashboard/rollup, verify page loads with rollup subscriptions list, configure digest dialog, and theme toggle",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V62",
+      "category": "pages",
+      "title": "Settings dashboard page renders with account management options",
+      "steps": "Run dev server, authenticate, then navigate to http://localhost:3000/dashboard/settings, verify page loads with export data button, delete account button, theme toggle, and privacy policy link",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V63",
+      "category": "auth",
+      "title": "Auth callback page handles OAuth redirects",
+      "steps": "Verify src/app/auth/callback/page.tsx exists and renders loading state with 'Signing you in...' message during OAuth callback processing",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V64",
+      "category": "auth",
+      "title": "Auth error page displays user-friendly error message",
+      "steps": "Verify src/app/auth/error/page.tsx exists and renders error page with 'Authentication Error' title, error message display, and back to home button",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V65",
+      "category": "pages",
+      "title": "Not-found page displays 404 with navigation options",
+      "steps": "Verify src/app/not-found.tsx renders 404 page with 'Page Not Found' title, go home button, dashboard link, and go back button",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V66",
+      "category": "pages",
+      "title": "Global error page displays user-friendly error boundary",
+      "steps": "Verify src/app/error.tsx renders error page with 'Something went wrong' title, error description, and try again button that calls reset function",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V67",
+      "category": "components",
+      "title": "Theme toggle component switches between light and dark modes",
+      "steps": "Verify src/components/theme-toggle.tsx uses useTheme hook from next-themes, renders Sun and Moon icons with transition animations, and toggles theme on click",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V68",
+      "category": "components",
+      "title": "Dashboard navigation component provides responsive mobile menu",
+      "steps": "Verify src/components/dashboard/dashboard-nav.tsx renders nav links (Email Groups, Rollup, Settings) with active state highlighting, mobile hamburger menu, and mobile drawer with backdrop",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V69",
+      "category": "components",
+      "title": "Scan button component handles scanning with progress tracking and rate limiting",
+      "steps": "Verify src/components/dashboard/scan-button.tsx provides scan button with dropdown (Quick Scan, Complete Scan, Reset & Clear All), progress display (Scanning X/Y), rate limit countdown (Retry in Xs), and polling for scan status every 2 seconds",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V70",
+      "category": "components",
+      "title": "Configure rollup dialog provides digest customization UI",
+      "steps": "Verify src/components/dashboard/configure-rollup-dialog.tsx provides enabled toggle, delivery slot selector (Morning/Afternoon/Evening), timezone input, digest name input, and save button",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V71",
+      "category": "components",
+      "title": "Session provider wraps app with NextAuth session context",
+      "steps": "Verify src/components/providers/session-provider.tsx exports Providers component that wraps children with SessionProvider from next-auth/react",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V72",
+      "category": "pages",
+      "title": "Sign-in page displays Google OAuth button with privacy messaging",
+      "steps": "Run dev server and navigate to http://localhost:3000/auth/signin, verify page loads with 'Sign in with Google' button, privacy policy link, Google Limited Use disclosure, and theme toggle",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V73",
+      "category": "pages",
+      "title": "Dev-signin page provides development authentication bypass",
+      "steps": "Verify src/app/dev-signin/page.tsx exists and renders development sign-in page with button to create test user session (only available in development mode)",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V74",
+      "category": "api",
+      "title": "Privacy policy page displays GDPR-compliant privacy content",
+      "steps": "Run dev server and navigate to http://localhost:3000/privacy, verify page loads with data collection section, data usage description, user rights (access, rectification, erasure, portability, objection), and Google Limited Use disclosure",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "V75",
+      "category": "components",
+      "title": "Subscription list component displays subscriptions with bulk actions",
+      "steps": "Verify src/components/subscriptions/subscription-list.tsx provides subscription table with sender info, message count, confidence badges, action dropdowns (keep/unsubscribe/rollup/delete), select-all checkbox, and bulk action button",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.128",
+      "title": "Regression: Prisma v7 compatible adapter for @auth/prisma-adapter (#128)",
+      "category": "regression",
       "verified": true,
-      "notes": "Verified at src/app/api/subscriptions/bulk/route.ts:1-184. Comprehensive bulk action endpoint with zod validation schema. Supports three actions: delete (queues bulk-delete jobs), unsubscribe (creates preferences and queues unsubscribe jobs), rollup (creates preferences and schedules daily digest). Handles both subscriptionIds and senderEmails arrays. Limits: 100 items per request. Token verification via getUserTokens(). Ownership verification for subscriptions. Uses getBulkDeleteQueue(), getUnsubscribeQueue(), scheduleDailyRollup(), removeScheduledRollup()."
+      "notes": "Works because: npm ls shows @prisma/adapter-pg@^6.0.0 is now installed, which is compatible with @prisma/client@7.7.0. TypeScript compilation passes without 'driverAdapterFactory.connect is not a function' error."
+    },
+    {
+      "id": "VR.128",
+      "title": "Regression: fix for #128",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
+    },
+    {
+      "id": "VR.127",
+      "title": "Regression: API routes return proper responses instead of 404 in dev mode (#127)",
+      "category": "regression",
+      "verified": true,
+      "notes": "Works because: next.config.ts now conditionally sets output: 'standalone' only for NODE_ENV=production. This prevents Next.js from prerendering API routes as static pages in dev mode, which was causing 404 responses. Routes like /api/dev-signin, /api/account/delete, /api/account/export, and /api/rollup/settings now respond with proper JSON (error messages or data) instead of HTML 404 pages."
+    },
+    {
+      "id": "VR.127",
+      "title": "Regression: fix for #127",
+      "category": "regression",
+      "verified": false,
+      "notes": ""
     }
   ]
 }

@@ -24,3 +24,17 @@
 {"check_id": "VR.117", "variant": "B", "result": "pass", "raw": "The verification is complete. The ThemeToggle component has been successfully added to both the rollup page (line 66) and settings page (line 49) headers, following the same pattern as the dashboard page with proper positioning on the right side of the header with flex gap-2 layout.\n\n{\"id\": \"VR.117\", \"result\": \"pass\", \"reason\": \"ThemeToggle component verified in both rollup and settings pages headers with consistent positioning and styling\"}\n"}
 {"check_id": "V3", "variant": "B", "result": "skip", "raw": "{\"id\": \"V3\", \"result\": \"skip\", \"reason\": \"Not running database validation test\"}\n"}
 {"check_id": "V4", "variant": "B", "result": "unknown", "raw": "\n"}
+{"check_id": "V5", "variant": "B", "result": "unknown", "raw": "\n"}
+{"check_id": "V6", "variant": "B", "result": "pass", "raw": "{\"id\": \"V6\", \"result\": \"pass\", \"reason\": \"Auth routes implemented with /auth prefix\"}\n"}
+{"check_id": "V7", "variant": "B", "result": "pass", "raw": "The Gmail detection module exists at `src/modules/gmail/` and includes:\n- Client code for Gmail API integration\n- Detection functionality for identifying subscriptions\n- Test coverage for detection functions\n\n{\"id\": \"V7\", \"result\": \"pass\", \"reason\": \"Gmail detection module exists at src/modules/gmail/ with proper API client and detection functionality\"}\n"}
+{"check_id": "V8", "variant": "B", "result": "pass", "raw": "{\"id\": \"V8\", \"result\": \"pass\", \"reason\": \"Job queue configuration found in src/services/jobQueue.ts with proper setup\"}\n"}
+{"check_id": "V9", "variant": "B", "result": "pass", "raw": "{\"id\": \"V9\", \"result\": \"pass\", \"reason\": \"Multiple subscription API endpoints exist with proper CRUD operations\"}\n"}
+{"check_id": "V10", "variant": "B", "result": "pass", "raw": "{\"id\": \"V10\", \"result\": \"pass\", \"reason\": \"Gmail webhook endpoint exists at src/app/api/gmail-webhook/route.ts with POST handler for subscription lifecycle\"}\n"}
+{"check_id": "V11", "variant": "B", "result": "unknown", "raw": "\n"}
+{"check_id": "V12", "variant": "B", "result": "pass", "raw": "{\"id\": \"V12\", \"result\": \"pass\", \"reason\": \"All Docker compose configurations are valid\"}\n"}
+{"check_id": "V13", "variant": "B", "result": "pass", "raw": "{\"id\": \"V13\", \"result\": \"pass\", \"reason\": \"Environment variables are thoroughly documented in README.md (section 89), DEPLOYMENT.md (section 51), and .env.example with clear descriptions and examples for all required variables.\"}\n"}
+{"check_id": "V14", "variant": "B", "result": "pass", "raw": "{\"id\": \"V14\", \"result\": \"pass\", \"reason\": \"Unsubscribe module exists at src/modules/gmail/unsubscribe.ts\"}\n"}
+{"check_id": "V15", "variant": "B", "result": "unknown", "raw": "\n"}
+{"check_id": "V21", "variant": "B", "result": "pass", "raw": "{\"id\": \"V21\", \"result\": \"pass\", \"reason\": \"Bulk action API endpoint correctly handles delete, unsubscribe, and rollup operations with proper validation and queueing\"}\n"}
+{"check_id": "V22", "variant": "B", "result": "pass", "raw": "{\"id\": \"V22\", \"result\": \"pass\", \"reason\": \"Subscription action API endpoint correctly updates single subscription preference\"}\n"}
+{"check_id": "V23", "variant": "B", "result": "pass", "raw": "{\"id\": \"V23\", \"result\": \"pass\", \"reason\": \"Account delete endpoint correctly cascade deletes user data including emails, accounts, tokens, and external accounts\"}\n"}

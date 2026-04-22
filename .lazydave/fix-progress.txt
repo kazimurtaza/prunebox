@@ -50,3 +50,5 @@
 [2026-04-21 03:01:37] [#55] fixed (61b2e16) → needs-verification
 [2026-04-21 03:21:49] [#118] fixed (6727e94) → needs-verification
 [2026-04-21 03:24:35] [#117] fixed (7ebfe78) → needs-verification
+[2026-04-22 21:48:36] [#128] fixed (0bcd1a3) → needs-verification
+[2026-04-22 21:53:12] [#127] fixed (a4846b6) → needs-verification

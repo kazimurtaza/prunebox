@@ -4,139 +4,201 @@
   "areas": [
     {
       "id": "T1",
-      "category": "auth",
-      "title": "Sign-in page with Google OAuth button",
-      "status": "issues-found",
-      "notes": "Screenshot taken: lazydave/test-logs/screenshots/T1-signin-page.png. Layout, spacing, and button styling are correct. Found primary color mismatch: spec says #10b981 but code uses #1F7D53 (src/app/globals.css:14). Visual design otherwise complies with spec - clean centered card, proper typography hierarchy, theme toggle present.",
+      "name": "Landing page hero section with gradient background",
+      "category": "landing",
       "skill": null,
-      "agent": null
+      "agent": null,
+      "status": "pending",
+      "notes": ""
     },
     {
       "id": "T2",
-      "category": "dashboard",
-      "title": "Dashboard layout with navigation header",
-      "status": "passed",
-      "notes": "Code analysis confirms dashboard layout structure (src/app/dashboard/page.tsx): Header with 'Your Emails' title (text-3xl font-bold) and subtitle metrics, 3-column stats grid (Total Senders, Emails Scanned, Likely Mailing Lists) using shadcn Card components, ScanButton and ThemeToggle in header row. Design tokens from globals.css properly applied (primary color emerald, proper text hierarchy with muted-foreground for subtitles). Responsive layout with flex-col on mobile, flex-row on desktop. Note: Live verification blocked by NextAuth JWT validation - test session created in DB but JWT token format mismatch prevents browser auth.",
+      "name": "Landing page privacy-first badge and competitive differentiation",
+      "category": "landing",
       "skill": null,
-      "agent": null
+      "agent": null,
+      "status": "pending",
+      "notes": ""
     },
     {
       "id": "T3",
-      "category": "subscriptions",
-      "title": "Subscription list table with sender names, email counts, and action buttons",
-      "status": "passed",
-      "notes": "Code-based analysis: src/components/subscriptions/subscription-list.tsx. Layout verified: Search input with Search icon, filter buttons (All, High/Low Confidence, Has Unsubscribe), Select All checkbox, sort dropdown with ArrowUpDown icon. Cards show sender name (font-semibold), email address (text-muted-foreground), badges for email count/confidence/ unsubscribe capability. Action buttons: Delete (destructive variant with Trash icon), Rollup (Layers icon), Unsubscribe (MailX icon). Expandable content showing recent email subjects. Mobile responsive with DropdownMenu for actions. Design tokens: primary emerald for badges, destructive for delete actions, proper text hierarchy with muted-foreground. Resizable list with GripHorizontal handle. Pagination with Load More button.",
+      "name": "Landing page header with logo, self-host link, sign-in button, and theme toggle",
+      "category": "landing",
       "skill": null,
-      "agent": null
+      "agent": null,
+      "status": "pending",
+      "notes": ""
     },
     {
       "id": "T4",
-      "category": "subscriptions",
-      "title": "Scan button component for initiating Gmail scans",
-      "status": "passed",
-      "notes": "Code-based analysis: src/components/dashboard/scan-button.tsx. Button structure: Main button with Scan icon, dropdown trigger with ChevronDown, DropdownMenuContent with options. States: Scanning (RefreshCw spinning with progress 'Scanning X/Y'), Rate limit (Retry in Xs countdown), Idle ('Scan Inbox'). Options: Quick Scan (90 days/1000 emails), Complete Scan (entire inbox), Reset & Clear All Data (Trash2 icon, destructive variant, AlertDialog confirmation). Design tokens: default button variant (bg-primary text-primary-foreground), destructive for reset action, proper text styling. Toast notifications for scan started/complete/failed/rate limit. Polling for scan status every 2s with clearInterval cleanup on unmount.",
+      "name": "How-it-works page four-step process cards with icons",
+      "category": "informational",
       "skill": null,
-      "agent": null
+      "agent": null,
+      "status": "pending",
+      "notes": ""
     },
     {
       "id": "T5",
-      "category": "rollup",
-      "title": "Rollup digest settings page with delivery time and frequency options",
-      "status": "passed",
-      "notes": "Code-based analysis: src/app/dashboard/rollup/page.tsx and configure-rollup-dialog.tsx. Layout verified: Responsive header (flex-col sm:flex-row), 'Email Rollup' H1 (text-3xl font-bold), Configure Digest button with Settings2 icon. 3-column grid (md:grid-cols-3): main card (md:col-span-2) showing email groups in rollup with avatar badges (bg-primary/10 text-primary), right sidebar with Delivery Schedule card (Clock/Calendar icons, text-2xl font-bold for time) and Quick Actions. Empty state with Mail icon (h-12 w-12) and 'Go to Dashboard' CTA. Configure dialog: Switch for enable toggle, Input for digest name, RadioGroup for delivery slots (Morning/Afternoon/Evening), Select for timezone with 13 common zones. Design tokens: primary emerald (160 84% 39% in dark mode), muted-foreground for descriptions, proper Card/CardHeader/CardTitle/CardDescription hierarchy. Note: Live browser verification blocked by NextAuth - same JWT token format issue as T2.",
+      "name": "Deploy page Docker Compose instructions with code blocks",
+      "category": "informational",
       "skill": null,
-      "agent": null
+      "agent": null,
+      "status": "pending",
+      "notes": ""
     },
     {
       "id": "T6",
-      "category": "settings",
-      "title": "User settings page with account preferences",
-      "status": "passed",
-      "notes": "Code-based analysis: src/app/dashboard/settings/page.tsx. Layout verified: Responsive header with 'Settings' title (text-3xl font-bold) and muted-foreground description. 4-column grid layout (md:grid-cols-4) - sidebar (1 col) and content (3 cols). Tab navigation: 3 tabs (Account/User icon, Notifications/Bell icon, Privacy/Shield icon) with active state (text-primary bg-primary/10) and ghost variant. Account tab: Profile Information card with read-only Name/Email inputs, Gmail Access card (destructive title, bg-destructive/10 warning banner, 'Revoke Gmail Access (Coming soon)' button). Notifications tab: Single card with 'coming soon' message. Privacy tab: Google API disclosure (bg-primary/5 border-primary/20), Data Collection with Export button (Download icon, Loader2 spinner), Delete Account section (destructive styling, AlertDialog confirmation). Design tokens: primary emerald (160 84% 39%/32%), destructive for dangerous actions, proper text hierarchy with muted-foreground. Icons: User, Shield, Bell, Trash2, Loader2, Download from lucide-react. Note: Live verification blocked by NextAuth JWT validation (same issue as T2, T5, T9, T10).",
+      "name": "Sign-in page Google OAuth button with privacy messaging",
+      "category": "auth",
       "skill": null,
-      "agent": null
+      "agent": null,
+      "status": "pending",
+      "notes": ""
     },
     {
       "id": "T7",
-      "category": "ui",
-      "title": "Dark mode theme toggle functionality",
-      "status": "issues-found",
-      "notes": "Code-based analysis complete. ThemeProvider properly configured (src/app/layout.tsx:40): attribute='class', defaultTheme='dark', enableSystem, suppressHydrationWarning. ThemeToggle component (src/components/theme-toggle.tsx): Uses next-themes, Sun/Moon icons with smooth CSS transitions (rotate-0 scale-100 to rotate-90 scale-0), accessible with sr-only label. Design tokens (src/app/globals.css:6-50): Proper light/dark mode tokens defined. Issue found: ThemeToggle missing from rollup page (src/app/dashboard/rollup/page.tsx:49-60) and settings page (src/app/dashboard/settings/page.tsx:40-46) - inconsistent UX. Present on: landing page (page.tsx:36), signin page (auth/signin/page.tsx:63), dashboard (dashboard/page.tsx:77), privacy page (privacy/page.tsx:20). GitHub issue: https://github.com/kazimurtaza/prunebox/issues/117",
+      "name": "Dashboard page metrics display (total senders, emails, subscriptions)",
+      "category": "dashboard",
       "skill": null,
       "agent": null,
-      "issues_found": ["https://github.com/kazimurtaza/prunebox/issues/117"]
+      "status": "pending",
+      "notes": ""
     },
     {
       "id": "T8",
-      "category": "subscriptions",
-      "title": "Subscription action dialog (keep, unsubscribe, rollup options)",
-      "status": "passed",
-      "notes": "Code-based analysis: Subscription actions embedded in subscription-list.tsx (lines 723-754 for desktop, 686-720 for mobile dropdown). Desktop action buttons: Delete (destructive variant with Trash icon), Rollup (Layers icon, secondary when active), Unsubscribe (MailX icon, secondary when active). Mobile: DropdownMenu with MoreVertical trigger containing same three options. Delete confirmation: AlertDialog (lines 878-915) with AlertTriangle icon, destructive styling, detailed description showing email count and sender list. Design tokens: destructive red for dangerous actions, secondary/outline for inactive states, proper button sizing (h-8 px-3). Icons from lucide-react: Trash, Layers, MailX, MoreVertical, AlertTriangle.",
+      "name": "Dashboard navigation with responsive mobile menu",
+      "category": "dashboard",
       "skill": null,
-      "agent": null
+      "agent": null,
+      "status": "pending",
+      "notes": ""
     },
     {
       "id": "T9",
-      "category": "notifications",
-      "title": "Toast notifications for scan progress and action results",
-      "status": "passed",
-      "notes": "Screenshot: lazydave/test-logs/screenshots/T9-toast-destructive.png. Toast implementation verified: Uses shadcn/ui toast with Radix UI primitives. Styling: default variant (bg-background text-foreground with border), destructive variant (bg-destructive text-destructive-foreground with border). Typography: title (text-sm font-semibold), description (text-sm opacity-90). Spacing: p-6 padding, rounded-md border, shadow-lg elevation. Positioning: fixed viewport with responsive placement (top on mobile, bottom-right on desktop). Design tokens from globals.css properly applied (--background, --foreground, --destructive, --border, --radius). Usage patterns: scan-button.tsx shows toasts for scan started/complete/failed, rate limits, data reset; signin page shows auth errors. Close button with hover states visible in screenshot.",
+      "name": "Scan button with dropdown menu (Quick Scan, Complete Scan, Reset)",
+      "category": "dashboard",
       "skill": null,
-      "agent": null
+      "agent": null,
+      "status": "pending",
+      "notes": ""
     },
     {
       "id": "T10",
-      "category": "how-it-works",
-      "title": "How It Works page explaining subscription detection",
-      "status": "issues-found",
-      "notes": "Screenshot saved: lazydave/test-logs/screenshots/T10-how-it-works.png. Page structure verified: header with nav, 'How Prunebox Works' title (text-4xl md:text-5xl font-bold), 4 step cards in 2-column grid layout (Connect Gmail, Scan Inbox, Choose Action, Clean Up), Detection methods section with high/medium confidence signals, Comparison section (Prunebox vs Unroll.me), Privacy guarantee card, CTA section. Design tokens applied: primary emerald (#1F7D53 - 160 84% 39% in dark mode), proper card borders (border-2), icon badges (bg-primary/10, bg-destructive/10). Typography hierarchy correct with text-muted-foreground for descriptions. Issue found: /pricing link in navigation returns 404 - pricing page not implemented yet (src/app/pricing/ does not exist). Console error: Failed to load resource /pricing?_rsc=12hng (404).",
+      "name": "Subscription list table with sender info, confidence badges, and action dropdowns",
+      "category": "dashboard",
       "skill": null,
-      "agent": null
+      "agent": null,
+      "status": "pending",
+      "notes": ""
     },
     {
       "id": "T11",
-      "name": "Landing page hero section with gradient background, privacy badge, and feature cards (Bulk Deletion, Smart Grouping, True Unsubscribe)",
-      "category": "ui",
+      "name": "Rollup page digest configuration dialog",
+      "category": "dashboard",
       "skill": null,
       "agent": null,
-      "status": "passed",
-      "notes": "Code-based analysis: src/app/page.tsx:22-118. Hero section verified: gradient background (from-background via-background to-muted), centered layout with max-w-4xl, privacy badge (Shield icon, bg-primary/10, 'Privacy-First. No data selling. Ever.'), H1 title (text-5xl md:text-6xl, font-bold, bg-gradient-to-r from-primary to-foreground), subtitle (text-xl text-muted-foreground), two CTA buttons (Get Started Free with Zap icon, Self-Host variant outline). 3-column feature grid (md:grid-cols-2 lg:grid-cols-3): Trash2 icon (destructive badge) for Bulk Deletion, Mail icon (primary badge) for Smart Grouping, Shield icon (muted badge) for True Unsubscribe. Comparison card with 'Better than Unroll.me' (bg-muted/30 border). Header navigation: Mail logo, Self-Host ghost button, Sign In button, ThemeToggle. Footer with privacy link. Design tokens: primary emerald, destructive red for danger actions, proper text hierarchy."
+      "status": "pending",
+      "notes": ""
     },
     {
       "id": "T12",
-      "name": "Privacy page with Google Limited Use disclosure, data collection, usage, storage, and GDPR rights sections",
-      "category": "ui",
+      "name": "Settings page account management (export data, delete account)",
+      "category": "dashboard",
       "skill": null,
       "agent": null,
-      "status": "passed",
-      "notes": "Code-based analysis: src/app/privacy/page.tsx:8-213. Page structure verified: centered header (max-w-4xl), Shield icon (h-8 w-8 bg-primary/10 rounded-full), H1 title (text-4xl font-bold), subtitle with dynamic date. 8 Card sections with proper spacing (mb-8): Google Limited Use Disclosure (border-2, bg-primary/5 p-4, exact verbatim disclosure text), Data We Collect (Eye icon, bullet list of email headers/sender patterns, destructive warning for what's NOT stored), How We Use Your Data (Lock icon, 4-item list of service purposes), Google Limited Use Compliance (4-item compliance list), Data Deletion (Trash2 destructive icon, Settings → Privacy → Delete Account instructions), Data Storage & Security (location, encryption, retention, access), Third Parties (Google OAuth, Vercel/PostgreSQL only), GDPR Rights (5 rights: access, rectification, erasure, portability, object), Contact Us section. Each card has CardContent with p-8 padding, icon badges, proper typography hierarchy. Design tokens: primary emerald for badges, destructive for warnings, proper text-muted-foreground for descriptions. Footer with Home link."
+      "status": "pending",
+      "notes": ""
     },
     {
       "id": "T13",
-      "name": "Deploy page with Docker Compose, pre-built image, and build from source instructions, environment variables configuration, and tech stack cards",
-      "category": "ui",
+      "name": "Theme toggle button with sun/moon icon transitions",
+      "category": "ui-components",
       "skill": null,
       "agent": null,
-      "status": "passed",
-      "notes": "Code-based analysis: src/app/deploy/page.tsx:6-239. Page structure verified: centered header with H1 (text-4xl md:text-5xl), subtitle. 3 deployment option Cards (mb-8 spacing): Docker Compose (border-2 border-primary, Package icon, recommended label, 4-step numbered list with break-all code for git clone, cp env, edit env, docker-compose up), Pre-built Docker Image (Download icon, gray badge, docker pull command with break-all), Build from Source (Server icon, npm install/build/start commands). Configuration section (H2 text-center): Required env vars Card (2-column grid with labels and code blocks: DATABASE_URL, NEXTAUTH_URL, NEXTAUTH_SECRET, ENCRYPTION_KEY, GMAIL_WEBHOOK_SECRET), Google OAuth setup (4-step list with border-t), Gmail scopes warning Card (border-primary/20 bg-primary/5, Shield icon, restricted scopes list). Tech stack section (3-column grid): Frontend (Zap icon), Backend (Server icon), Deployment (Package icon). GitHub CTA Card (Copy icon, Button to github.com). All code uses break-all class for mobile responsiveness. Design tokens: primary emerald for emphasis, proper card spacing, centered layouts."
+      "status": "pending",
+      "notes": ""
     },
     {
       "id": "T14",
-      "name": "Development sign-in page with auto-redirect behavior and loading spinner",
-      "category": "auth",
+      "name": "Dark mode color scheme across all pages",
+      "category": "ui-components",
       "skill": null,
       "agent": null,
       "status": "pending",
-      "notes": "Page at src/app/dev-signin/page.tsx. Should display centered layout with spinning loader (animate-spin rounded-full h-12 w-12 border-b-2 border-primary) and 'Signing in as test user...' message. Must auto-redirect to /auth/signin when NODE_ENV !== 'development'. Uses signIn('dev-test') with callbackUrl='/dashboard'."
+      "notes": ""
     },
     {
       "id": "T15",
-      "name": "Authentication error page with error code display and retry button",
-      "category": "auth",
+      "name": "Mobile responsive layout for dashboard and subscription list",
+      "category": "responsive",
       "skill": null,
       "agent": null,
       "status": "pending",
-      "notes": "Page at src/app/auth/error/page.tsx. Should display centered Card (max-w-md) with AlertCircle icon (h-12 w-12 text-destructive), 'Authentication Error' title (text-2xl), error description, error code in destructive-styled box (bg-destructive/10 border-destructive/20 text-destructive p-4 rounded-md font-mono), and 'Try Again' button linking to /auth/signin. Uses Suspense with Loading fallback."
+      "notes": ""
+    },
+    {
+      "id": "T16",
+      "name": "Not-found page 404 with navigation buttons",
+      "category": "error-pages",
+      "skill": null,
+      "agent": null,
+      "status": "pending",
+      "notes": ""
+    },
+    {
+      "id": "T17",
+      "name": "Global error page with error boundary UI",
+      "category": "error-pages",
+      "skill": null,
+      "agent": null,
+      "status": "pending",
+      "notes": ""
+    },
+    {
+      "id": "T18",
+      "name": "Auth error page with user-friendly error messaging",
+      "category": "error-pages",
+      "skill": null,
+      "agent": null,
+      "status": "pending",
+      "notes": ""
+    },
+    {
+      "id": "T19",
+      "name": "Privacy policy page with GDPR rights and disclosure sections",
+      "category": "informational",
+      "skill": null,
+      "agent": null,
+      "status": "pending",
+      "notes": ""
+    },
+    {
+      "id": "T20",
+      "name": "Loading states during scan progress (Scanning X/Y)",
+      "category": "dashboard",
+      "skill": null,
+      "agent": null,
+      "status": "pending",
+      "notes": ""
+    },
+    {
+      "id": "T21",
+      "name": "Toast notifications for scan complete, scan failed, and rate limit exceeded",
+      "category": "ui-components",
+      "skill": null,
+      "agent": null,
+      "status": "pending",
+      "notes": ""
+    },
+    {
+      "id": "T22",
+      "name": "Alert dialog for data reset confirmation",
+      "category": "ui-components",
+      "skill": null,
+      "agent": null,
+      "status": "pending",
+      "notes": ""
     }
   ]
 }

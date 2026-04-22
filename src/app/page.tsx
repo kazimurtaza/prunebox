@@ -111,6 +111,8 @@ export default function HomePage() {
           <p>&copy; {new Date().getFullYear()} Prunebox. Privacy-first email cleanup and grouping tool.</p>
           <div className="flex justify-center gap-4 mt-2">
             <Link href="/privacy" className="hover:text-foreground">Privacy Policy</Link>
+            <span>•</span>
+            <Link href="/terms" className="hover:text-foreground">Terms of Service</Link>
           </div>
         </div>
       </footer>

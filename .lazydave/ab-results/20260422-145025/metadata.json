@@ -1,0 +1,8 @@
+{
+  "timestamp": "2026-04-22T14:50:25+10:00",
+  "prompt_a": "/home/murtaza/projects/prunebox/.lazydave/prompts/visual.md",
+  "prompt_b": "/home/murtaza/projects/prunebox/.lazydave/prompts/visual.v1-a.md",
+  "model": "glm-5.1",
+  "checks_count": 15,
+  "manifest": "/home/murtaza/projects/prunebox/.lazydave/manifests/visual-areas.json"
+}

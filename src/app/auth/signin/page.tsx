@@ -110,7 +110,7 @@ function SignInContent() {
         </div>
 
         <div className="mt-6 text-center text-sm text-muted-foreground">
-          <p>By continuing, you agree to our <Link href="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>.</p>
+          <p>By continuing, you agree to our <Link href="/privacy" className="underline hover:text-foreground">Privacy Policy</Link> and <Link href="/terms" className="underline hover:text-foreground">Terms of Service</Link>.</p>
           <p className="mt-2">We never sell your data. Your email privacy is our priority.</p>
         </div>
 

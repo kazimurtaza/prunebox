@@ -1,2 +1,14 @@
 # Lazydave v2 — Refine Progress Log
 [2026-04-20 20:34:44] [#110] refined — analysis posted
+[2026-04-22 20:24:27] [#125] refined — analysis posted
+[2026-04-22 20:26:52] [#124] refined — analysis posted
+[2026-04-22 20:29:13] [#123] refined — analysis posted
+[2026-04-22 20:39:49] [refined] #122 — analysis posted: privacy page exists on develop (d1de7f1) but missing from master (branch divergence). Page is 95% spec-compliant, only missing 72-hour breach notification section.
+[2026-04-22 20:37:08] [#122] refined — analysis posted
+[2026-04-22 21:01:00] [refined] #121 — analysis posted: dev-signin 404 in Docker caused by NODE_ENV=production in docker-compose.dev.yml. dev-test credentials provider and page guard are both gated on NODE_ENV=development. Fix: change dev compose to NODE_ENV=development.
+[2026-04-22 20:40:04] [#121] refined — analysis posted
+[2026-04-22 21:15:00] [refined] #128 — analysis posted: @prisma/adapter-pg@5.22.0 (v5) is incompatible with @prisma/client@7.7.0 (v7). Driver adapter interface changed in v7 causing 't.driverAdapterFactory.connect is not a function'. Fix: upgrade adapter-pg to ^7.7.0.
+[2026-04-22 20:48:07] [#128] refined — analysis posted
+[2026-04-22 21:54:44] [refined] #127 — analysis posted: root cause is branch divergence. Routes (account/delete, account/export, rollup/settings, dev-signin) exist only on develop, never merged to master. Docker image (prunebox:latest) built from master doesn't include them. Blocked by #128 (Prisma adapter incompatibility).
+[2026-04-22 21:41:08] [#127] refined — analysis posted
+[2026-04-22 21:55:03] [#120] refined — analysis posted
