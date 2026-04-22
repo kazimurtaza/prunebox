@@ -1,0 +1,2 @@
+{"variant": "A", "passed": 9, "failed": 11, "checks": 20, "est_tokens": 7480}
+{"variant": "B", "passed": 13, "failed": 7, "checks": 20, "est_tokens": 6748}

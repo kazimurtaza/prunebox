@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
-import { signIn } from '@/modules/auth/auth';
 import { db } from '@/lib/db';
 
 /**
  * Development-only endpoint to sign in as test user without OAuth
  * This should only be available in development environment
  */
-export async function POST(request: Request) {
+export async function POST() {
   if (process.env.NODE_ENV !== 'development') {
     return NextResponse.json({ error: 'Not allowed in production' }, { status: 403 });
   }

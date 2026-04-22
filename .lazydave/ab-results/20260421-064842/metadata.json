@@ -1,0 +1,8 @@
+{
+  "timestamp": "2026-04-21T06:48:42+10:00",
+  "prompt_a": "/home/murtaza/projects/prunebox/.lazydave/prompts/smoke.md",
+  "prompt_b": "/home/murtaza/projects/prunebox/.lazydave/prompts/smoke.v1-b.md",
+  "model": "claude-haiku-4-5-20251001",
+  "checks_count": 20,
+  "manifest": "/home/murtaza/projects/prunebox/.lazydave/manifests/smoke-checks.json"
+}

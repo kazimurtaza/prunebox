@@ -90,7 +90,7 @@ export function ConfigureRollupDialog({ initialSettings, onSaved }: ConfigureRol
       }
       const data = await res.json();
       setSettings(data);
-    } catch (err) {
+    } catch {
       setError("Failed to load settings");
     } finally {
       setFetching(false);
@@ -119,8 +119,7 @@ export function ConfigureRollupDialog({ initialSettings, onSaved }: ConfigureRol
     }
   }
 
-  const selectedSlot = DELIVERY_SLOTS.find((slot) => slot.value === settings.deliverySlot);
-
+  
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>

@@ -1,12 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/modules/auth/auth';
+import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
 /**
  * Development-only authentication callback
  * POST /api/dev-auth/callback will sign in the test user and redirect to dashboard
  */
-export async function POST(request: NextRequest) {
+export async function POST() {
   if (process.env.NODE_ENV !== 'development') {
     return NextResponse.json({ error: 'Not allowed in production' }, { status: 403 });
   }

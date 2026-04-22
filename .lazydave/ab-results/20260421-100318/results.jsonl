@@ -1,0 +1,40 @@
+{"check_id": "V1", "variant": "A", "result": "unknown", "raw": "\n"}
+{"check_id": "V2", "variant": "A", "result": "pass", "raw": "{\"id\": \"V2\", \"result\": \"pass\", \"reason\": \"ESLint completed successfully with only warnings (no critical errors). Exit code 0.\"}\n"}
+{"check_id": "VR.117", "variant": "A", "result": "unknown", "raw": "Perfect! I've verified that ThemeToggle is indeed present on both the rollup page (line 66 in src/app/dashboard/rollup/page.tsx) and the settings page (line 49 in src/app/dashboard/settings/page.tsx). Both pages import the ThemeToggle component and place it on the right side of the header with flex gap-2, maintaining consistent UI patterns across the dashboard.\n\nThe check has been properly verified and the implementation matches the expected behavior. Both authenticated pages now have consistent theme toggle access as required.\n"}
+{"check_id": "V3", "variant": "A", "result": "unknown", "raw": "\n"}
+{"check_id": "V4", "variant": "A", "result": "unknown", "raw": "\n"}
+{"check_id": "V5", "variant": "A", "result": "pass", "raw": "{\"id\": \"V5\", \"result\": \"pass\", \"reason\": \"Health check endpoint verified at /api/health with 200 OK response\"}\n"}
+{"check_id": "V6", "variant": "A", "result": "pass", "raw": "{\"id\": \"V6\", \"result\": \"pass\", \"reason\": \"Authentication routes exist - verified login, logout, and protected route endpoints are properly implemented\"}\n"}
+{"check_id": "V7", "variant": "A", "result": "pass", "raw": "{\"id\": \"V7\", \"result\": \"pass\", \"reason\": \"Gmail detection module verified - comprehensive subscription detection logic present, all 45 tests pass\"}\n"}
+{"check_id": "V8", "variant": "A", "result": "unknown", "raw": "\n"}
+{"check_id": "V9", "variant": "A", "result": "pass", "raw": "{\"id\": \"V9\", \"result\": \"pass\", \"reason\": \"Subscription API endpoint exists at src/app/api/subscriptions/route.ts with GET operation implemented. Supports pagination, authentication, filtering by userId, returns SubscriptionResponse[] with action field from preferences. Includes error handling via withErrorHandling wrapper.\"}\n"}
+{"check_id": "V10", "variant": "A", "result": "pass", "raw": "{\"id\": \"V10\", \"result\": \"pass\", \"reason\": \"Gmail webhook endpoint verified - exists at /api/webhook/gmail with proper HMAC SHA256 signature verification and error handling\"}\n"}
+{"check_id": "V11", "variant": "A", "result": "unknown", "raw": "\n"}
+{"check_id": "V12", "variant": "A", "result": "pass", "raw": "{\"id\": \"V12\", \"result\": \"pass\", \"reason\": \"All Docker Compose configurations validated - docker-compose.yml, docker-compose.dev.yml, docker-compose.production.yml all pass 'docker compose config' with proper services, healthchecks, and port mappings\"}\n"}
+{"check_id": "V13", "variant": "A", "result": "pass", "raw": "{\"id\": \"V13\", \"result\": \"pass\", \"reason\": \"All environment variables are properly documented in .env.example with comprehensive descriptions, README.md Configuration section, and DEPLOYMENT.md production guidance. All 16 required variables including ENCRYPTION_KEY, DATABASE_URL, GOOGLE_OAUTH credentials, REDIS_URL, and scan limits are documented with example values and setup instructions.\"}\n"}
+{"check_id": "V14", "variant": "A", "result": "pass", "raw": "{\"id\": \"V14\", \"result\": \"pass\", \"reason\": \"Unsubscribe module exists at src/app/unsubscribe/page.tsx and implements proper functionality with UI components and state management\"}\n"}
+{"check_id": "V15", "variant": "A", "result": "unknown", "raw": "\n"}
+{"check_id": "V21", "variant": "A", "result": "unknown", "raw": "\n"}
+{"check_id": "V22", "variant": "A", "result": "pass", "raw": "{\"id\": \"V22\", \"result\": \"pass\", \"reason\": \"Subscription action API endpoint properly validates requests, checks authentication, handles three actions (keep/unsubscribe/rollup), upserts preferences, and integrates with job queues. Endpoint returns 401 for unauthenticated requests as expected.\"}\n"}
+{"check_id": "V23", "variant": "A", "result": "unknown", "raw": "\n"}
+{"check_id": "V24", "variant": "A", "result": "unknown", "raw": "\n"}
+{"check_id": "V1", "variant": "B", "result": "unknown", "raw": "\n"}
+{"check_id": "V2", "variant": "B", "result": "pass", "raw": "```json\n{\"id\": \"V2\", \"result\": \"pass\", \"reason\": \"ESLint completed successfully with only warnings (no critical errors). Exit code 0.\"}\n```\n"}
+{"check_id": "VR.117", "variant": "B", "result": "unknown", "raw": "\n"}
+{"check_id": "V3", "variant": "B", "result": "unknown", "raw": "\n"}
+{"check_id": "V4", "variant": "B", "result": "pass", "raw": "{\"id\": \"V4\", \"result\": \"pass\", \"reason\": \"Database migrations have already been applied - all 11 tables exist in PostgreSQL\"}\n"}
+{"check_id": "V5", "variant": "B", "result": "pass", "raw": "{\"id\": \"V5\", \"result\": \"pass\", \"reason\": \"API health endpoint responds with healthy status and database connected\"}\n"}
+{"check_id": "V6", "variant": "B", "result": "pass", "raw": "```json\n{\"id\": \"V6\", \"result\": \"pass\", \"reason\": \"Authentication routes exist: /api/auth/[...nextauth]/route.ts (NextAuth handler), /api/dev-signin/route.ts (dev-only), /auth/signin/page.tsx (Google OAuth UI), /auth/callback/page.tsx (OAuth callback)\"}\n```\n"}
+{"check_id": "V7", "variant": "B", "result": "pass", "raw": "The Gmail detection module exists. Found a comprehensive Gmail client at `src/modules/gmail/client.ts` with message detection functionality.\n```json\n{\"id\": \"V7\", \"result\": \"pass\", \"reason\": \"Gmail detection module exists at src/modules/gmail/client.ts\"}\n```\n"}
+{"check_id": "V8", "variant": "B", "result": "skip", "raw": "{\"id\": \"V8\", \"result\": \"skip\", \"reason\": \"Job queue configuration check requires running application context to verify queue setup\"}\n"}
+{"check_id": "V9", "variant": "B", "result": "pass", "raw": "{\"id\": \"V9\", \"result\": \"pass\", \"reason\": \"Subscription API endpoints exist and are properly implemented: GET /api/subscriptions, POST /api/subscriptions/action, POST /api/subscriptions/bulk, GET /api/subscriptions/subjects, POST /api/subscriptions/scan-sender\"}\n"}
+{"check_id": "V10", "variant": "B", "result": "pass", "raw": "{\"id\": \"V10\", \"result\": \"pass\", \"reason\": \"Gmail webhook endpoint verified\"}\n"}
+{"check_id": "V11", "variant": "B", "result": "unknown", "raw": "\n"}
+{"check_id": "V12", "variant": "B", "result": "pass", "raw": "{\"id\": \"V12\", \"result\": \"pass\", \"reason\": \"Docker compose configuration is valid and properly formatted\"}\n"}
+{"check_id": "V13", "variant": "B", "result": "pass", "raw": "{\"id\": \"V13\", \"result\": \"pass\", \"reason\": \"Environment variables are well documented in both .env.example file and README.md with clear descriptions and examples\"}\n"}
+{"check_id": "V14", "variant": "B", "result": "pass", "raw": "{\"id\": \"V14\", \"result\": \"pass\", \"reason\": \"Unsubscribe module exists with comprehensive logic including one-click (RFC 8058), mailto, HTTP, and manual methods. Module properly exports all functions and interfaces.\"}\n"}
+{"check_id": "V15", "variant": "B", "result": "pass", "raw": "{\"id\": \"V15\", \"result\": \"pass\", \"reason\": \"Dashboard page renders correctly with security redirect to signin when unauthenticated\"}\n"}
+{"check_id": "V21", "variant": "B", "result": "unknown", "raw": "\n"}
+{"check_id": "V22", "variant": "B", "result": "unknown", "raw": "\n"}
+{"check_id": "V23", "variant": "B", "result": "unknown", "raw": "\n"}
+{"check_id": "V24", "variant": "B", "result": "unknown", "raw": "\n"}

@@ -82,6 +82,7 @@ model Subscription {
   recentSnippet         String?
   user                  User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
   preferences           SubscriptionPreference[]
+  unsubscriptionAttempts UnsubscriptionAttempt[]
 
   @@unique([userId, senderEmail])
   @@index([userId, senderEmail])

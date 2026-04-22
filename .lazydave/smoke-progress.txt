@@ -10,3 +10,4 @@
 [2026-04-21 02:34:46] smoke iteration 2 partial (37 remaining)
 [2026-04-21 02:35:12] smoke batch verified (1 items: V15,)
 [2026-04-21 02:36:05] smoke batch verified (1 items: V4,)
+[2026-04-21 07:11:45] smoke batch verified (6 items: V16,V17,V18,V27,V28,V29,)

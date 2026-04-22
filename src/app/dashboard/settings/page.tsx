@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,7 +20,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import { User, Shield, Bell, Trash2, Loader2, Download } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 type Tab = 'account' | 'notifications' | 'privacy';

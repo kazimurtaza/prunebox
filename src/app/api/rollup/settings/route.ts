@@ -11,11 +11,6 @@ interface RollupSettingsResponse {
   digestName: string;
 }
 
-const DELIVERY_SLOT_TIMES: Record<DeliverySlot, string> = {
-  MORNING: '08:00',
-  AFTERNOON: '14:00',
-  EVENING: '20:00',
-};
 
 export async function GET() {
   return withErrorHandling(async () => {
