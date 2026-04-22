@@ -163,13 +163,29 @@ export default function PrivacyPage() {
                 <ul className="list-disc list-inside space-y-2 ml-4">
                   <li><strong>Right to access:</strong> Request a copy of your data</li>
                   <li><strong>Right to rectification:</strong> Correct inaccurate data</li>
-                  <li><strong>Right to erasure:</strong> Delete all your data</li>
+                  <li><strong>Right to erasure:</strong> Delete all your data (Article 17)</li>
                   <li><strong>Right to data portability:</strong> Export your data</li>
                   <li><strong>Right to object:</strong> Object to data processing</li>
                 </ul>
                 <p>
                   To exercise these rights, please contact us or use the Delete Account feature in Settings.
                 </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-8 border-destructive/50">
+            <CardContent className="p-8">
+              <h2 className="text-2xl font-bold mb-4">Data Breach Notification</h2>
+              <div className="space-y-4 text-muted-foreground">
+                <p>
+                  In the unlikely event of a data breach involving your personal information:
+                </p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li>We will notify supervisory authorities within <strong>72 hours</strong> of becoming aware of the breach (GDPR Article 33)</li>
+                  <li>We will notify you without undue delay if the breach poses a high risk to your rights and freedoms</li>
+                  <li>Notifications will describe the nature of the breach, categories of data affected, and recommended mitigation steps</li>
+                </ul>
               </div>
             </CardContent>
           </Card>
