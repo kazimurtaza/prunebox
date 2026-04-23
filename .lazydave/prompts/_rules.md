@@ -1,4 +1,4 @@
-# Prompt version: v1
+# Prompt version: v2
 
 # Lazydave v2 — Shared Rules
 
@@ -21,15 +21,21 @@ Read these rules before performing any action. They apply to ALL stages.
 ## Protected Files
 
 DO NOT modify:
-- `.lazydave/` — Lazydave runtime state
+- `.lazydave/logs/` — Lazydave runtime logs
+- `.lazydave/manifests/config.json` — Lazydave configuration
+- `.lazydave/manifests/.init-analysis.json` — Init analysis cache
+- `.lazydave/ledger.jsonl` — Lazydave ledger
+- `.lazydave/cost` — Cost tracking
 - `{{CLAUDE_MD}}` — Project instructions
 - `{{SPEC_FILE}}` — Unless fixing spec (fix-spec label)
 - `{{LAZYDAVE_DIR}}/manifests/` — Tool's own manifests (never the project's)
 - Any files outside the project that Lazydave shouldn't touch
 
 You MAY modify:
-- `{{PROJECT_DIR}}/manifests/*.json` — Project manifest tracking files
-- `{{PROJECT_DIR}}/.lazydave/progress/*.txt` — Progress log files
+- `.lazydave/manifests/smoke-checks.json` — Smoke check manifest
+- `.lazydave/manifests/visual-areas.json` — Visual areas manifest
+- `.lazydave/manifests/audit-areas.json` — Audit areas manifest
+- `.lazydave/progress/*.txt` — Progress log files
 - Source code (when fixing bugs, fix-code issues)
 
 ## Progress Logging

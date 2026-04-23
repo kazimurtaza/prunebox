@@ -8,7 +8,8 @@
     "triage": "glm-4.5",
     "refine": "glm-5.1",
     "fix": "glm-4.7",
-    "verify": "glm-4.5"
+    "verify": "glm-4.5",
+    "ab": "glm-5.1"
   },
   "iterations": {
     "smoke": 40,
@@ -42,14 +43,16 @@
     "zero": false
   },
   "paths": {
-    "manifests": "manifests",
-    "progress": "progress",
-    "test_logs": "test-logs",
+    "manifests": ".lazydave/manifests",
+    "progress": ".lazydave/progress",
+    "test_logs": ".lazydave/test-logs",
     "spec": "docs/prunebox_specsheet.md",
     "project_claude_md": "CLAUDE.md"
   },
   "docker": {
     "container": "prunebox-dev",
-    "port": 3000
+    "port": 3001,
+    "dev_port": 5173,
+    "dev_api_port": 3001
   }
 }

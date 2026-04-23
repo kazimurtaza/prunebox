@@ -10,7 +10,7 @@ Read `{{CLAUDE_MD}}` for project context.
 
 1. **Navigate to the app** using browser automation tools
 2. **Take screenshots** of each area in the batch
-3. **Compare against baselines** in `lazydave/test-logs/baselines/` (if available)
+3. **Compare against baselines** in `.lazydave/test-logs/baselines/` (if available)
 4. **Check design compliance** — colors, spacing, fonts, layout
 5. **Upload evidence** of any issues found
 

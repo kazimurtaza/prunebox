@@ -63,7 +63,7 @@ After auditing each area, update the manifest file: `.lazydave/manifests/audit-a
 ## Test Coverage
 
 When creating a fix-code or fix-spec issue, also add a smoke check to
-`lazydave/manifests/smoke-checks.json` with the next V-number ID (find the
+`.lazydave/manifests/smoke-checks.json` with the next V-number ID (find the
 current max and increment), matching category, and `"verified": false`.
 
 Do NOT add visual areas (requires browser context you don't have).

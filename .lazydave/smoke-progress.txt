@@ -40,3 +40,5 @@
 [2026-04-22 18:22:45] [verified] smoke batch verified (10 items: VR.117,VR.116,VR.112,VR.115,VR.115,VR.114,VR.114,VR.112,VR.123,VR.109,)
 [2026-04-22 18:21:20] smoke iteration 8 partial (58 remaining)
 [2026-04-22 18:23:08] smoke batch verified (10 items: VR.117,VR.108,VR.108,VR.107,VR.88,VR.110,VR.105,VR.105,VR.104,VR.104,)
+[2026-04-23 08:34:14] smoke batch verified (2 items: V8,V12,)
+[2026-04-23 10:02:29] smoke batch verified (2 items: V8,V12,)

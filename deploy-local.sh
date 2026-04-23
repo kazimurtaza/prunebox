@@ -1,42 +1,35 @@
 #!/usr/bin/env bash
-# Dev server deployment script for Lazydave QA
-# Brings up the development server on the configured port
-
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+cd "$(dirname "$0")"
 
-# Load config if available
-if [[ -f ".lazydave/manifests/config.json" ]]; then
-  PORT=$(jq -r '.docker.port // empty' .lazydave/manifests/config.json 2>/dev/null)
-fi
-
-if [[ -z "$PORT" ]]; then
-  echo "Error: No docker port detected. Set 'docker.port' in .lazydave/manifests/config.json or add EXPOSE to your Dockerfile."
-  exit 1
-fi
-
-echo "Starting dev server on port $PORT..."
-
-# Check if docker-compose exists
-if [[ -f "docker-compose.yml" ]]; then
-  docker compose up -d
-elif [[ -f "docker/docker-compose.yml" ]]; then
-  cd docker && docker compose up -d
-elif [[ -f "Dockerfile" ]]; then
-  # Fallback: build and run directly
-  docker build -t dev-server .
-  docker run -d --name dev-server -p "$PORT:3000" dev-server
+# Read port from config or use default
+CONFIG_FILE=".lazydave/manifests/config.json"
+if [ -f "$CONFIG_FILE" ]; then
+    HOST_PORT=$(grep -o '"dev_port":[[:space:]]*[0-9]*' "$CONFIG_FILE" | grep -o '[0-9]*' || echo "3001")
 else
-  echo "Error: No docker-compose.yml or Dockerfile found"
-  exit 1
+    HOST_PORT=3001
 fi
+
+echo "Starting Prunebox development environment..."
+echo "Server will be available at http://localhost:$HOST_PORT"
+
+# Start docker-compose
+docker compose -f docker-compose.dev.yml up -d --build
 
 # Wait for server to be ready
-echo "Waiting for server to start..."
-if ! timeout 60 bash -c 'until curl -s http://localhost:$1 > /dev/null 2>&1; do sleep 2; done' _ "$PORT"; then
-  echo "Warning: Server did not start within 60 seconds" >&2
-fi
+echo "Waiting for server to be ready..."
+max_wait=120
+waited=0
+while [ $waited -lt $max_wait ]; do
+    if curl -s "http://localhost:$HOST_PORT/api/health" > /dev/null 2>&1; then
+        echo "✓ Server is ready at http://localhost:$HOST_PORT"
+        exit 0
+    fi
+    sleep 2
+    waited=$((waited + 2))
+done
 
-echo "Server is ready at http://localhost:$PORT"
+echo "✗ Server did not become ready within ${max_wait}s"
+echo "Check logs with: docker compose -f docker-compose.dev.yml logs -f"
+exit 1

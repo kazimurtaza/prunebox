@@ -1,17 +1,47 @@
-# Prompt version: v1
+# Prompt version: v2
 
 # Project Analysis for Manifest Generation
 
-You are analyzing **{{PROJECT_NAME}}** to generate QA manifests.
+You are analyzing **{{PROJECT_NAME}}** to generate QA manifests and deployment artifacts.
 
 **IMPORTANT: Execute this analysis now. Read files, analyze the project, and write the output. Do not just acknowledge this prompt — complete the full task.**
 
 ## Steps (execute in order)
 
 1. Use Glob to discover the top-level project layout
-2. Read key files to understand what this project is (README, Makefile, package.json, etc.)
+2. Read key files to understand what this project is (README, Makefile, package.json, Dockerfile, etc.)
 3. If `{{SPEC_FILE}}` exists, read it for feature requirements
-4. Write your analysis to `.lazydave/manifests/.init-analysis.json` (see format below)
+4. Write `deploy-local.sh` to the project root — a script that starts the dev server for QA testing
+5. If the project needs a Dockerfile or docker-compose.yml and they don't exist, create them
+6. Write your analysis to `.lazydave/manifests/.init-analysis.json` (see format below)
+
+## deploy-local.sh
+
+Write a `deploy-local.sh` script to the project root that starts the development server for QA testing.
+
+**IMPORTANT: Prefer Docker when a docker-compose.yml exists.** The QA pipeline needs a running server on a predictable port. Docker provides a consistent environment.
+
+- **Docker project** (docker-compose.yml exists) — use `docker compose up -d --build`. Extract the host port from the compose file (first number before `:` in a port mapping like `"8080:3000"` → use `8080`)
+- **npm project** (no Docker) — use `npm run dev` (or `npm run dev:all` if a `dev:server` script exists)
+- **Python project** — use the appropriate venv/venv activation + server command
+- **Go project** — use `go run` or the Makefile target
+- **Bash project** — source the main entry point
+
+The script must:
+- Be executable (`chmod +x`)
+- Use `set -euo pipefail`
+- Wait for the server to be ready (poll with curl)
+- Print the URL where the server is accessible
+- Read the port from `.lazydave/manifests/config.json` under `docker.dev_port` or `docker.port` if available
+- Work when run from the project root
+
+## Optional: Dockerfile and docker-compose.yml
+
+If the project has a build system but no Dockerfile, create a minimal production Dockerfile.
+If the project has a Dockerfile but no docker-compose.yml, create one.
+
+Only create these if the project clearly needs containerization (web apps, APIs, services).
+Do NOT create Docker files for pure libraries, CLI tools, or bash script projects.
 
 ## What to determine
 

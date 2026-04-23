@@ -4,258 +4,94 @@
   "areas": [
     {
       "id": "A1",
-      "category": "detection",
-      "title": "Section 4: Detecting subscription emails programmatically",
+      "category": "auth",
+      "title": "Section 8: Gmail API technical architecture",
       "spec_sections": [
-        "4"
+        "8"
       ],
       "status": "pending",
       "notes": "",
-      "improvements": [
-        "Auto-Submitted header detection (spec omission)",
-        "35+ sender patterns vs 5 in spec (detection.ts:124-157)",
-        "19 ESP domain patterns vs 3 in spec (detection.ts:181-199)",
-        "Confidence scoring (0-100 scale) with tiered confidence levels",
-        "Body parsing for unsubscribe links with spam phrase filtering (detection.ts:297-336)",
-        "RFC 8058 one-click unsubscribe detection (detection.ts:42-47)",
-        "Mailto unsubscribe parsing with subject/body extraction (detection.ts:341-355)"
-      ],
+      "improvements": [],
       "regressions": [],
-      "issues_found": [
-        "https://github.com/kazimurtaza/prunebox/issues/86"
-      ]
+      "issues_found": []
     },
     {
       "id": "A2",
-      "category": "unsubscribe",
-      "title": "Section 5: Automated unsubscription via List-Unsubscribe header",
+      "category": "subscriptions",
+      "title": "Section 9: Detecting subscription emails",
       "spec_sections": [
-        "5"
+        "9"
       ],
       "status": "pending",
       "notes": "",
-      "improvements": [
-        "Database audit trail via UnsubscriptionAttempt model (8 fields vs spec's 7: added completedAt timestamp) with CASCADE deletion (schema.prisma:141-155)",
-        "90-day data retention for unsubscription attempts via automatic cleanup in runUnsubscribe() (jobs.ts:333-338)",
-        "Specific token error handling with user-friendly messages 'Google account access expired. Please reconnect your account' (jobs.ts:400-423)",
-        "Redirect detection for confirmation pages returning 'may require manual action' (unsubscribe.ts:79-90)",
-        "Comprehensive error reporting with status tracking: 'pending', 'success', 'failed', 'error' (jobs.ts:352-395, 404-412)",
-        "Body parsing for unsubscribe links with spam phrase filtering to avoid malicious links (detection.ts:297-336)",
-        "Attempt fallback chain in attemptUnsubscribe() with method selection (unsubscribe.ts:115-148)"
-      ],
+      "improvements": [],
       "regressions": [],
       "issues_found": []
     },
     {
       "id": "A3",
-      "category": "oauth",
-      "title": "Section 3: Gmail API technical architecture",
+      "category": "unsubscribe",
+      "title": "Section 10: Automated unsubscription",
       "spec_sections": [
-        "3"
+        "10"
       ],
       "status": "pending",
       "notes": "",
-      "improvements": [
-        "Token encryption uses AES-256-GCM with authenticated encryption and PBKDF2-SHA256 key derivation (stronger than spec's AES-256) via crypto.ts:6-98",
-        "Token refresh with automatic database persistence via oauth2Client.on('tokens') callback (client.ts:69-128)",
-        "InvalidTokenError custom exception for graceful revoked token handling (client.ts:7-12)",
-        "Rate limit handling with exponential backoff (2^n * 1000ms + random jitter) and 3 retries (client.ts:240-252)",
-        "Automatic token refresh attempt in createGmailClient before API calls (client.ts:144-160)"
-      ],
+      "improvements": [],
       "regressions": [],
       "issues_found": []
     },
     {
       "id": "A4",
       "category": "database",
-      "title": "Section 6: Database schema for subscription tracking",
+      "title": "Section 11: Database schema",
       "spec_sections": [
-        "6"
+        "11"
       ],
       "status": "pending",
       "notes": "",
-      "improvements": [
-        "CASCADE deletion on all 8 user-related relations for GDPR Article 17 right to erasure (spec only REFERENCES without cascade) via schema.prisma:44(Account),55(Session),83(Subscription),100-101(SubscriptionPreference),117(GmailSyncState),136(RollupSettings),150-151(UnsubscriptionAttempt),167(BulkDeletionJob)",
-        "7 additional indexes for query performance beyond spec: Subscription(userId,lastSeenAt), SubscriptionPreference(userId), GmailSyncState(userId), RollupSettings(userId), UnsubscriptionAttempt(userId,subscriptionId), UnsubscriptionAttempt(status), BulkDeletionJob(userId,status)",
-        "Nullable rollupFrequency in SubscriptionPreference (sensible: keep/unsubscribe actions don't need frequency)",
-        "Prisma@relation with onDelete Cascade enables automatic cleanup for account deletion endpoint"
-      ],
+      "improvements": [],
       "regressions": [],
       "issues_found": []
     },
     {
       "id": "A5",
       "category": "architecture",
-      "title": "Section 7: Node.js technical implementation architecture",
+      "title": "Section 13: Product architecture",
       "spec_sections": [
-        "7"
+        "13"
       ],
       "status": "pending",
       "notes": "",
-      "improvements": [
-        "Token encryption uses AES-256-GCM mode with PBKDF2 key derivation and authenticated encryption (stronger than spec's basic AES-256) via lib/crypto.ts:6-98",
-        "History monitoring via historyMonitorQueue with 10-minute polling implemented (spec listed as future enhancement) via queues.ts:69-77, jobs.ts:669-774",
-        "Lazy-loaded queue pattern prevents Redis connections during Next.js build (queues.ts:5-36)",
-        "Additional bulk-delete queue for mass deletion operations beyond spec's 3 queues (queues.ts:51-57)",
-        "Worker initialization includes automatic history monitoring scheduling for all existing users on startup (queues.ts:138-162)"
-      ],
+      "improvements": [],
       "regressions": [],
       "issues_found": []
     },
     {
       "id": "A6",
-      "category": "security",
-      "title": "Section 8: Google verification process and CASA compliance",
-      "spec_sections": [
-        "8"
-      ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [
-        "Dedicated OAuth token encryption documentation (docs/oauth-token-encryption.md) with AES-256-GCM, PBKDF2, middleware architecture - 400+ lines (spec omits token encryption)",
-        "Step-by-step OAuth consent screen setup instructions (README.md:112-124)",
-        "Test user addition guidance for unverified apps (README.md:126-132)",
-        "Security checklist with verification of all encryption code paths (oauth-token-encryption.md:298-310)",
-        "Token encryption verification across workers, Gmail client, API routes, NextAuth (oauth-token-encryption.md:352-363)",
-        "Deploy page includes Gmail scopes warning card with all 4 Restricted scopes listed (deploy/page.tsx:162-182)"
-      ],
-      "regressions": [
-        "Terms of Service page missing - /terms returns 404 (required for Google OAuth verification per spec line 323, issue #125)",
-        "Privacy policy uses dynamic date {new Date().toLocaleDateString()} instead of static Last Updated date (Google verification requires fixed date)"
-      ],
-      "issues_found": [
-        "https://github.com/kazimurtaza/prunebox/issues/125"
-      ]
-    },
-    {
-      "id": "A7",
-      "category": "legal",
-      "title": "Section 9: Legal compliance requirements (GDPR, privacy policy)",
-      "spec_sections": [
-        "9"
-      ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [
-        "Limited Use disclosure in 4 locations vs spec's 1 required (privacy/page.tsx:39-42,90-93, signin:118, settings:151-153)",
-        "All 5 GDPR rights explicitly enumerated vs spec's generic 'right to erasure' (privacy/page.tsx:158-174)",
-        "Data export API for GDPR Article 15 (access) and Article 20 (portability) (api/account/export/route.ts:6-70)",
-        "CASCADE deletion on all 8 User relations exceeds spec's REFERENCES-only (schema.prisma:44,55,83,100-101,117,136,150-151,167)",
-        "OAuth with explicit prompt='consent' and access_type='offline' for proper opt-in (auth.config.ts:44-45)",
-        "Privacy policy includes 'no data selling, no advertising, no AI training' declaration beyond spec requirements (privacy:96-99)",
-        "Signin page links to privacy policy and includes consent language (signin:113,118)"
-      ],
-      "regressions": [],
-      "issues_found": [
-        "https://github.com/kazimurtaza/prunebox/issues/92"
-      ]
-    },
-    {
-      "id": "A8",
-      "category": "product",
-      "title": "Section 10: Product architecture and feature requirements",
-      "spec_sections": [
-        "10"
-      ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [
-        "bulk-delete queue for mass deletion operations (spec only listed 3 queues, queues.ts:51-57)",
-        "history-monitor queue for Gmail API polling (spec listed as future enhancement, queues.ts:69-77)",
-        "Token refresh with automatic database persistence via oauth2Client.on('tokens') callback (client.ts:69-128)",
-        "History monitoring via Gmail history.list API (jobs.ts:669-774, client.ts:371-446)",
-        "Schedule daily digest function with cron pattern support (queues.ts:79-95)",
-        "History monitoring initialization for all users on startup (queues.ts:138-162)",
-        "Queue configuration with retry logic (3 attempts, exponential backoff) and job retention policies (queues.ts:7-21)",
-        "Phase 2 worker architecture implemented in MVP with 5 BullMQ workers exceeding spec's Phase 1 monolith (workers.ts:16-69)",
-        "Lazy-loaded queue pattern prevents Redis connections during Next.js build (queues.ts:5-21)"
-      ],
-      "regressions": [],
-      "issues_found": []
-    },
-    {
-      "id": "A9",
-      "category": "competitive",
-      "title": "Section 2: Competitive landscape and feature gaps",
+      "category": "features",
+      "title": "Unroll.me feature comparison (Section 2)",
       "spec_sections": [
         "2"
       ],
       "status": "pending",
       "notes": "",
-      "improvements": [
-        "GDPR compliance implementation exceeds spec with full rights page (Article 17, portability, access, rectification, objection) via privacy/page.tsx:158-174",
-        "Explicit competitive differentiation against Unroll.me on homepage (page.tsx:99-106) and how-it-works page (how-it-works/page.tsx:125-174)",
-        "Self-host option provided as additional differentiation (homepage:59-61, deploy page exists)"
-      ],
-      "regressions": [
-        "Mobile-native experience underserved (spec Section 2 lists this as market gap, code is web-first responsive only)"
-      ],
-      "issues_found": [
-        "https://github.com/murtazajaffer/prunebox/issues/102"
-      ]
-    },
-    {
-      "id": "A10",
-      "category": "unrollme",
-      "title": "Section 1: Unroll.me functionality and limitations",
-      "spec_sections": [
-        "1"
-      ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [
-        "True unsubscription via RFC 8058 one-click POST, HTTP GET, and mailto methods (unsubscribe.ts:13-148) vs Unroll.me's filtering-only (spec lines 15-16)",
-        "Explicit competitive differentiation on homepage and how-it-works page calling out Unroll.me's filtering-only approach (page.tsx:92, how-it-works:125-175)",
-        "Select-all functionality for bulk actions (subscription-list.tsx:232-238, 542-555) addressing Unroll.me user complaint (spec line 36)",
-        "Manual sender scanning via /api/subscriptions/scan-sender (scan-sender/route.ts:10-109) allowing users to add missed subscriptions vs Unroll.me's 'cannot manually add' (spec line 37)",
-        "GDPR compliance with full privacy policy and account deletion (privacy/page.tsx, delete/route.ts) addressing EU availability gap (spec line 39)",
-        "Bulk deletion with gmail.users.messages.batchDelete in 1000-message chunks (client.ts:304-324) vs Unroll.me's no bulk delete capability (spec line 38)",
-        "Rollup digest with customizable delivery slots (MORNING/AFTERNOON/EVENING) matching and exceeding Unroll.me's single fixed-time digest (spec lines 16-17)",
-        "Confidence scoring system (0-100 scale) with tiered confidence levels (detection.ts:53-95) for subscription detection"
-      ],
+      "improvements": [],
       "regressions": [],
       "issues_found": []
     },
     {
-      "id": "A11",
-      "category": "legal",
-      "title": "Section 9: Legal compliance - Data Processing Agreements and breach notification",
+      "id": "A7",
+      "category": "privacy",
+      "title": "Legal compliance requirements (Section 12)",
       "spec_sections": [
-        "9"
+        "12"
       ],
       "status": "pending",
       "notes": "",
-      "improvements": [
-        "CASCADE deletion on all 8 User relations exceeds spec's REFERENCES-only for GDPR Article 17 (schema.prisma:44,55,83,100-101,117,136,150-151,167)",
-        "All 5 GDPR rights enumerated vs spec's focus only on erasure (privacy/page.tsx:158-174)",
-        "Data export API beyond spec's requirements (api/account/export/route.ts:6-70)",
-        "OAuth consent with explicit prompt='consent' and access_type='offline' (auth.config.ts:44-45)",
-        "Privacy policy includes GDPR contact commitment: 'respond within 30 days as required by law' (privacy:185)"
-      ],
+      "improvements": [],
       "regressions": [],
-      "issues_found": [
-        "https://github.com/kazimurtaza/prunebox/issues/92"
-      ]
-    },
-    {
-      "id": "A12",
-      "name": "Section 11: Development timeline and budget",
-      "category": "spec",
-      "spec_sections": [
-        "11"
-      ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [
-        "Self-hosted deployment option via /deploy page with Docker Compose instructions (README:26-60)",
-        "CASA Tier 2/3 costs and verification timeline documented (README:145-167)",
-        "MVP monolithic architecture implemented matching spec Phase 1 (lines 347-356)",
-        "Production Docker configuration (docker-compose.production.yml)"
-      ],
-      "regressions": [],
-      "issues_found": [
-        "https://github.com/kazimurtaza/prunebox/issues/102"
-      ]
+      "issues_found": []
     }
   ]
 }
