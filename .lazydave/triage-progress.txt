@@ -1,3 +1,7 @@
 # Lazydave v2 — Triage Progress Log
 [2026-04-22 17:44:49] Triaged 10 issues
 [2026-04-22 20:46:54] Triaged 7 issues
+[2026-04-24 22:34:56] Triaged 5 issues
+[2026-04-24 22:36:21] Triaged 4 issues
+[2026-04-24 22:53:46] [triage] Triaged user-decision issues: #102 approved (fix-spec - pricing -> open-source), #130/#92/#86 deferred awaiting user decision
+[2026-04-24 22:52:11] Triaged 4 issues
