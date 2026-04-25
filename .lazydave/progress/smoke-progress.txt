@@ -1,2 +1,28 @@
 [2026-04-23 08:34:43] [verified] smoke batch verified (2 items: V8,V12,)
 [2026-04-23 10:03:02] smoke batch verified (2 items: V8,V12,)
+[2026-04-23 10:03:53] [verified] V9: NextAuth configuration is valid - MINOR: DEV_MODE_ENABLED not documented in .env.example
+[2026-04-23 10:05:06] smoke batch verified (2 items: V1,V2,)
+[2026-04-23 10:06:24] [verified] V15: UI components compile without errors - All 20 shadcn/ui components properly exported and TypeScript compiles without errors
+[2026-04-23 10:06:59] [verified] smoke batch verified (1 items: V14,)
+[2026-04-23 10:07:38] [verified] smoke batch verified (3 items: V4,V5,V13,)
+[2026-04-23 10:13:40] [verified] smoke batch verified (2 items: V6,V7,)
+[2026-04-23 10:14:11] smoke batch verified (1 items: V16,)
+[2026-04-23 10:14:30] smoke batch verified (4 items: V16,V10,V11,V3,)
+[2026-04-23 10:16:29] audit verified A1 - Section 8: Gmail API technical architecture - PASSED with improvements
+[2026-04-23 10:19:XX] [verified] smoke batch verified (5 items: V8,V12,V20,V21,V22,)
+[2026-04-23 10:27:45] [verified] smoke batch verified (1 items: V9,)
+[2026-04-23 10:27:14] [verified] smoke batch verified (2 items: V1,V2,)
+[2026-04-23 10:26:38] [verified] smoke batch verified (1 items: V18,)
+[2026-04-23 10:28:57] [verified] V15 - UI components compile without errors
+[2026-04-23 10:29:11] [verified] database batch (V4, V5, V13)
+[2026-04-23 10:29:18] [verified] database batch verified (3 items: V4, V5, V13)
+[2026-04-23 10:29:26] [verified] security batch verified (2 items: V10, V11)
+[2026-04-23 10:29:39] [verified] tests + regression batch verified (2 items: V3, VR.119)
+[2026-04-23 10:29:47] [verified] queues + webhook batch verified (3 items: V16, V17, V19)
+[2026-04-23 10:34:48] [verified] docker batch verified (2 items: V6, V7)
+[2026-04-23 10:35:14] [verified] pages batch verified (4 items: V14, V23, V24, V25)
+[2026-04-23 10:35:25] [completed] ALL smoke checks verified (26/26)
+[2026-04-24 18:58:17] [verified] smoke batch verified (10 items: V8,V12,V20,V21,V22,V26,V27,V28,V29,V30,)
+[2026-04-24 18:59:XX] [verified] V31: Account delete endpoint removes all user data - Verified src/app/api/account/delete/route.ts: POST endpoint cascades deletion of all user data (Account, Session, Subscription, SubscriptionPreference, UnsubscriptionAttempt, BulkDeletionJob, GmailSyncState, RollupSettings, User), returns correct response {success: true, message}
+[2026-04-24 19:12:XX] [verified] smoke batch verified (14 items: V9,V32,V1,V2,V4,V5,V13,V3,V10,V11,V6,V7,V16,V17,V18,V19,VR.119,V14,V15,V23,V24,V25,)
+[2026-04-24 19:12:00] [completed] ALL smoke checks verified (33/33)
