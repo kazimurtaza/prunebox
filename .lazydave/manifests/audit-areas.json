@@ -9,9 +9,17 @@
       "spec_sections": [
         "8"
       ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [],
+      "status": "passed",
+      "notes": "Verified Section 8 (Gmail API technical architecture). All required OAuth scopes implemented: gmail.readonly, gmail.modify, gmail.labels, gmail.send (auth.config.ts:47-55). Bulk deletion uses batchDelete API with 1000 ID chunks as specified (client.ts:304-323). Token refresh persistence exceeds spec with automatic database updates on refresh (client.ts:69-128). Rate limit handling with exponential backoff for 429 errors (client.ts:240-252, 407-421). History API for incremental sync fully implemented (client.ts:366-446). InvalidTokenError class for graceful token revocation handling. Performance optimization: optional gmailClient parameter to avoid client churn. Security: header sanitization in sendEmail (client.ts:338-339).",
+      "improvements": [
+        "Token refresh persistence to database with automatic updates on token refresh (spec only mentioned storing tokens)",
+        "Rate limit handling with exponential backoff retry logic (spec only documented limits, no handling strategy)",
+        "History API implementation for incremental sync (not mentioned in Section 8)",
+        "InvalidTokenError custom error class for graceful handling of revoked tokens",
+        "Optional gmailClient parameter to avoid per-message client churn (performance optimization)",
+        "Safe email sending with header sanitization to prevent injection attacks",
+        "Message headers normalization to key-value object for easier access"
+      ],
       "regressions": [],
       "issues_found": []
     },
@@ -22,11 +30,25 @@
       "spec_sections": [
         "9"
       ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [],
-      "regressions": [],
-      "issues_found": []
+      "status": "issues-found",
+      "notes": "Verified Section 9 (Detecting subscription emails). Core detection algorithm implemented: List-Unsubscribe header (RFC 2369) with 95 confidence, RFC 8058 one-click with 100 confidence (detection.ts:25-58), List-Id header with 90 confidence (60-77), Precedence header (bulk/list/junk) with 75 confidence (79-97), 39 sender patterns vs 5 in spec (119-177), 19 ESP domains vs 3 in spec (179-217). Parse functions: extractEmailBody for multipart messages (253-291), parseBodyForUnsubscribeLink with spam filtering (297-336), parseMailtoUnsubscribe for mailto links (341-355), parseSender with lowercase normalization (227-247). REGRESSION: Gmail category detection missing - spec requires checking category:promotions and category:updates (spec line 87-88) but code doesn't check message.labelIds for CATEGORY_PROMOTIONS/CATEGORY_UPDATES.",
+      "improvements": [
+        "Auto-Submitted header detection (99-117) - RFC 3834 standard not in spec's algorithm",
+        "39 sender patterns vs 5 in spec (newsletter@, noreply@, marketing@, updates@, plus 35 more: news@, digest@, notifications@, etc.)",
+        "ESP domain detection for 19 providers (Mailchimp, SendGrid, Substack, ConstantContact, Campaign Monitor, ConvertKit, Revue, Beehiiv, Sendinblue/Brevo, AWeber, ActiveCampaign, iContact, Emm.tf, MailerLite)",
+        "extractEmailBody() parses message body (HTML/plain text) with nested part handling for unsubscribe URLs",
+        "parseBodyForUnsubscribeLink() with spam phrase filtering (buy now, winner, urgent) and UTM parameter cleaning",
+        "parseMailtoUnsubscribe() extracts subject/body from mailto links for proper unsubscription emails",
+        "parseSender() normalizes emails to lowercase to prevent duplicate subscription groups",
+        "Confidence scoring more granular than spec (60-100 range with 60=auto-submitted, 65=ESP, 70=newsletter, 75=precedence, 90=list-id, 95=list-unsubscribe, 100=one-click vs binary true/false)",
+        "RFC 8058 one-click detection with List-Unsubscribe-Post header check (spec mentioned but algorithm didn't include)"
+      ],
+      "regressions": [
+        "Gmail category detection not implemented - spec explicitly lists checking for category:promotions and category:updates (spec line 87-88) as secondary detection signal, but detectSubscription() only receives headers parameter and doesn't check message.labelIds for CATEGORY_PROMOTIONS/CATEGORY_UPDATES labels"
+      ],
+      "issues_found": [
+        "https://github.com/kazimurtaza/prunebox/issues/86"
+      ]
     },
     {
       "id": "A3",
@@ -35,11 +57,27 @@
       "spec_sections": [
         "10"
       ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [],
-      "regressions": [],
-      "issues_found": []
+      "status": "issues-found",
+      "notes": "Verified Section 10 (Automated unsubscription). RFC 8058 one-click implemented correctly with POST request, Content-Type header, and body 'List-Unsubscribe=One-Click' (unsubscribe.ts:13-39). Mailto unsubscribe implemented with parseMailtoUnsubscribe() extracting to/subject/body (detection.ts:341-355, unsubscribe.ts:44-65). HTTP unsubscribe with redirect detection (unsubscribe.ts:71-110) - detects 300-399 redirects but marks as manual. parseBodyForUnsubscribeLink() for fallback when no List-Unsubscribe header (detection.ts:297-336) with spam phrase filtering and URL validation. Error handling reports broken/expired links. REGRESSIONS: No CAPTCHA detection (spec line 126 requires flagging), no headless browser for confirmation pages (spec line 124 notes 'may require headless browser'). Covered by issue #130.",
+      "improvements": [
+        "Spam phrase filtering in parseBodyForUnsubscribeLink() to avoid malicious URLs (detection.ts:307-321) - 'buy now', 'winner', 'urgent' etc.",
+        "URL validation with new URL() catch block prevents invalid URLs from being returned (detection.ts:324-329)",
+        "UTM parameter cleaning from URLs to avoid tracking parameters (detection.ts:317)",
+        "UnsubscriptionAttempt model tracks all attempts with status/error for audit trail (jobs.ts:352-359) - spec only mentioned reporting failure",
+        "90-day data retention cleanup for unsubscription attempts (jobs.ts:333-338) - privacy feature not in spec",
+        "Token refresh handling during unsubscription jobs via database fetch (jobs.ts:458-470) - spec didn't address token staleness",
+        "Comprehensive error messages distinguishing token errors from unsub failures (jobs.ts:400-412) - better UX than spec's 'report failure'",
+        "Safe email sending with header sanitization for mailto unsubscribe (client.ts:338-339) - security improvement",
+        "attemptUnsubscribe() supports all four methods: one_click, mailto, http, manual (unsubscribe.ts:115-148) - cleaner architecture than spec's implied approach",
+        "runUnsubscribe() skips unsubscription if method='none' with specific error message (jobs.ts:366-375) - graceful degradation"
+      ],
+      "regressions": [
+        "No CAPTCHA detection - spec Section 10 line 126 requires 'CAPTCHA protection → flag for manual user action', code accepts HTTP success (200/204/ok) without verifying actual unsubscription occurred (unsubscribe.ts:23-24, 94-96)",
+        "No headless browser for HTTP confirmation pages - spec line 124 notes 'HTTP unsubscribe shows confirmation page → may require headless browser', code returns 'manual action' message for redirects without attempting browser automation (unsubscribe.ts:83-89 comment acknowledges this)"
+      ],
+      "issues_found": [
+        "https://github.com/kazimurtaza/prunebox/issues/130"
+      ]
     },
     {
       "id": "A4",
@@ -48,9 +86,16 @@
       "spec_sections": [
         "11"
       ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [],
+      "status": "passed",
+      "notes": "Verified Section 11 (Database schema). All 6 required tables implemented: subscriptions, subscription_preferences, gmail_sync_state, unsubscription_attempts, bulk_deletion_jobs, rollup_settings. Schema verified against prisma/schema.prisma and prisma/migrations/20250422000000_init/migration.sql. All foreign keys have CASCADE deletes (migration.sql:205-233). DeliverySlot enum correctly defined (migration.sql:4-5, schema.prisma:122-126). Field type mapping: spec VARCHAR(320) → Prisma @db.VarChar(320) for senderEmail (schema.prisma:71, migration.sql:59), BIGINT for historyId (schema.prisma:110, migration.sql:92).",
+      "improvements": [
+        "Prisma cuid() for IDs instead of UUID v4 (schema.prisma:12,69,93,108,129,142,158) - more scalable, avoids monotonically increasing IDs that can cause index hotspots",
+        "Cascade delete behavior (onDelete: Cascade) on all 8 foreign key relations (schema.prisma:44,55,83,100,101,117,136,151) - spec didn't specify cascade behavior, code ensures automatic cleanup",
+        "Additional indexes beyond spec: Subscription.index([userId, lastSeenAt]) (schema.prisma:89), UnsubscriptionAttempt.index([status]) (schema.prisma:154), BulkDeletionJob.index([userId, status]) (schema.prisma:169)",
+        "User model extends spec with emailVerified field from NextAuth.js requirements (schema.prisma:14, migration.sql:11)",
+        "CamelCase field names (senderEmail, unsubscribeMethod) matching JavaScript conventions vs spec's snake_case - better code consistency",
+        "historyId nullable (BigInt?) in GmailSyncState (schema.prisma:110) vs required BIGINT in spec - more defensive for new users before first sync"
+      ],
       "regressions": [],
       "issues_found": []
     },
@@ -61,9 +106,15 @@
       "spec_sections": [
         "13"
       ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [],
+      "status": "passed",
+      "notes": "Verified Section 13 (Product Architecture). All Phase 1 requirements implemented: Next.js 15+ with App Router, shadcn/ui + TailwindCSS, NextAuth.js v5, PostgreSQL + Prisma, BullMQ + Redis, googleapis. Workers use lazy-loading pattern within Next.js rather than separate services (pragmatic choice for smaller deployments). Five queues implemented vs three in spec (adds history-monitor for incremental sync, bulk-delete for cleanup operations).",
+      "improvements": [
+        "Custom DashboardSkeleton implementation instead of shadcn/ui skeleton component (src/app/dashboard/page.tsx:119)",
+        "BullMQ workers run within Next.js app using lazy-loading pattern (src/modules/queues/queues.ts) - more flexible than separate services for smaller deployments",
+        "Additional history-monitor queue for incremental sync (src/modules/queues/queues.ts:69-77) - spec only mentioned email-scan, unsubscribe, rollup",
+        "Queue configuration with exponential backoff retry logic and automatic cleanup (src/modules/queues/queues.ts:7-21)",
+        "Five queues implemented: email-scan, unsubscribe, bulk-delete, rollup-digest, history-monitor (src/modules/queues/queues.ts)"
+      ],
       "regressions": [],
       "issues_found": []
     },
@@ -74,9 +125,19 @@
       "spec_sections": [
         "2"
       ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [],
+      "status": "passed",
+      "notes": "Verified Section 2 (Unroll.me feature comparison). How It Works page (src/app/how-it-works/page.tsx:123-175) contains comprehensive 'True Unsubscription vs Filtering' comparison section explicitly contrasting Prunebox vs Unroll.me. Landing page (src/app/page.tsx:98-106) includes 'Better than Unroll.me' section. README.md line 3 positions as 'better alternative to Unroll.me'. Implementation addresses all key spec points: Unroll.me's filtering-only approach (line 11-12), Uber scandal/data selling (lines 25-30), subscription detection explanation (lines 21-22), and user complaints (lines 32-38). How It Works page lines 89-121 explains detection algorithm with high/medium confidence signals matching spec. Privacy-first positioning throughout.",
+      "improvements": [
+        "How It Works page provides user-facing Prunebox vs Unroll.me comparison with visual card layout (not in spec - spec was background research)",
+        "True Unsubscription vs Filtering section explicitly lists Unroll.me flaws (filtering only, subscriptions remain active, disconnecting floods inbox, sells data)",
+        "How We Detect Email Groups section explains algorithm to users with high/medium confidence signals (spec only documented detection for implementation)",
+        "Landing page 'Better than Unroll.me' section directly addresses Uber scandal (page.tsx:98-106)",
+        "Privacy guarantee section with Shield icon, no-data-selling pledge, Google Limited Use disclosure (how-it-works:177-195)",
+        "Rollup customization exceeds Unroll.me: 3 delivery slots vs 1, 14 timezones vs single, customizable digest name",
+        "Subscription list advanced filtering (high/low confidence, has unsubscribe, search by sender) exceeds Unroll.me capabilities",
+        "Confidence scoring system (0-100) for detection transparency not mentioned in Unroll.me spec",
+        "Bulk selection with checkboxes and select all functionality addresses spec complaint about Unroll.me (line 36)"
+      ],
       "regressions": [],
       "issues_found": []
     },
@@ -87,9 +148,107 @@
       "spec_sections": [
         "12"
       ],
-      "status": "pending",
-      "notes": "",
-      "improvements": [],
+      "status": "issues-found",
+      "notes": "Verified Section 12 (Legal compliance requirements). All Google API Limited Use requirements implemented: no data selling (privacy:96), no advertising (privacy:97), no AI training (privacy:98), user data deletion enabled (settings:207-263, delete/route.ts:14-49). Privacy policy includes all required elements: data types (privacy:52-63), purpose (privacy:75-83), storage location (privacy:129), third parties (privacy:141-154), Limited Use disclosure (privacy:39-43). GDPR compliance: 72-hour breach notification explicitly stated (privacy:185), explicit consent via OAuth prompt:consent (auth.config.ts:44), right to erasure fully implemented with cascade deletion of all 8 tables. Only gaps are legal documentation (DPA, SCC) which are outside scope for self-hosted open-source model - covered by issue #92.",
+      "improvements": [
+        "Data export API (/api/account/export) implements GDPR right to data portability beyond spec requirement",
+        "Privacy policy explicitly documents 72-hour breach notification with GDPR Article 33 reference (privacy:185-188)",
+        "Account deletion cascades through all 8 related tables with explicit deletion order (delete/route.ts:14-49) - spec only requires 'enable user data deletion'",
+        "GDPR rights section in privacy policy (access, rectification, erasure, portability, objection) goes beyond minimal spec (privacy:158-175)",
+        "Settings Privacy tab includes Google Limited Use disclosure for in-app transparency (settings:151-154)",
+        "Data export includes all user data: user profile, subscriptions, preferences, rollupSettings, syncState",
+        "Explicit opt-in consent via OAuth prompt:consent parameter (auth.config.ts:44) - spec requires 'explicit and opt-in (not pre-checked boxes)'",
+        "Gmail access revocation warning in settings (settings:115-118) with 'Coming soon' for revoke button",
+        "Privacy policy footer links to Terms and Home pages (privacy:220-224) for easy navigation",
+        "Terms page includes GDPR compliance clause for EU users (terms:175-176)"
+      ],
+      "regressions": [],
+      "issues_found": [
+        "https://github.com/kazimurtaza/prunebox/issues/92"
+      ]
+    },
+    {
+      "id": "A8",
+      "category": "compliance",
+      "title": "Google verification process and timeline (Section 14)",
+      "spec_sections": [
+        "14"
+      ],
+      "status": "passed",
+      "notes": "Verified Section 14 (Google verification process and timeline). README.md lines 145-168 documents complete verification timeline: Brand verification (2-3 days), OAuth scope review (1-4 weeks), CASA Tier 2 assessment (1-3 weeks), Total 4-8 weeks minimum. CASA costs documented: Tier 2 ($500-1,000/year), Tier 3 ($4,500+/year), annual recertification required. Unverified consequences documented: 100 test user limit, 'Unverified app' warning, 7-day refresh token expiry. Privacy policy (/privacy) includes Google API Limited Use disclosure (line 39-42), all required elements: data types (headers, sender patterns), purpose (subscription management only), storage location/duration (PostgreSQL until account deletion), third parties (none for data use, Google OAuth for auth only), 72-hour breach notification. Terms page (/terms) exists with service description, user responsibilities, payment terms, liability limitations, governing law. OAuth scopes in auth.config.ts (lines 47-55) use full restricted scope URLs. DEPLOYMENT.md references verification requirements (line 42).",
+      "improvements": [
+        "Verification timeline and costs documented in README.md with spec-exact table format (README:145-168)",
+        "Privacy policy includes all required Google verification elements: data types (headers, sender patterns), purpose, storage, third parties, Limited Use disclosure (privacy:39-43, 88-103)",
+        "Terms of service page exists and is accessible at /terms with GDPR compliance clause (terms:175-176)",
+        "OAuth implementation uses prompt: consent + access_type: offline for refresh token acquisition required for production (auth.config.ts:43-45)",
+        "Token encryption documented for CASA security requirements (README:98, DEPLOYMENT.md:62)"
+      ],
+      "regressions": [],
+      "issues_found": []
+    },
+    {
+      "id": "A9",
+      "category": "planning",
+      "title": "Development timeline and budget (Section 15)",
+      "spec_sections": [
+        "15"
+      ],
+      "status": "issues-found",
+      "notes": "Spec Section 15 (lines 373-399) defines development timeline, compliance budget ($7,500-21,000 first year), and pricing tiers (Annual: $24.99/year, Monthly: $4.99/month, Lifetime: $59-79, Free tier: 10 unsubscribes). Codebase has COMPLETELY DIFFERENT business model: self-hostable open-source with NO pricing implementation. Evidence: README.md:5 'You can self-host your own instance', /pricing page linked in nav (how-it-works/page.tsx:47) does not exist, no Stripe/payment infrastructure, no pricing tables in Prisma schema, '10 free bulk deletions' claimed (how-it-works/page.tsx:200) but NOT enforced in code (bulk/route.ts only has technical limit of 100 per batch, no per-user quota tracking). Terms page mentions 'Free tier' and 'Paid tier' (terms/page.tsx:106-107) but no implementation exists. This is a SPEC GAP - spec assumes commercial SaaS, code implements open-source self-host. Existing issue #102 captures this drift as user-decision.",
+      "improvements": [
+        "Core functionality ahead of spec timeline - all major features (scan, unsubscribe, rollup, bulk delete) implemented across Weeks 1-8 phases",
+        "Rollup implementation exceeds spec - supports multiple delivery slots (MORNING/AFTERNOON/EVENING, 14 timezones) vs spec's single delivery time mentioned elsewhere",
+        "Self-host open-source model addresses competitive gap mentioned in spec Section 6 (no competitor offers self-hosting option)",
+        "Docker deployment documentation (README.md:26-50, DEPLOYMENT.md) exceeds spec requirements for production readiness"
+      ],
+      "regressions": [
+        "Missing /pricing page - broken navigation link (how-it-works/page.tsx:47 links to non-existent page)",
+        "'10 free bulk deletions' marketing claim not enforced - bulk/route.ts:71-72,99-100 only limits 100 per batch technically, no per-user quota tracking database column or logic",
+        "Terms page references non-existent 'Free tier' and 'Paid tier' (terms/page.tsx:106-107) - confusing UX for self-host model",
+        "No usage metrics tracking - spec's free tier '10 unsubscribes' cannot be enforced without BulkDeletionJob usage aggregation"
+      ],
+      "issues_found": [
+        "https://github.com/kazimurtaza/prunebox/issues/102"
+      ]
+    },
+    {
+      "id": "A10",
+      "category": "spec",
+      "title": "Section 6: Competitive landscape and pricing strategy",
+      "spec_sections": [
+        "6"
+      ],
+      "status": "issues-found",
+      "notes": "Verified Section 6 (Competitive landscape and pricing strategy). Spec provides market research: feature comparison matrix (Clean Email $29.99/yr, Leave Me Alone, SaneBox $59-299/yr, Unroll.me free), market gaps (GDPR right to be forgotten, mobile-native, mass deletion, business features). Codebase has docs/CLEANEMAIL_COMPARISON.md with comprehensive 566-line competitor analysis. README.md:3, page.tsx:99-106, how-it-works/page.tsx:152 mention Unroll.me comparison. Fundamentally different business model: spec assumes commercial SaaS with pricing tiers, code implements self-host open-source. Issue #102 captures this SPEC GAP as user-decision.",
+      "improvements": [
+        "Comprehensive CleanEmail comparison document (566 lines) covering feature parity, roadmap, implementation plans - exceeds spec research-only approach (docs/CLEANEMAIL_COMPARISON.md)",
+        "Self-host open-source model addresses competitive gap mentioned in spec line 150 (no competitor offers self-hosting option)",
+        "Open-source code provides auditability advantage not available to any competitor (comparison.md:443-447)",
+        "Zero subscription fees for self-hosted users vs all competitors charging $19-299/yr (comparison.md:433-451)",
+        "GDPR right to be forgotten (account deletion cascades all 8 tables) implements market gap from spec line 148"
+      ],
+      "regressions": [],
+      "issues_found": [
+        "https://github.com/kazimurtaza/prunebox/issues/102"
+      ]
+    },
+    {
+      "id": "A11",
+      "category": "spec",
+      "title": "Section 7: Node.js technical implementation architecture",
+      "spec_sections": [
+        "7"
+      ],
+      "status": "passed",
+      "notes": "Verified Section 7 (Node.js technical implementation architecture). All spec-required technologies implemented: Next.js 15+ (package.json:49), shadcn/ui + TailwindCSS (Radix UI components:28-41, tailwindcss:69), NextAuth.js v5 (50), PostgreSQL + Prisma (prisma/schema.prisma:6-8), BullMQ + Redis (42, ioredis:47), googleapis (46). Critical OAuth params implemented: prompt:consent (auth.config.ts:44), access_type:offline (45). Background job architecture matches spec: email-scan, unsubscribe, rollup queues (queues.ts:23-27) plus bulk-delete, history-monitor. Email monitoring: MVP manual scans implemented; history-monitor queue for incremental sync (queues.ts:142-154) vs spec's future polling/push options.",
+      "improvements": [
+        "Additional bulk-delete queue beyond spec's three queues (queues.ts:25-26) - spec only mentioned email-scan, unsubscribe, rollup",
+        "History-monitor queue for incremental sync (queues.ts:69-77) - spec only documented future polling/push approaches as options",
+        "Lazy-loading pattern for queue instances (queues.ts:23-27) prevents Redis connections during Next.js build - pragmatic improvement over direct instantiation",
+        "Queue configuration with exponential backoff retry logic and automatic cleanup (queues.ts:7-21) - spec only showed basic queue creation",
+        "Timezone-aware rollup scheduling with getUtcHourFromLocal helper (queues.ts:115-128) - spec showed hardcoded cron pattern",
+        "initializeHistoryMonitoringForAllUsers startup function (queues.ts:171-195) for automatic user monitoring - not mentioned in spec"
+      ],
       "regressions": [],
       "issues_found": []
     }
