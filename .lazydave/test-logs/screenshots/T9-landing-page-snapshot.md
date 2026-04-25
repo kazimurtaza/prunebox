@@ -1,0 +1,13 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]
+    - main [ref=e17]:
+      - generic [ref=e18]
+      - generic [ref=e29]
+      - generic [ref=e50]
+    - contentinfo [ref=e53]:
+      - generic [ref=e54]
+  - region "Notifications (F8)":
+    - list
+  - alert [ref=e58]

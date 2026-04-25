@@ -1,0 +1,157 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "Prunebox" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img [ref=e6]
+          - generic [ref=e9]: Prunebox
+        - navigation [ref=e10]:
+          - link "Sign In" [ref=e11] [cursor=pointer]:
+            - /url: /auth/signin
+            - button "Sign In" [ref=e12]
+          - button "Toggle theme" [ref=e13] [cursor=pointer]:
+            - img
+            - img
+            - generic [ref=e14]: Toggle theme
+    - main [ref=e15]:
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - img [ref=e19]
+          - heading "Privacy Policy" [level=1] [ref=e21]
+          - paragraph [ref=e22]: "Your privacy is our priority. Last updated: 4/20/2026"
+        - generic [ref=e24]:
+          - heading "Google API Limited Use Disclosure" [level=2] [ref=e25]
+          - paragraph [ref=e26]: The use of information received from Gmail APIs will adhere to Google's User Data Policy, including the Limited Use requirements.
+        - generic [ref=e28]:
+          - heading "Data We Collect" [level=2] [ref=e29]:
+            - img [ref=e30]
+            - text: Data We Collect
+          - generic [ref=e33]:
+            - paragraph [ref=e34]: "We only collect the minimum data necessary to provide our email group management service:"
+            - list [ref=e35]:
+              - listitem [ref=e36]:
+                - strong [ref=e37]: "Email headers:"
+                - text: Subject, sender, date, and List-Unsubscribe headers
+              - listitem [ref=e38]:
+                - strong [ref=e39]: "Sender patterns:"
+                - text: Email addresses and domains to identify email groups
+              - listitem [ref=e40]:
+                - strong [ref=e41]: "Account information:"
+                - text: Your name and email address from Google OAuth
+            - paragraph [ref=e42]:
+              - strong [ref=e43]: "We do NOT store:"
+              - text: Email body content, attachments, or message content. We only scan headers to identify subscriptions.
+        - generic [ref=e45]:
+          - heading "How We Use Your Data" [level=2] [ref=e46]:
+            - img [ref=e47]
+            - text: How We Use Your Data
+          - generic [ref=e50]:
+            - paragraph [ref=e51]:
+              - text: Your data is used
+              - strong [ref=e52]: only
+              - text: "to provide the email group management service:"
+            - list [ref=e53]:
+              - listitem [ref=e54]: Scan your inbox to identify email subscriptions and groups
+              - listitem [ref=e55]: Display email groups in your dashboard
+              - listitem [ref=e56]: Execute bulk deletion or unsubscription requests you initiate
+              - listitem [ref=e57]: Send optional digest emails about your email groups
+        - generic [ref=e59]:
+          - heading "Google Limited Use Compliance" [level=2] [ref=e60]
+          - generic [ref=e61]:
+            - paragraph [ref=e62]: "Prunebox complies with Google's Limited Use requirements for Gmail API data:"
+            - list [ref=e63]:
+              - listitem [ref=e64]:
+                - strong [ref=e65]: "No data selling:"
+                - text: We never sell, rent, or share your data with third parties
+              - listitem [ref=e66]:
+                - strong [ref=e67]: "No advertising:"
+                - text: We do not use your data for advertising purposes
+              - listitem [ref=e68]:
+                - strong [ref=e69]: "No AI training:"
+                - text: We do not use your data to train non-personalized AI/ML models
+              - listitem [ref=e70]:
+                - strong [ref=e71]: "User control:"
+                - text: You can export or delete all your data at any time from Settings
+        - generic [ref=e73]:
+          - heading "Data Deletion" [level=2] [ref=e74]:
+            - img [ref=e75]
+            - text: Data Deletion
+          - generic [ref=e78]:
+            - paragraph [ref=e79]: "You have the right to delete all your data at any time:"
+            - list [ref=e80]:
+              - listitem [ref=e81]:
+                - text: Go to
+                - strong [ref=e82]: Settings → Privacy → Delete Account
+              - listitem [ref=e83]: This permanently removes all your data from our servers
+              - listitem [ref=e84]: Gmail access is also revoked via Google OAuth
+        - generic [ref=e86]:
+          - heading "Data Storage & Security" [level=2] [ref=e87]
+          - list [ref=e89]:
+            - listitem [ref=e90]:
+              - strong [ref=e91]: "Storage location:"
+              - text: Data is stored in secure PostgreSQL databases
+            - listitem [ref=e92]:
+              - strong [ref=e93]: "Encryption:"
+              - text: All data is encrypted at rest and in transit
+            - listitem [ref=e94]:
+              - strong [ref=e95]: "Retention:"
+              - text: Data is retained until you delete your account
+            - listitem [ref=e96]:
+              - strong [ref=e97]: "Access:"
+              - text: Only you can access your data via authenticated sessions
+        - generic [ref=e99]:
+          - heading "Third Parties" [level=2] [ref=e100]
+          - generic [ref=e101]:
+            - paragraph [ref=e102]: "We do not sell, rent, or share your data with third parties. The only third-party services we use are:"
+            - list [ref=e103]:
+              - listitem [ref=e104]:
+                - strong [ref=e105]: "Google OAuth:"
+                - text: For authentication and Gmail API access
+              - listitem [ref=e106]:
+                - strong [ref=e107]: "Vercel/PostgreSQL:"
+                - text: For hosting and database infrastructure
+            - paragraph [ref=e108]:
+              - strong [ref=e109]: "Important:"
+              - text: We do not use any analytics, tracking, or advertising services.
+        - generic [ref=e111]:
+          - heading "GDPR Rights (EU Users)" [level=2] [ref=e112]
+          - generic [ref=e113]:
+            - paragraph [ref=e114]: "If you are located in the EU, you have the following rights under GDPR:"
+            - list [ref=e115]:
+              - listitem [ref=e116]:
+                - strong [ref=e117]: "Right to access:"
+                - text: Request a copy of your data
+              - listitem [ref=e118]:
+                - strong [ref=e119]: "Right to rectification:"
+                - text: Correct inaccurate data
+              - listitem [ref=e120]:
+                - strong [ref=e121]: "Right to erasure:"
+                - text: Delete all your data
+              - listitem [ref=e122]:
+                - strong [ref=e123]: "Right to data portability:"
+                - text: Export your data
+              - listitem [ref=e124]:
+                - strong [ref=e125]: "Right to object:"
+                - text: Object to data processing
+            - paragraph [ref=e126]: To exercise these rights, please contact us or use the Delete Account feature in Settings.
+        - generic [ref=e128]:
+          - heading "Contact Us" [level=2] [ref=e129]
+          - generic [ref=e130]:
+            - paragraph [ref=e131]: If you have questions about this privacy policy or how we handle your data, please contact us.
+            - paragraph [ref=e132]: For GDPR inquiries, we will respond within 30 days as required by law.
+        - link "Back to Sign In" [ref=e134] [cursor=pointer]:
+          - /url: /auth/signin
+          - button "Back to Sign In" [ref=e135]
+    - contentinfo [ref=e136]:
+      - generic [ref=e137]:
+        - paragraph [ref=e138]: © 2026 Prunebox. Privacy-first email cleanup and grouping tool.
+        - generic [ref=e139]:
+          - link "Privacy Policy" [ref=e140] [cursor=pointer]:
+            - /url: /privacy
+          - generic [ref=e141]: •
+          - link "Home" [ref=e142] [cursor=pointer]:
+            - /url: /
+  - region "Notifications (F8)":
+    - list
+  - alert [ref=e143]
