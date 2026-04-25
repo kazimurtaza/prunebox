@@ -6,8 +6,8 @@
       "id": "T1",
       "category": "dashboard",
       "title": "Main dashboard layout with navigation",
-      "status": "pending",
-      "notes": "",
+      "status": "passed",
+      "notes": "DashboardLayout (src/app/dashboard/layout.tsx): Full-viewport bg-muted/30, header with bg-card border-b, Mail icon + 'Prunebox' logo (text-primary), DashboardNav responsive (desktop: hidden md:flex with gap-4, mobile: hamburger menu with overlay). User avatar (h-8 w-8) with fallback, ghost variant Sign Out button. Main container with mx-auto px-4 py-6. Auth protection via redirect to /auth/signin. Design tokens: primary emerald, proper border, card surfaces.",
       "skill": null,
       "agent": null
     },
@@ -15,8 +15,8 @@
       "id": "T2",
       "category": "dashboard",
       "title": "Subscription list display with sender names and email counts",
-      "status": "pending",
-      "notes": "",
+      "status": "passed",
+      "notes": "SubscriptionList (src/components/subscriptions/subscription-list.tsx): Search input with Search icon (absolute left-3), filter buttons (All, High/Low Confidence, Has Unsubscribe), sort Select with ArrowUpDown icon. Subscription cards: Checkbox, expandable Chevron, senderName (font-semibold), senderEmail (text-muted-foreground), badges (email count, confidence %, can unsubscribe). Empty state with Mail icon. Resizable list (drag handle with GripHorizontal), pagination (Load More button). Mobile responsive: h-12 px-4 buttons, collapsible filters. Design tokens verified.",
       "skill": null,
       "agent": null
     },
@@ -24,8 +24,8 @@
       "id": "T3",
       "category": "dashboard",
       "title": "Scan button with progress indicator during email scanning",
-      "status": "pending",
-      "notes": "",
+      "status": "passed",
+      "notes": "ScanButton (src/components/dashboard/scan-button.tsx): Primary button with Scan icon (idle) or RefreshCw animate-spin (scanning). Progress display: 'Scanning {scanProgress}/{scanTotal}'. Rate limit countdown with 'Retry in {s}s'. DropdownMenu with Quick/Complete Scan options, Reset & Clear All (destructive with Trash2 icon). Polling every 2s via /api/scan/status. Toast notifications for completion/failure (destructive variant on error). Rounded-l-none/r-none styling for button group. Design tokens: primary, destructive proper.",
       "skill": null,
       "agent": null
     },
@@ -33,8 +33,8 @@
       "id": "T4",
       "category": "dashboard",
       "title": "Subscription action buttons (keep, unsubscribe, rollup)",
-      "status": "pending",
-      "notes": "",
+      "status": "passed",
+      "notes": "Action buttons in SubscriptionList: Desktop (hidden sm:flex gap-2): Delete (destructive, Trash icon), Rollup (secondary/outline toggle, Layers icon), Unsubscribe (secondary/outline toggle, MailX icon). Mobile (sm:hidden): MoreVertical dropdown with same actions. Bulk actions: Delete All (destructive, Trash icon), Unsubscribe (outline, Trash2 icon). Button sizes: h-8 px-3 for card actions, h-12 px-4 for mobile. Disabled state during processing (processingSenderEmails). Design tokens: destructive red, proper icon sizing.",
       "skill": null,
       "agent": null
     },
@@ -42,8 +42,8 @@
       "id": "T5",
       "category": "rollup",
       "title": "Rollup digest configuration dialog",
-      "status": "pending",
-      "notes": "",
+      "status": "passed",
+      "notes": "ConfigureRollupDialog (src/components/dashboard/configure-rollup-dialog.tsx): Dialog with Settings2 icon trigger (outline variant), DialogContent sm:max-w-[425px]. Form controls: Enable Rollup Switch, Digest Name Input placeholder 'My Daily Rollup', Delivery Time RadioGroup (3 slots: Morning 8:00, Afternoon 2:00, Evening 8:00 PM), Timezone Select (13 common zones). Loading state: Loader2 spinner centered py-8 with 'Loading...' on save button. Error display: bg-destructive/10 p-3 rounded-md. Design tokens verified: primary emerald 160 84% 32%, destructive 0 84.2% 60.2%, proper Label/Switch spacing. Code verification complete.",
       "skill": null,
       "agent": null
     },
@@ -51,8 +51,8 @@
       "id": "T6",
       "category": "settings",
       "title": "Settings page with account and preferences",
-      "status": "pending",
-      "notes": "",
+      "status": "passed",
+      "notes": "Settings page (src/app/dashboard/settings/page.tsx): Layout max-w-4xl mx-auto space-y-6, header with text-3xl font-bold heading + text-muted-foreground description, ThemeToggle top-right. Responsive grid md:grid-cols-4 gap-6 for sidebar + content. Sidebar navigation with ghost variant Buttons (User, Bell, Shield icons), active state text-primary bg-primary/10. Account tab: Profile Card with disabled Inputs (name/email from session), Gmail Access Card with text-destructive title + bg-destructive/10 warning box. Notifications: Coming soon placeholder. Privacy tab: Google API disclosure (bg-primary/5 border-primary/20), Data Export (Download icon + Loader2 spinner), Delete Account (destructive AlertDialog with Trash2). Design tokens verified: primary emerald 160 84% 32%, destructive 0 84.2% 60.2%, proper spacing and card surfaces. Code verification complete.",
       "skill": null,
       "agent": null
     },
@@ -60,8 +60,8 @@
       "id": "T7",
       "category": "auth",
       "title": "Google OAuth sign-in flow",
-      "status": "pending",
-      "notes": "",
+      "status": "passed",
+      "notes": "Sign-in page with centered Card layout (bg-card, max-w-md, p-8, rounded-xl shadow-lg), Mail icon in primary color circle (bg-primary/10 h-16 w-16), 'Welcome to Prunebox' heading (text-2xl font-bold), subtitle (text-muted-foreground), 'Continue with Google' button with official Google logo (svg, w-5 h-5), ThemeToggle in top-right, legal footer with Privacy/Terms links (underline hover:text-foreground), Google API Limited Use disclosure (bg-primary/5 border-primary/20). Error handling via URL error param with toast notifications (destructive variant). Design tokens verified: primary emerald 160 84% 32%, bg-card, text-muted-foreground, proper spacing. Screenshot: .lazydave/test-logs/screenshots/T7-google-oauth-signin-flow.png",
       "skill": null,
       "agent": null
     },
@@ -69,8 +69,8 @@
       "id": "T8",
       "category": "theme",
       "title": "Dark/light theme toggle",
-      "status": "pending",
-      "notes": "",
+      "status": "passed",
+      "notes": "ThemeToggle component (src/components/theme-toggle.tsx) verified on landing and sign-in pages. Uses next-themes with class-based toggling (attribute='class', defaultTheme='dark', enableSystem). Light mode CSS vars: primary 160 84% 32% (#1F7D53 emerald), background 0 0% 100% (white), foreground 100 50% 10%. Dark mode CSS vars: primary 160 84% 39% (brighter emerald), background 220 14% 6% (dark blue), card 220 14% 10%. Icon animation: Sun (rotate-0 scale-100) transitions to Moon (rotate-90 scale-0), with smooth rotate/scale transitions. Theme persists to localStorage. Button styling: ghost variant, h-9 w-9 p-0, sr-only label. Verified via browser evaluation at http://localhost:3001.",
       "skill": null,
       "agent": null
     },
@@ -78,6 +78,98 @@
       "id": "T9",
       "category": "landing",
       "title": "Landing page with product description",
+      "status": "passed",
+      "notes": "Landing page (src/app/page.tsx): Gradient background (from-background via-background to-muted), header (bg-background/80 backdrop-blur-sm border-b) with logo (Mail icon h-6 w-6 text-primary + 'Prunebox' text-xl font-bold), nav (Self-Host ghost, Sign In, ThemeToggle). Hero: privacy badge (Shield bg-primary/10 rounded-full), gradient headline 'Take Back Control...' (bg-clip-text text-transparent from-primary to-foreground, text-5xl md:text-6xl font-bold), subtitle (text-xl text-muted-foreground), CTA buttons (Get Started Free with Zap, Self-Host outline). Feature cards: responsive grid (md:grid-cols-2 lg:grid-cols-3), each bg-card p-8 rounded-xl shadow-sm border, icon squares (Bulk Deletion: Trash2 bg-destructive/10, Smart Grouping: Mail bg-primary/10, True Unsubscribe: Shield bg-muted). Comparison section: 'Better than Unroll.me' (bg-muted/30 border). Footer (border-t bg-background/80, text-sm text-muted-foreground). Design tokens verified: primary emerald rgb(16,183,127), card rgb(22,24,29), Inter font. Screenshot: .lazydave/test-logs/screenshots/T9-landing-page.png",
+      "skill": null,
+      "agent": null
+    },
+    {
+      "id": "T10",
+      "category": "rollup",
+      "name": "Rollup digest email content and format",
+      "status": "passed",
+      "notes": "runRollup job (src/modules/queues/jobs.ts:588-663): Generates plain text digest email. Subject: 'Your Prunebox Subscription Digest ({n} subscriptions)'. Body format: Header with count, numbered list (1. Sender Name (email) + Unsubscribe URL/mailto if available), footer with '---' separator and management link (https://prunebox.app/dashboard). Subscriptions sorted alphabetically by senderName. Sent via sendEmail() to user's Gmail using stored access_token. Rollup page displays subscriptions in Card with avatar circles (h-10 w-10 bg-primary/10), empty state with Mail icon, Delivery schedule Card (Clock/Calendar icons), Quick actions (Send Test Digest, Disable Rollup destructive). Code verification complete.",
+      "skill": null,
+      "agent": null
+    },
+    {
+      "id": "T11",
+      "category": "dashboard",
+      "name": "Subscription list item states (hover, loading, error, empty)",
+      "status": "passed",
+      "notes": "List item states verified: Hover (hover:bg-accent/50 transition-all), Selected (ring-2 ring-primary). Loading state: animate-spin border-b-2 border-primary with 'Loading email groups...' text (text-muted-foreground). Empty state: Mail icon h-12 w-12 text-muted-foreground, centered in Card with py-12. Processing overlay: absolute inset-0 bg-background/80 backdrop-blur-sm with spinner. Card expansion: ChevronDown/ChevronUp toggle, recent subjects with loading spinner. Error state: Toast with destructive variant. All states use proper design tokens.",
+      "skill": null,
+      "agent": null
+    },
+    {
+      "id": "T12",
+      "category": "settings",
+      "name": "Settings page sections and navigation",
+      "status": "passed",
+      "notes": "Settings navigation (src/app/dashboard/settings/page.tsx): Sidebar with 3 tabs - Account (User icon), Notifications (Bell icon), Privacy (Shield icon). Active tab styling: text-primary bg-primary/10 font-medium, inactive: text-muted-foreground. Full-width ghost variant Buttons with justify-start and icon (mr-2 h-4 w-4). Tab content area: md:grid-cols-3 space-y-6. Account section: Profile Information Card (2-column grid for name/email, disabled Inputs), Gmail Access Card (destructive title with warning box). Notifications section: Single Card with 'Coming soon' placeholder. Privacy section: Card with Google API Limited Use disclosure, Separator, Data Collection row with Download button, Delete Account row with destructive AlertDialog. Responsive: flex-col on mobile, grid on desktop. Code verification complete.",
+      "skill": null,
+      "agent": null
+    },
+    {
+      "id": "T13",
+      "category": "auth",
+      "name": "OAuth callback page with success/error states",
+      "status": "passed",
+      "notes": "Callback page at /auth/callback/page.tsx returns null (intentional) - NextAuth handles actual OAuth callback at /api/auth/[...nextauth]/route.ts. Success state: Redirects to /dashboard after successful authentication. Error states: Redirects to /auth/signin with error parameter (OAuthAccountNotLinked, OAuthCallbackError, AccessDenied, Configuration), triggers toast notification with specific error messages. No visual callback page needed - handled by NextAuth session management. Design verified: Error toasts use destructive variant with proper title/description. Auth config includes signIn callback preventing account linking between different Google accounts.",
+      "skill": null,
+      "agent": null
+    },
+    {
+      "id": "T14",
+      "category": "legal",
+      "name": "Terms of Service page layout and readability",
+      "status": "issues-found",
+      "notes": "Source file exists at src/app/terms/page.tsx with proper structure (Card layout, FileText/Sale/CreditCard/AlertTriangle icons, sections: Service Description, User Responsibilities, Payment, Cancellation, Liability, Governing Law). However, http://localhost:3001/terms returns 404 - appears to be a Next.js build/route issue. Privacy page at /privacy works correctly, suggesting terms route was not included in build. Requires rebuild or route investigation. Code design tokens verified: primary emerald, destructive red, proper spacing.",
+      "skill": null,
+      "agent": null,
+      "issues_found": ["BUG: /terms route returns 404 despite source file existing at src/app/terms/page.tsx"],
+      "existing_issues_referenced": ["https://github.com/kazimurtaza/prunebox/issues/131"]
+    },
+    {
+      "id": "T15",
+      "category": "legal",
+      "name": "Privacy policy page completeness",
+      "status": "passed",
+      "notes": "Privacy page renders successfully at http://localhost:3001/privacy. Complete Card-based layout with Shield icon hero, Google API Limited Use Disclosure (border-2 Card, bg-primary/5 border-primary/20), Data We Collect (Eye icon), How We Use Data (Lock icon), Google Limited Use Compliance (4 items: no data selling, no advertising, no AI training, user control), Data Deletion (Trash2 destructive icon), Data Storage & Security, Third Parties, GDPR Rights (5 rights listed), Contact Us. Design tokens: primary emerald, destructive red, muted-foreground text. Footer with Privacy/Terms/Home links. Screenshot evidence in T15-privacy-snapshot.md. PASSED.",
+      "skill": null,
+      "agent": null
+    },
+    {
+      "id": "T16",
+      "category": "auth",
+      "name": "Auth error page displays OAuth error messages",
+      "status": "passed",
+      "notes": "Error messages handled via URL error param on sign-in page (/auth/signin). useEffect hook detects error parameter and triggers toast notification (destructive variant). Specific error messages for: OAuthAccountNotLinked ('Account Not Linked'), OAuthCallbackError ('Authentication Failed'), AccessDenied ('Access Denied'), Configuration ('Configuration Error'), Default ('Authentication Error'). Error parameter cleared from URL after toast display using window.history.replaceState. Code verified in src/app/auth/signin/page.tsx lines 17-57. Design tokens: destructive variant toast, proper title/description structure.",
+      "skill": null,
+      "agent": null
+    },
+    {
+      "id": "T17",
+      "category": "dashboard",
+      "name": "Rollup digest page displays subscriptions and schedule",
+      "status": "pending",
+      "notes": "",
+      "skill": null,
+      "agent": null
+    },
+    {
+      "id": "T18",
+      "category": "auth",
+      "name": "Dev mode sign-in page with loading spinner",
+      "status": "pending",
+      "notes": "",
+      "skill": null,
+      "agent": null
+    },
+    {
+      "id": "T19",
+      "category": "settings",
+      "name": "Settings data export button and download functionality",
       "status": "pending",
       "notes": "",
       "skill": null,
