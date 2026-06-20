@@ -149,7 +149,7 @@ export async function withErrorHandling(
     logger.error('Unhandled error in API route:', error);
 
     // Handle Prisma errors
-    if (error && typeof error === 'object' && 'code' in error) {
+    if (error && typeof error === 'object' && 'code' in error && typeof (error as { code: unknown }).code === 'string') {
       const prismaError = error as { code: string; meta?: { target?: string[] } };
 
       // Unique constraint violation

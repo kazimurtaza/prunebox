@@ -65,52 +65,61 @@ export function createOAuth2Client(
       return;
     }
 
-    try {
-      // Import db dynamically to avoid circular dependencies in worker context
-      const { db } = await import('@/lib/db');
+    // Import db dynamically to avoid circular dependencies in worker context
+    const { db } = await import('@/lib/db');
 
-      // Find the Google account for this user
-      const account = await db.account.findFirst({
-        where: {
-          userId,
-          provider: 'google',
-        },
-      });
+    // Retry DB persistence up to 3 times — in-memory token stays valid either way
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        // Find the Google account for this user
+        const account = await db.account.findFirst({
+          where: {
+            userId,
+            provider: 'google',
+          },
+        });
 
-      if (!account) {
-        logger.warn(`No Google account found for userId ${userId} - cannot persist tokens`);
-        return;
+        if (!account) {
+          logger.warn(`No Google account found for userId ${userId} - cannot persist tokens`);
+          return;
+        }
+
+        // Prepare update data
+        const updateData: {
+          access_token?: string;
+          refresh_token?: string | null;
+          expires_at?: number;
+        } = {};
+
+        if (tokens.access_token) {
+          updateData.access_token = tokens.access_token;
+          // Calculate expires_at (1 hour from now for Google tokens)
+          updateData.expires_at = Math.floor(Date.now() / 1000) + 3600;
+          logger.info(`Persisting new access token for user ${userId}`);
+        }
+
+        if (tokens.refresh_token) {
+          updateData.refresh_token = tokens.refresh_token;
+          logger.info(`Persisting new refresh token for user ${userId}`);
+        }
+
+        // Update the account with new tokens
+        await db.account.update({
+          where: { id: account.id },
+          data: updateData,
+        });
+
+        logger.debug(`Successfully persisted tokens for user ${userId}`);
+        return; // Success — exit retry loop
+      } catch (error) {
+        logger.error(`Failed to persist refreshed tokens for user ${userId} (attempt ${attempt}/3):`, error);
+        if (attempt < 3) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
       }
-
-      // Prepare update data
-      const updateData: {
-        access_token?: string;
-        refresh_token?: string | null;
-        expires_at?: number;
-      } = {};
-
-      if (tokens.access_token) {
-        updateData.access_token = tokens.access_token;
-        // Calculate expires_at (1 hour from now for Google tokens)
-        updateData.expires_at = Math.floor(Date.now() / 1000) + 3600;
-        logger.info(`Persisting new access token for user ${userId}`);
-      }
-
-      if (tokens.refresh_token) {
-        updateData.refresh_token = tokens.refresh_token;
-        logger.info(`Persisting new refresh token for user ${userId}`);
-      }
-
-      // Update the account with new tokens
-      await db.account.update({
-        where: { id: account.id },
-        data: updateData,
-      });
-
-      logger.debug(`Successfully persisted tokens for user ${userId}`);
-    } catch (error) {
-      logger.error(`Failed to persist refreshed tokens for user ${userId}:`, error);
     }
+
+    logger.error(`Failed to persist refreshed tokens for user ${userId} after 3 attempts — in-memory token is still valid for current operations`);
   });
 
   return oauth2Client;
@@ -133,11 +142,12 @@ export async function createGmailClient(
   } catch (error) {
     // Check for invalid_grant error - token expired/revoked
     const err = error as { code?: number; message?: string };
+    const msg = (err?.message || '').toLowerCase();
     if (err?.code === 401 ||
-        err?.message?.includes('invalid_grant') ||
-        err?.message?.includes('invalid_credentials') ||
-        err?.message?.includes('Token has been expired') ||
-        err?.message?.includes('access_token expired')) {
+        msg.includes('invalid_grant') ||
+        msg.includes('invalid_credentials') ||
+        msg.includes('token has been expired') ||
+        msg.includes('access_token expired')) {
       logger.error(`Invalid Google token for user ${userId}: token has been revoked or expired`);
       throw new InvalidTokenError('Google access token is invalid or has been revoked. Please reconnect your account.');
     }

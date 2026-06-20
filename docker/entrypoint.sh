@@ -56,15 +56,30 @@ chown -R postgres:postgres /var/lib/postgresql/data 2>/dev/null || true
 echo "🔄 Starting PostgreSQL temporarily for schema setup..."
 su-exec postgres pg_ctl -D /var/lib/postgresql/data -l /var/lib/postgresql/logfile start 2>/dev/null || true
 
-# Wait for PostgreSQL to be ready
-for i in 1 2 3 4 5 6 7 8 9 10; do
-    if su-exec postgres pg_isready -q 2>/dev/null; then
-        echo "✅ PostgreSQL is ready"
-        break
+# Wait for PostgreSQL to be ready (up to 60 seconds for slow home hardware)
+timeout=60
+elapsed=0
+while ! su-exec postgres pg_isready -q 2>/dev/null; do
+    if [ $elapsed -ge $timeout ]; then
+        echo "❌ PostgreSQL failed to start within ${timeout}s"
+        exit 1
     fi
-    echo "⏳ Waiting for PostgreSQL... ($i/10)"
-    sleep 1
+    echo "⏳ Waiting for PostgreSQL... (${elapsed}/${timeout}s)"
+    sleep 2
+    elapsed=$((elapsed + 2))
 done
+echo "✅ PostgreSQL is ready"
+
+# Auto-sync DATABASE_URL with POSTGRES_PASSWORD to prevent mismatch
+if [ -n "$POSTGRES_PASSWORD" ] && [ -n "$DATABASE_URL" ]; then
+    current_pass=$(echo "$DATABASE_URL" | sed -n 's|.*://[^:]*:\(.*\)@[^@]*$|\1|p')
+    if [ "$current_pass" != "$POSTGRES_PASSWORD" ]; then
+        export DATABASE_URL="postgresql://prunebox:${POSTGRES_PASSWORD}@localhost:5432/prunebox"
+        echo "🔧 Auto-synced DATABASE_URL with POSTGRES_PASSWORD"
+    fi
+elif [ -n "$POSTGRES_PASSWORD" ]; then
+    export DATABASE_URL="postgresql://prunebox:${POSTGRES_PASSWORD}@localhost:5432/prunebox"
+fi
 
 # Run Prisma migrations if DATABASE_URL is set
 if [ -n "$DATABASE_URL" ]; then
@@ -96,5 +111,5 @@ sleep 2
 
 echo "🎯 Starting all services with supervisord..."
 
-# Start supervisord
+# Start supervisord (handles SIGTERM for graceful shutdown via stopasgroup)
 exec supervisord -c /etc/supervisord.conf

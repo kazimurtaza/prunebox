@@ -4,22 +4,7 @@ import { db } from '@/lib/db';
 import { ApiErrorResponse, withErrorHandling } from '@/lib/errors';
 import { Prisma } from '@prisma/client';
 import type { Subscription } from '@prisma/client';
-
-// Define the subscription action type
-type SubscriptionAction = 'keep' | 'unsubscribe' | 'rollup';
-
-// Response type for subscriptions API
-interface SubscriptionResponse {
-  id: string;
-  senderEmail: string;
-  senderName: string | null;
-  messageCount: number;
-  recentSubject: string | null;
-  lastSeenAt: string;
-  confidenceScore: number;
-  listUnsubscribeHeader: string | null;
-  action?: SubscriptionAction;
-}
+import type { Subscription as SubscriptionResponse, SubscriptionAction } from '@/types/subscription';
 
 export async function GET(request: Request) {
   return withErrorHandling(async () => {

@@ -454,6 +454,10 @@ export async function runBulkDelete(data: BulkDeleteJobData) {
     let accessToken = account.access_token;
     let refreshToken = account.refresh_token ?? undefined;
 
+    if (!accessToken || accessToken.trim().length === 0) {
+      throw new Error('Google access token is empty or invalid — please reconnect your account');
+    }
+
     // Build a broader search query to catch all sender variants
     // Gmail search supports multiple from: patterns with OR
     const domain = senderEmail.includes('@') ? senderEmail.split('@')[1] : senderEmail;

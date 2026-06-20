@@ -55,6 +55,9 @@ logs/
 /cleanup_*.ts
 /logs*.txt
 
+# Claude Code
+CLAUDE.md
+
 # Git worktrees
 .worktrees/
 worktrees/

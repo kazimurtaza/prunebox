@@ -1,6 +1,6 @@
 import { db } from '@/lib/db';
 
-export async function getUserTokens(userId: string) {
+export async function getUserTokens(userId: string): Promise<{ accessToken: string | null; refreshToken: string | null } | null> {
   const account = await db.account.findFirst({
     where: { userId, provider: 'google' },
   });
@@ -10,7 +10,7 @@ export async function getUserTokens(userId: string) {
   }
 
   return {
-    accessToken: account.access_token || null,
-    refreshToken: account.refresh_token || null,
+    accessToken: account.access_token ?? null,
+    refreshToken: account.refresh_token ?? null,
   };
 }

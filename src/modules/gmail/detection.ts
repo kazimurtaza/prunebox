@@ -130,7 +130,7 @@ export function detectSubscription(headers: Record<string, string>): Subscriptio
   }
 
   // 6. Check domain patterns (email service providers)
-  const fromDomain = from.split('@')[1]?.toLowerCase() || '';
+  const fromDomain = from.includes('@') ? from.split('@')[1]!.toLowerCase() : '';
   const espDomains = [
     '.mailchimp.com',
     '.sendgrid.net',

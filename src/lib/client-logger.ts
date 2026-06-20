@@ -24,7 +24,7 @@ export function clientError(
 
   if (error instanceof Error) {
     errorDetails.error = error.message;
-    if (error.stack) {
+    if (error.stack && process.env.NODE_ENV !== 'production') {
       errorDetails.stack = error.stack;
     }
   } else if (error !== undefined) {
