@@ -4,6 +4,11 @@ import Credentials from 'next-auth/providers/credentials';
 import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 
+// Note: env var validation is intentionally NOT done at module/import scope.
+// Next.js evaluates server modules during `next build` (page data collection),
+// which would crash on missing vars. Missing credentials surface naturally at
+// runtime when Google OAuth is attempted.
+
 export const authConfig: NextAuthConfig = {
   providers: [
     // Development-only credentials provider for testing

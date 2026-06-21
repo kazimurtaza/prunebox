@@ -36,7 +36,21 @@ export function ScanButton({ initialStatus, onScanComplete }: ScanButtonProps) {
     const [isResetting, setIsResetting] = useState(false);
     const { toast } = useToast();
     const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const consecutiveErrors = useRef(0);
+    const pollingInProgress = useRef(false);
     const isInitialized = useRef(false);
+
+    // Stop polling and reset scan state
+    const stopPolling = useCallback(() => {
+        if (pollingIntervalRef.current !== null) {
+            clearInterval(pollingIntervalRef.current);
+            pollingIntervalRef.current = null;
+        }
+        setStatus('idle');
+        setScanProgress(0);
+        setScanTotal(0);
+        consecutiveErrors.current = 0;
+    }, []);
 
     // Clean up polling on unmount
     useEffect(() => {
@@ -65,25 +79,25 @@ export function ScanButton({ initialStatus, onScanComplete }: ScanButtonProps) {
 
     // Start polling for scan status
     const startPolling = useCallback(() => {
-        if (pollingIntervalRef.current !== null) {
-            clearInterval(pollingIntervalRef.current);
-        }
+        stopPolling();
+        pollingInProgress.current = false;
 
         pollingIntervalRef.current = setInterval(async () => {
+            // Prevent overlapping async callbacks
+            if (pollingInProgress.current) return;
+            pollingInProgress.current = true;
+
             try {
                 const response = await fetch('/api/scan/status');
                 if (response.ok) {
+                    consecutiveErrors.current = 0;
                     const data = await response.json();
                     setScanProgress(data.scanProgress || 0);
                     setScanTotal(data.scanTotal || 0);
 
                     if (data.scanStatus === 'idle' || data.scanStatus === 'completed') {
                         // Scan completed
-                        if (pollingIntervalRef.current !== null) {
-                            clearInterval(pollingIntervalRef.current);
-                            pollingIntervalRef.current = null;
-                        }
-                        setStatus('idle');
+                        stopPolling();
                         if (onScanComplete) {
                             onScanComplete();
                         }
@@ -92,12 +106,8 @@ export function ScanButton({ initialStatus, onScanComplete }: ScanButtonProps) {
                             description: `Finished scanning ${data.scanTotal || 0} emails.`,
                         });
                     } else if (data.scanStatus === 'error') {
-                        // Scan failed - check for specific error message
-                        if (pollingIntervalRef.current !== null) {
-                            clearInterval(pollingIntervalRef.current);
-                            pollingIntervalRef.current = null;
-                        }
-                        setStatus('idle');
+                        // Scan failed
+                        stopPolling();
                         const errorMsg = (data as { errorMessage?: string }).errorMessage;
                         toast({
                             title: "Scan failed",
@@ -106,12 +116,34 @@ export function ScanButton({ initialStatus, onScanComplete }: ScanButtonProps) {
                         });
                     }
                     // If still 'scanning', continue polling
+                } else {
+                    // Non-OK response (500, 401, etc.) — treat as an error
+                    consecutiveErrors.current++;
+                    if (consecutiveErrors.current >= 5) {
+                        stopPolling();
+                        toast({
+                            title: "Connection lost",
+                            description: `Server returned ${response.status} — check if the app is running and try again.`,
+                            variant: "destructive",
+                        });
+                    }
                 }
             } catch {
-                // Keep polling on network errors
+                // Network-level error (server unreachable)
+                consecutiveErrors.current++;
+                if (consecutiveErrors.current >= 5) {
+                    stopPolling();
+                    toast({
+                        title: "Connection lost",
+                        description: "Could not reach the server — check if the app is running and try again.",
+                        variant: "destructive",
+                    });
+                }
+            } finally {
+                pollingInProgress.current = false;
             }
         }, 2000); // Check every 2 seconds
-    }, [onScanComplete, toast]);
+    }, [onScanComplete, toast, stopPolling]);
 
     // Fetch initial scan status on mount (handles browser restart scenario)
     useEffect(() => {
@@ -174,9 +206,14 @@ export function ScanButton({ initialStatus, onScanComplete }: ScanButtonProps) {
                 // Start polling for completion
                 startPolling();
             } else {
-                const error = await response.json();
+                let errorData: { error?: { message?: string; code?: string } } = {};
+                try {
+                    errorData = await response.json();
+                } catch {
+                    // Non-JSON response body (e.g. 502 HTML from proxy)
+                }
                 // Check for rate limit error
-                if (response.status === 429 || error?.error?.code === 'TOO_MANY_REQUESTS') {
+                if (response.status === 429 || errorData?.error?.code === 'TOO_MANY_REQUESTS') {
                     setRetryAfter(60);
                     toast({
                         title: "Rate limit exceeded",
@@ -186,7 +223,7 @@ export function ScanButton({ initialStatus, onScanComplete }: ScanButtonProps) {
                 } else {
                     toast({
                         title: "Scan failed",
-                        description: error.error?.message || "Could not start scan",
+                        description: errorData.error?.message || `Server error (${response.status})`,
                         variant: "destructive",
                     });
                 }
@@ -221,10 +258,15 @@ export function ScanButton({ initialStatus, onScanComplete }: ScanButtonProps) {
                     onScanComplete();
                 }
             } else {
-                const error = await response.json();
+                let errorData: { error?: { message?: string } } = {};
+                try {
+                    errorData = await response.json();
+                } catch {
+                    // Non-JSON response body (e.g. 502 HTML from proxy)
+                }
                 toast({
                     title: "Reset failed",
-                    description: error.error || "Could not reset data",
+                    description: errorData.error?.message || `Server error (${response.status})`,
                     variant: "destructive",
                 });
             }

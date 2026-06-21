@@ -56,6 +56,10 @@ logs/
 /logs*.txt
 .playwright-mcp/
 
+# Claude Code
+CLAUDE.md
+.claude/
+
 # Git worktrees
 .worktrees/
 worktrees/

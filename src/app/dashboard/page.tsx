@@ -1,20 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { SubscriptionList } from '@/components/subscriptions/subscription-list';
 import { ScanButton } from '@/components/dashboard/scan-button';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { clientError } from '@/lib/client-logger';
-import type { Subscription } from '@/components/subscriptions/subscription-list';
+import type { Subscription } from '@/types/subscription';
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -22,31 +25,52 @@ export default function DashboardPage() {
     }
   }, [status, router]);
 
-  useEffect(() => {
-    if (session?.user) {
-      fetchData();
-    }
-  }, [session]);
+  const fetchData = useCallback(async () => {
+    // Abort any previous fetch
+    if (abortRef.current) abortRef.current.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
-  const fetchData = async () => {
     try {
-      const subsResponse = await fetch('/api/subscriptions');
+      const subsResponse = await fetch('/api/subscriptions', { signal: controller.signal });
 
       if (subsResponse.ok) {
         const data = await subsResponse.json();
         setSubscriptions(data.subscriptions);
+        setError(null);
       }
-    } catch (error) {
-      clientError('Failed to fetch dashboard data', error);
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      clientError('Failed to fetch dashboard data', err);
+      setError('Failed to load your email groups. Please try again.');
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) setLoading(false);
     }
-  };
+  }, []);
+
+  // Fetch on mount when session is available
+  useEffect(() => {
+    if (session?.user) {
+      fetchData();
+    }
+    return () => {
+      if (abortRef.current) abortRef.current.abort();
+    };
+  }, [session, fetchData]);
 
   // Handle subscription updates from child components
   const handleSubscriptionsUpdate = (newSubscriptions: Subscription[]) => {
     setSubscriptions(newSubscriptions);
   };
+
+  if (error && !loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 gap-4">
+        <p className="text-muted-foreground">{error}</p>
+        <Button variant="outline" onClick={fetchData}>Try Again</Button>
+      </div>
+    );
+  }
 
   if (status === 'loading' || loading) {
     return <DashboardSkeleton />;

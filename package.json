@@ -64,7 +64,7 @@
     "autoprefixer": "^10.4.20",
     "eslint": "^9",
     "eslint-config-next": "^15.1.0",
-    "postcss": "^8.4.49",
+    "postcss": "^8.5.10",
     "prisma": "^7.7.0",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.2",
@@ -72,6 +72,11 @@
     "vitest": "^4.1.4"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
+  },
+  "overrides": {
+    "uuid": "^11.1.1",
+    "postcss": "^8.5.10",
+    "@hono/node-server": "^1.19.13"
   }
 }

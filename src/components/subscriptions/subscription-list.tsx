@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { clientError } from "@/lib/client-logger";
+import type { Subscription } from "@/types/subscription";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,18 +33,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
-export interface Subscription {
-  id: string;
-  senderEmail: string;
-  senderName: string;
-  messageCount: number;
-  recentSubject: string;
-  lastSeenAt: string;
-  confidenceScore: number;
-  listUnsubscribeHeader?: string | null;
-  action?: "keep" | "unsubscribe" | "rollup";
-}
 
 interface SubscriptionListProps {
   userId: string;
@@ -152,6 +141,11 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
   }, [listHeight]);
 
   // Handle resize start
+  const resizeHandlersRef = useRef<{
+    handleMove: (e: MouseEvent | TouchEvent) => void;
+    handleEnd: () => void;
+  } | null>(null);
+
   const handleResizeStart = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     setIsResizing(true);
@@ -172,13 +166,28 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
       document.removeEventListener('mouseup', handleEnd);
       document.removeEventListener('touchmove', handleMove);
       document.removeEventListener('touchend', handleEnd);
+      resizeHandlersRef.current = null;
     };
 
+    resizeHandlersRef.current = { handleMove, handleEnd };
     document.addEventListener('mousemove', handleMove);
     document.addEventListener('mouseup', handleEnd);
     document.addEventListener('touchmove', handleMove);
     document.addEventListener('touchend', handleEnd);
   };
+
+  // Clean up resize listeners on unmount
+  useEffect(() => {
+    return () => {
+      if (resizeHandlersRef.current) {
+        const { handleMove, handleEnd } = resizeHandlersRef.current;
+        document.removeEventListener('mousemove', handleMove);
+        document.removeEventListener('mouseup', handleEnd);
+        document.removeEventListener('touchmove', handleMove);
+        document.removeEventListener('touchend', handleEnd);
+      }
+    };
+  }, []);
 
   // FIXED: Watch initialSubscriptions for changes (fixes post-scan empty page)
   useEffect(() => {
@@ -322,7 +331,7 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
     }
   };
 
-  const deleteFromSender = async (senderEmail: string, _senderName: string) => {
+  const deleteFromSender = async (senderEmail: string, _senderName: string | null) => {
     const sub = subscriptions.find((s) => s.senderEmail === senderEmail);
     setDeleteConfirm({
       open: true,
@@ -391,7 +400,7 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       result = result.filter((s) =>
-        s.senderName.toLowerCase().includes(query) ||
+        (s.senderName?.toLowerCase().includes(query) ?? false) ||
         s.senderEmail.toLowerCase().includes(query)
       );
     }
@@ -642,12 +651,21 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
             sortedSubscriptions.map((subscription) => (
               <Card
                 key={subscription.id}
+                tabIndex={0}
+                role="button"
+                aria-pressed={selectedIds.has(subscription.id)}
                 className={cn(
                   "cursor-pointer transition-all",
                   selectedIds.has(subscription.id) && "ring-2 ring-primary",
                   "hover:bg-accent/50"
                 )}
                 onClick={() => !processingSenderEmails.has(subscription.senderEmail) && toggleSelection(subscription.id)}
+                onKeyDown={(e) => {
+                  if ((e.key === 'Enter' || e.key === ' ') && !processingSenderEmails.has(subscription.senderEmail)) {
+                    e.preventDefault();
+                    toggleSelection(subscription.id);
+                  }
+                }}
               >
                 <CardContent className="p-3 sm:p-4">
                   <div className="flex items-start gap-3">
@@ -679,7 +697,7 @@ export function SubscriptionList({ userId: _userId, initialSubscriptions, onUpda
                           </button>
 
                           <h3 className="font-semibold truncate text-sm sm:text-base">
-                            {subscription.senderName}
+                            {subscription.senderName || subscription.senderEmail}
                           </h3>
 
                           {/* Mobile: more menu */}
